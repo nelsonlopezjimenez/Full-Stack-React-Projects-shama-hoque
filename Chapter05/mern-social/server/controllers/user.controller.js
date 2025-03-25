@@ -49,7 +49,7 @@ const list = (req, res) => {
       })
     }
     res.json(users)
-  }).select('name email updated created')
+  }).select('name email updated created photo hashed_password')
 }
 
 const update = (req, res, next) => {
