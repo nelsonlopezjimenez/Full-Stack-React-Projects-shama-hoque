@@ -1,5 +1,16 @@
 # MERN Social
 
+## Chapter 05: 3.25.2025
+
+1. Live demo still available, but I did not try.
+1. Some problems with ssl legacy version and other thinks
+1. going from 8.11 to 13.14 and back and forth again resolved the issues
+1. Today the first commit: added photo and hashed_password to the ouptut of /api/users get route
+1. Tested astro forms to do SSR server side rendering for now, but to add build and then add dynamic data. 
+1. Two fetch actions, one depending on the other it is not working
+1. /api/users get brings all data for unsigned account
+1. The only get route for the account pic needs the _id, but it cannot be extracted after the data is sent, so no way to call the second route to fetch photos
+
 ### [Live Demo](http://social.mernbook.com/ "MERN Social")
 
 #### What you need to run this code
