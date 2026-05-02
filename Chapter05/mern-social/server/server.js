@@ -2,12 +2,13 @@ import config from './../config/config'
 import app from './express'
 import mongoose from 'mongoose'
 
-// Connection URL
-mongoose.Promise = global.Promise
 mongoose.connect(config.mongoUri)
-mongoose.connection.on('error', () => {
-  throw new Error(`unable to connect to database: ${mongoUri}`)
-})
+  .then(() => {
+    console.info('Connected to MongoDB: ' + config.mongoUri)
+  })
+  .catch((err) => {
+    throw new Error(`Unable to connect to database: ${err.message}`)
+  })
 
 app.listen(config.port, (err) => {
   if (err) {

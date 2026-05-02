@@ -1,26 +1,29 @@
-import React, {Component} from 'react'
-import Card, { CardHeader, CardContent, CardActions } from 'material-ui/Card'
-import Button from 'material-ui/Button'
-import TextField from 'material-ui/TextField'
-import Typography from 'material-ui/Typography'
-import Avatar from 'material-ui/Avatar'
-import Icon from 'material-ui/Icon'
+﻿import React, { Component } from 'react'
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import CardActions from '@mui/material/CardActions'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import Avatar from '@mui/material/Avatar'
+import Icon from '@mui/material/Icon'
+import IconButton from '@mui/material/IconButton'
+import PhotoCamera from '@mui/icons-material/PhotoCamera'
 import PropTypes from 'prop-types'
-import {withStyles} from 'material-ui/styles'
-import {create} from './api-post.js'
+import { withStyles } from '@mui/material/styles'
+import { create } from './api-post.js'
 import auth from './../auth/auth-helper'
-import IconButton from 'material-ui/IconButton'
-import PhotoCamera from 'material-ui-icons/PhotoCamera'
 
 const styles = theme => ({
   root: {
     backgroundColor: '#efefef',
-    padding: `${theme.spacing.unit*3}px 0px 1px`
+    padding: `${theme.spacing(3)} 0px 1px`
   },
   card: {
-    maxWidth:600,
+    maxWidth: 600,
     margin: 'auto',
-    marginBottom: theme.spacing.unit*3,
+    marginBottom: theme.spacing(3),
     backgroundColor: 'rgba(65, 150, 136, 0.09)',
     boxShadow: 'none'
   },
@@ -41,14 +44,14 @@ const styles = theme => ({
     display: 'none',
   },
   textField: {
-    marginLeft: theme.spacing.unit*2,
-    marginRight: theme.spacing.unit*2,
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
     width: '90%'
   },
   submit: {
-    margin: theme.spacing.unit * 2
+    margin: theme.spacing(2)
   },
-  filename:{
+  filename: {
     verticalAlign: 'super'
   }
 })
@@ -63,68 +66,87 @@ class NewPost extends Component {
 
   componentDidMount = () => {
     this.postData = new FormData()
-    this.setState({user: auth.isAuthenticated().user})
+    this.setState({ user: auth.isAuthenticated().user })
   }
+
   clickPost = () => {
     const jwt = auth.isAuthenticated()
-    create({
-      userId: jwt.user._id
-    }, {
-      t: jwt.token
-    }, this.postData).then((data) => {
+    create(
+      { userId: jwt.user._id },
+      { t: jwt.token },
+      this.postData
+    ).then((data) => {
       if (data.error) {
-        this.setState({error: data.error})
+        this.setState({ error: data.error })
       } else {
-        this.setState({text:'', photo: ''})
+        this.setState({ text: '', photo: '' })
         this.props.addUpdate(data)
       }
     })
   }
+
   handleChange = name => event => {
-    const value = name === 'photo'
-      ? event.target.files[0]
-      : event.target.value
+    const value = name === 'photo' ? event.target.files[0] : event.target.value
     this.postData.set(name, value)
     this.setState({ [name]: value })
   }
+
   render() {
-    const {classes} = this.props
-    return (<div className={classes.root}>
-      <Card className={classes.card}>
-      <CardHeader
-            avatar={
-              <Avatar src={'/api/users/photo/'+this.state.user._id}/>
-            }
+    const { classes } = this.props
+    return (
+      <div className={classes.root}>
+        <Card className={classes.card}>
+          <CardHeader
+            avatar={<Avatar src={'/api/users/photo/' + this.state.user._id}/>}
             title={this.state.user.name}
             className={classes.cardHeader}
           />
-      <CardContent className={classes.cardContent}>
-        <TextField
-            placeholder="Share your thoughts ..."
-            multiline
-            rows="3"
-            value={this.state.text}
-            onChange={this.handleChange('text')}
-            className={classes.textField}
-            margin="normal"
-        />
-        <input accept="image/*" onChange={this.handleChange('photo')} className={classes.input} id="icon-button-file" type="file" />
-        <label htmlFor="icon-button-file">
-          <IconButton color="secondary" className={classes.photoButton} component="span">
-            <PhotoCamera />
-          </IconButton>
-        </label> <span className={classes.filename}>{this.state.photo ? this.state.photo.name : ''}</span>
-        { this.state.error && (<Typography component="p" color="error">
-            <Icon color="error" className={classes.error}>error</Icon>
-              {this.state.error}
-            </Typography>)
-        }
-      </CardContent>
-      <CardActions>
-        <Button color="primary" variant="raised" disabled={this.state.text === ''} onClick={this.clickPost} className={classes.submit}>POST</Button>
-      </CardActions>
-    </Card>
-  </div>)
+          <CardContent className={classes.cardContent}>
+            <TextField
+              placeholder="Share your thoughts ..."
+              multiline
+              rows={3}
+              value={this.state.text}
+              onChange={this.handleChange('text')}
+              className={classes.textField}
+              margin="normal"
+            />
+            <input
+              accept="image/*"
+              onChange={this.handleChange('photo')}
+              className={classes.input}
+              id="icon-button-file"
+              type="file"
+            />
+            <label htmlFor="icon-button-file">
+              <IconButton color="secondary" className={classes.photoButton} component="span">
+                <PhotoCamera/>
+              </IconButton>
+            </label>
+            <span className={classes.filename}>
+              {this.state.photo ? this.state.photo.name : ''}
+            </span>
+            {this.state.error && (
+              <Typography component="p" color="error">
+                <Icon color="error" className={classes.error}>error</Icon>
+                {this.state.error}
+              </Typography>
+            )}
+          </CardContent>
+          <CardActions>
+            <Button
+              color="primary"
+              variant="contained"
+              disabled={this.state.text === ''}
+              onClick={this.clickPost}
+              className={classes.submit}
+            >
+              POST
+            </Button>
+          </CardActions>
+        </Card>
+      </div>
+    )
   }
 }
 
@@ -134,3 +156,4 @@ NewPost.propTypes = {
 }
 
 export default withStyles(styles)(NewPost)
+

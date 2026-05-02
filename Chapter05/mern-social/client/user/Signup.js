@@ -1,52 +1,58 @@
-import React, {Component} from 'react'
-import Card, {CardActions, CardContent} from 'material-ui/Card'
-import Button from 'material-ui/Button'
-import TextField from 'material-ui/TextField'
-import Typography from 'material-ui/Typography'
-import Icon from 'material-ui/Icon'
+﻿import React, { Component } from 'react'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import Icon from '@mui/material/Icon'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 import PropTypes from 'prop-types'
-import {withStyles} from 'material-ui/styles'
-import {create} from './api-user.js'
-import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle} from 'material-ui/Dialog'
-import {Link} from 'react-router-dom'
+import { withStyles } from '@mui/material/styles'
+import { create } from './api-user.js'
+import { Link } from 'react-router-dom'
 
 const styles = theme => ({
   card: {
     maxWidth: 600,
     margin: 'auto',
     textAlign: 'center',
-    marginTop: theme.spacing.unit * 5,
-    paddingBottom: theme.spacing.unit * 2
+    marginTop: theme.spacing(5),
+    paddingBottom: theme.spacing(2)
   },
   error: {
     verticalAlign: 'middle'
   },
   title: {
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing(2),
     color: theme.palette.openTitle
   },
   textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
     width: 300
   },
   submit: {
     margin: 'auto',
-    marginBottom: theme.spacing.unit * 2
+    marginBottom: theme.spacing(2)
   }
 })
 
 class Signup extends Component {
   state = {
-      name: '',
-      password: '',
-      email: '',
-      open: false,
-      error: ''
+    name: '',
+    password: '',
+    email: '',
+    open: false,
+    error: ''
   }
 
   handleChange = name => event => {
-    this.setState({[name]: event.target.value})
+    this.setState({ [name]: event.target.value })
   }
 
   clickSubmit = () => {
@@ -57,50 +63,87 @@ class Signup extends Component {
     }
     create(user).then((data) => {
       if (data.error) {
-        this.setState({error: data.error})
+        this.setState({ error: data.error })
       } else {
-        this.setState({error: '', open: true})
+        this.setState({ error: '', open: true })
       }
     })
   }
 
   render() {
-    const {classes} = this.props
-    return (<div>
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography type="headline" component="h2" className={classes.title}>
-            Sign Up
-          </Typography>
-          <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal"/><br/>
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal"/><br/>
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal"/>
-          <br/> {
-            this.state.error && (<Typography component="p" color="error">
-              <Icon color="error" className={classes.error}>error</Icon>
-              {this.state.error}</Typography>)
-          }
-        </CardContent>
-        <CardActions>
-          <Button color="primary" variant="raised" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
-        </CardActions>
-      </Card>
-      <Dialog open={this.state.open} disableBackdropClick={true}>
-        <DialogTitle>New Account</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            New account successfully created.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Link to="/signin">
-            <Button color="primary" autoFocus="autoFocus" variant="raised">
-              Sign In
+    const { classes } = this.props
+    return (
+      <div>
+        <Card className={classes.card}>
+          <CardContent>
+            <Typography variant="h5" component="h2" className={classes.title}>
+              Sign Up
+            </Typography>
+            <TextField
+              id="name"
+              label="Name"
+              className={classes.textField}
+              value={this.state.name}
+              onChange={this.handleChange('name')}
+              margin="normal"
+            /><br/>
+            <TextField
+              id="email"
+              type="email"
+              label="Email"
+              className={classes.textField}
+              value={this.state.email}
+              onChange={this.handleChange('email')}
+              margin="normal"
+            /><br/>
+            <TextField
+              id="password"
+              type="password"
+              label="Password"
+              className={classes.textField}
+              value={this.state.password}
+              onChange={this.handleChange('password')}
+              margin="normal"
+            />
+            <br/>
+            {this.state.error && (
+              <Typography component="p" color="error">
+                <Icon color="error" className={classes.error}>error</Icon>
+                {this.state.error}
+              </Typography>
+            )}
+          </CardContent>
+          <CardActions>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={this.clickSubmit}
+              className={classes.submit}
+            >
+              Submit
             </Button>
-          </Link>
-        </DialogActions>
-      </Dialog>
-    </div>)
+          </CardActions>
+        </Card>
+        <Dialog
+          open={this.state.open}
+          onClose={(_, reason) => { if (reason !== 'backdropClick') this.setState({ open: false }) }}
+        >
+          <DialogTitle>New Account</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              New account successfully created.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Link to="/signin">
+              <Button color="primary" autoFocus variant="contained">
+                Sign In
+              </Button>
+            </Link>
+          </DialogActions>
+        </Dialog>
+      </div>
+    )
   }
 }
 
@@ -109,3 +152,4 @@ Signup.propTypes = {
 }
 
 export default withStyles(styles)(Signup)
+
