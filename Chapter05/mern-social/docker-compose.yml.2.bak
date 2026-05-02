@@ -1,0 +1,22 @@
+services:
+  mern-social:
+    image: mern-social-mern-social:latest
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - JWT_SECRET=your_secret_key
+      - MONGODB_URI=mongodb://mongo:27017/mernproject
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:8.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mern-social-data:/data/db
+
+volumes:
+  mern-social-data:
