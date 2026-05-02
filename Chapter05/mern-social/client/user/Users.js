@@ -1,30 +1,36 @@
-import React, {Component} from 'react'
+﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import {withStyles} from 'material-ui/styles'
-import Paper from 'material-ui/Paper'
-import List, {ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText} from 'material-ui/List'
-import Avatar from 'material-ui/Avatar'
-import IconButton from 'material-ui/IconButton'
-import Typography from 'material-ui/Typography'
-import ArrowForward from 'material-ui-icons/ArrowForward'
-import Person from 'material-ui-icons/Person'
-import {Link} from 'react-router-dom'
-import {list} from './api-user.js'
+import { withStyles } from '@mui/material/styles'
+import Paper from '@mui/material/Paper'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
+import ListItemText from '@mui/material/ListItemText'
+import Avatar from '@mui/material/Avatar'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+import ArrowForward from '@mui/icons-material/ArrowForward'
+import Person from '@mui/icons-material/Person'
+import { Link } from 'react-router-dom'
+import { list } from './api-user.js'
 
 const styles = theme => ({
-  root: theme.mixins.gutters({
-    padding: theme.spacing.unit,
-    margin: theme.spacing.unit * 5
-  }),
+  root: {
+    padding: theme.spacing(1),
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    margin: theme.spacing(5)
+  },
   title: {
-    margin: `${theme.spacing.unit * 4}px 0 ${theme.spacing.unit * 2}px`,
+    margin: `${theme.spacing(4)} 0 ${theme.spacing(2)}`,
     color: theme.palette.openTitle
   }
 })
 
 class Users extends Component {
   state = {
-      users: []
+    users: []
   }
 
   componentDidMount() {
@@ -32,37 +38,36 @@ class Users extends Component {
       if (data.error) {
         console.log(data.error)
       } else {
-        this.setState({users: data})
+        this.setState({ users: data })
       }
     })
   }
 
   render() {
-    const {classes} = this.props
+    const { classes } = this.props
     return (
       <Paper className={classes.root} elevation={4}>
-        <Typography type="title" className={classes.title}>
+        <Typography variant="h6" className={classes.title}>
           All Users
         </Typography>
         <List dense>
-         {this.state.users.map((item, i) => {
-          return <Link to={"/user/" + item._id} key={i}>
-                    <ListItem button>
-                      <ListItemAvatar>
-                        <Avatar>
-                          <Person/>
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary={item.name}/>
-                      <ListItemSecondaryAction>
-                      <IconButton>
-                          <ArrowForward/>
-                      </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                 </Link>
-               })
-             }
+          {this.state.users.map((item, i) => (
+            <Link to={'/user/' + item._id} key={i}>
+              <ListItem button>
+                <ListItemAvatar>
+                  <Avatar>
+                    <Person/>
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText primary={item.name}/>
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <ArrowForward/>
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            </Link>
+          ))}
         </List>
       </Paper>
     )
@@ -74,3 +79,4 @@ Users.propTypes = {
 }
 
 export default withStyles(styles)(Users)
+
