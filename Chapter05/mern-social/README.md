@@ -39,8 +39,66 @@ Claude assisted upgrading.
 
 ※ recap: Upgraded Chapter 5 mern-social from Node 8/React 16 era to modern stack — both webpack builds pass with zero errors. Next step is     
   installing MongoDB and running the dev server to verify the app works end-to-end. (disable recaps in /config)
+
                                                                                                                       
-                                                                                                                    
+### Remarkable errors
+```js
+ Error: Exit code 1
+      @ ./server/express.js 14:0-48 73:36-46                                                                                                   
+      @ ./server/server.js 2:0-28 9:0-10                                                                                                       
+                                                                                                                                               
+     ERROR in ./client/user/FindPeople.js 17:0-41                                                                                              
+     Module not found: Error: Can't resolve '@mui/styles' in                                                                                   
+     'C:\Users\usergolden26\Documents\_REPOs\Full-Stack-React-Projects-shama-hoque\Chapter05\mern-social\client\user'
+      @ ./client/core/Home.js 26:0-46 121:40-50                                                                                                
+      @ ./client/MainRouter.js 3:0-31 23:35-39                                                                                               
+      @ ./server/express.js 14:0-48 73:36-46                                                                                                   
+      @ ./server/server.js 2:0-28 9:0-10                                                                                                       
+                                                                                                                                               
+     … +31 lines (ctrl+o to expand)                                                                                                            
+                                                                                                                                               
+● @mui/styles needs to be @mui/material/styles. I need to fix all the withStyles imports:                                                      
+                                                                                                                                               
+● PowerShell(cd "C:\Users\usergolden26\Documents\_REPOs\Full-Stack-React-Projects-shama-hoque\Chapter05\mern-social"; Get-ChildItem -Recurse
+            -Include "*.js" client | Select-…)                                                                                                 
+  ⎿  (No output)
+                                                                                                                                               
+  Searched for 1 pattern (ctrl+o to expand)                                                                                                    
+                                                                                                                                               
+● PowerShell(cd "C:\Users\usergolden26\Documents\_REPOs\Full-Stack-React-Projects-shama-hoque\Chapter05\mern-social\client"; $files =
+            Get-ChildItem -Recurse -Include "*.js"…)                                                                                           
+  ⎿  Fixed 12 files                                                                                             
+                                                                                                                                               
+● Good. Now rebuild to check for remaining errors:                                                                                             
+                                                                                                                                               
+● PowerShell(cd "C:\Users\usergolden26\Documents\_REPOs\Full-Stack-React-Projects-shama-hoque\Chapter05\mern-social"; npx webpack              
+            --mode=development --config webpack.config.…)                                                                                      
+  ⎿  Error: Exit code 1                                                                                                                        
+     assets by status 171 KiB [cached] 2 assets                                                                                                
+     asset server.generated.js 335 KiB [emitted] (name: main)                                                                                  
+     runtime modules 970 bytes 5 modules                                                                                                       
+     javascript modules 182 KiB                                                                                                                
+       modules by path external "@mui/ 1.8 KiB                                                                                                 
+         modules by path external "@mui/material/ 1.35 KiB 33 modules                                                                          
+         modules by path external "@mui/icons-material/ 462 bytes 11 modules                                                                   
+       cacheable modules 179 KiB 39 modules                                                                                                    
+       modules by path external "@emotion/ 126 bytes                                                                                           
+     … +32 lines (ctrl+o to expand)                                                                                                            
+                                                                                                                                               
+● Just one remaining file — PostList.js still has an old material-ui/styles import:                                                            
+                                                                                                                                               
+  Read 1 file (ctrl+o to expand)                                                                                                               
+                                                                                                                                               
+● The withStyles import in PostList.js was unused in the original. Let me remove it:
+                                                                                                                                               
+● Write(client\post\PostList.js)                                                                                                               
+  ⎿  Added 7 lines, removed 7 lines                                                                                                            
+       1 -import React, {Component} from 'react'                                                                                               
+       1 +import React, { Component } from 'react'                                                                                             
+       2  import PropTypes from 'prop-types'                                                                                                   
+       3 -import {withStyles} from 'material-ui/styles'                                                                                        
+       3  import Post from './Post'                                                            ```
+
 ### TODO
 1. Run dev server
 1. Separate servers
