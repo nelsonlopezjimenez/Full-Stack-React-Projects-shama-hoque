@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
+import { withStyles } from '@mui/styles'
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
 import ImageList from '@mui/material/ImageList'

@@ -10,7 +10,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Navigate } from 'react-router-dom'
 import auth from './../auth/auth-helper'
-import { remove } from './api-user.js'
+import { remove } from './api-user.jsx'
 
 class DeleteUser extends Component {
   state = {

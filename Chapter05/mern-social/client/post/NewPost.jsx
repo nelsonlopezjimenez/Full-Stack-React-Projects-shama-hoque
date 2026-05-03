@@ -11,8 +11,8 @@ import Icon from '@mui/material/Icon'
 import IconButton from '@mui/material/IconButton'
 import PhotoCamera from '@mui/icons-material/PhotoCamera'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
-import { create } from './api-post.js'
+import { withStyles } from '@mui/styles'
+import { create } from './api-post.jsx'
 import auth from './../auth/auth-helper'
 
 const styles = theme => ({

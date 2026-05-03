@@ -7,9 +7,9 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import Icon from '@mui/material/Icon'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
+import { withStyles } from '@mui/styles'
 import auth from './../auth/auth-helper'
-import { signin } from './api-auth.js'
+import { signin } from './api-auth.jsx'
 import { withRouter } from './../withRouter'
 
 const styles = theme => ({

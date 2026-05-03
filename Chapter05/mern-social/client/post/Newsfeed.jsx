@@ -1,12 +1,12 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
+import { withStyles } from '@mui/styles'
 import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import auth from './../auth/auth-helper'
 import PostList from './PostList'
-import { listNewsFeed } from './api-post.js'
+import { listNewsFeed } from './api-post.jsx'
 import NewPost from './NewPost'
 
 const styles = theme => ({

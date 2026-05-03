@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
+import { withStyles } from '@mui/styles'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography'
 import Snackbar from '@mui/material/Snackbar'
 import ViewIcon from '@mui/icons-material/Visibility'
 import { Link } from 'react-router-dom'
-import { findPeople, follow } from './api-user.js'
+import { findPeople, follow } from './api-user.jsx'
 import auth from './../auth/auth-helper'
 
 const styles = theme => ({

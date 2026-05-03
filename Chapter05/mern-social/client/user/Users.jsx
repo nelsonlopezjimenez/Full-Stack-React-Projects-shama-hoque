@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
+import { withStyles } from '@mui/styles'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography'
 import ArrowForward from '@mui/icons-material/ArrowForward'
 import Person from '@mui/icons-material/Person'
 import { Link } from 'react-router-dom'
-import { list } from './api-user.js'
+import { list } from './api-user.jsx'
 
 const styles = theme => ({
   root: {

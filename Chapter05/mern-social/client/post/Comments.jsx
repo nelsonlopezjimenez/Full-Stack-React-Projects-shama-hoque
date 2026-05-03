@@ -5,8 +5,8 @@ import TextField from '@mui/material/TextField'
 import Avatar from '@mui/material/Avatar'
 import Icon from '@mui/material/Icon'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
-import { comment, uncomment } from './api-post.js'
+import { withStyles } from '@mui/styles'
+import { comment, uncomment } from './api-post.jsx'
 import { Link } from 'react-router-dom'
 
 const styles = theme => ({

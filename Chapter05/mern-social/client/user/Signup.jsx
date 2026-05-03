@@ -12,8 +12,8 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
-import { create } from './api-user.js'
+import { withStyles } from '@mui/styles'
+import { create } from './api-user.jsx'
 import { Link } from 'react-router-dom'
 
 const styles = theme => ({

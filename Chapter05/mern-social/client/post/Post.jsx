@@ -13,9 +13,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import CommentIcon from '@mui/icons-material/Comment'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
+import { withStyles } from '@mui/styles'
 import { Link } from 'react-router-dom'
-import { remove, like, unlike } from './api-post.js'
+import { remove, like, unlike } from './api-post.jsx'
 import Comments from './Comments'
 
 const styles = theme => ({

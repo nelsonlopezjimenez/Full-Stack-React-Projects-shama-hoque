@@ -9,10 +9,10 @@ import Icon from '@mui/material/Icon'
 import Avatar from '@mui/material/Avatar'
 import FileUpload from '@mui/icons-material/FileUpload'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/material/styles'
+import { withStyles } from '@mui/styles'
 import { Navigate } from 'react-router-dom'
 import auth from './../auth/auth-helper'
-import { read, update } from './api-user.js'
+import { read, update } from './api-user.jsx'
 import { withRouter } from './../withRouter'
 
 const styles = theme => ({

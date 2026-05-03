@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Button from '@mui/material/Button'
-import { follow, unfollow } from './api-user.js'
+import { follow, unfollow } from './api-user.jsx'
 
 class FollowProfileButton extends Component {
   followClick = () => {
