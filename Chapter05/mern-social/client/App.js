@@ -3,10 +3,6 @@ import MainRouter from './MainRouter'
 import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { teal, orange } from '@mui/material/colors'
-import createCache from '@emotion/cache'
-import { CacheProvider } from '@emotion/react'
-
-const cache = createCache({ key: 'css', prepend: true })
 
 const theme = createTheme({
   palette: {
@@ -30,11 +26,9 @@ const theme = createTheme({
 
 const App = () => (
   <BrowserRouter>
-    <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>
-        <MainRouter/>
-      </ThemeProvider>
-    </CacheProvider>
+    <ThemeProvider theme={theme}>
+      <MainRouter/>
+    </ThemeProvider>
   </BrowserRouter>
 )
 

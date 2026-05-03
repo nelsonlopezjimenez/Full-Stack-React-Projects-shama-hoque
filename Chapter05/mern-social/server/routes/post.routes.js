@@ -1,7 +1,7 @@
 import express from 'express'
-import userCtrl from '../controllers/user.controller'
-import authCtrl from '../controllers/auth.controller'
-import postCtrl from '../controllers/post.controller'
+import userCtrl from '../controllers/user.controller.js'
+import authCtrl from '../controllers/auth.controller.js'
+import postCtrl from '../controllers/post.controller.js'
 
 const router = express.Router()
 

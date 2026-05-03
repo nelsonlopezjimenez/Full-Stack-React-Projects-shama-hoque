@@ -1,9 +1,12 @@
-import User from '../models/user.model'
+import User from '../models/user.model.js'
 import _ from 'lodash'
-import errorHandler from './../helpers/dbErrorHandler'
+import errorHandler from './../helpers/dbErrorHandler.js'
 import formidable from 'formidable'
 import fs from 'fs'
-import profileImage from './../../client/assets/images/profile-pic.png'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const create = async (req, res, next) => {
   const user = new User(req.body)
@@ -96,7 +99,7 @@ const photo = (req, res, next) => {
 }
 
 const defaultPhoto = (req, res) => {
-  return res.sendFile(process.cwd() + profileImage)
+  return res.sendFile(path.join(__dirname, '../../client/assets/images/profile-pic.png'))
 }
 
 const addFollowing = async (req, res, next) => {
