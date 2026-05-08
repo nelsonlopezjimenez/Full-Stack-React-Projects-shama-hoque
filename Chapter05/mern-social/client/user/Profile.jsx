@@ -1,11 +1,10 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 import ListItemText from '@mui/material/ListItemText'
 import Avatar from '@mui/material/Avatar'
 import IconButton from '@mui/material/IconButton'
@@ -129,29 +128,31 @@ class Profile extends Component {
           Profile
         </Typography>
         <List dense>
-          <ListItem>
+          <ListItem
+            secondaryAction={
+              auth.isAuthenticated().user && auth.isAuthenticated().user._id == this.state.user._id
+                ? (
+                  <span>
+                    <Link to={'/user/edit/' + this.state.user._id}>
+                      <IconButton aria-label="Edit" color="primary">
+                        <Edit/>
+                      </IconButton>
+                    </Link>
+                    <DeleteUser userId={this.state.user._id}/>
+                  </span>
+                )
+                : (
+                  <FollowProfileButton
+                    following={this.state.following}
+                    onButtonClick={this.clickFollowButton}
+                  />
+                )
+            }
+          >
             <ListItemAvatar>
               <Avatar src={photoUrl} className={classes.bigAvatar}/>
             </ListItemAvatar>
             <ListItemText primary={this.state.user.name} secondary={this.state.user.email}/>
-            {auth.isAuthenticated().user && auth.isAuthenticated().user._id == this.state.user._id
-              ? (
-                <ListItemSecondaryAction>
-                  <Link to={'/user/edit/' + this.state.user._id}>
-                    <IconButton aria-label="Edit" color="primary">
-                      <Edit/>
-                    </IconButton>
-                  </Link>
-                  <DeleteUser userId={this.state.user._id}/>
-                </ListItemSecondaryAction>
-              )
-              : (
-                <FollowProfileButton
-                  following={this.state.following}
-                  onButtonClick={this.clickFollowButton}
-                />
-              )
-            }
           </ListItem>
           <Divider/>
           <ListItem>
@@ -175,5 +176,5 @@ Profile.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withRouter(withStyles(styles)(Profile))
+export default withRouter(withStyles(Profile, styles))
 

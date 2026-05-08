@@ -11,7 +11,7 @@ import Icon from '@mui/material/Icon'
 import IconButton from '@mui/material/IconButton'
 import PhotoCamera from '@mui/icons-material/PhotoCamera'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import { create } from './api-post.jsx'
 import auth from './../auth/auth-helper'
 
@@ -155,5 +155,5 @@ NewPost.propTypes = {
   addUpdate: PropTypes.func.isRequired
 }
 
-export default withStyles(styles)(NewPost)
+export default withStyles(NewPost, styles)
 

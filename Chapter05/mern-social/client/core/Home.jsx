@@ -1,11 +1,11 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
 import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
+import Grid from '@mui/material/Grid2'
 import seashellImg from './../assets/images/seashell.jpg'
 import { Link } from 'react-router-dom'
 import auth from './../auth/auth-helper'
@@ -54,7 +54,7 @@ class Home extends Component {
       <div className={classes.root}>
         {this.state.defaultPage &&
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Card className={classes.card}>
                 <Typography variant="h5" component="h2" className={classes.title}>
                   Home Page
@@ -71,10 +71,10 @@ class Home extends Component {
         }
         {!this.state.defaultPage &&
           <Grid container spacing={3}>
-            <Grid item xs={8} sm={7}>
+            <Grid xs={8} sm={7}>
               <Newsfeed/>
             </Grid>
-            <Grid item xs={6} sm={5}>
+            <Grid xs={6} sm={5}>
               <FindPeople/>
             </Grid>
           </Grid>
@@ -88,5 +88,5 @@ Home.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Home)
+export default withStyles(Home, styles)
 

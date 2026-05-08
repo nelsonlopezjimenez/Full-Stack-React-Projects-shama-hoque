@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import Icon from '@mui/material/Icon'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import auth from './../auth/auth-helper'
 import { signin } from './api-auth.jsx'
 import { withRouter } from './../withRouter'
@@ -120,5 +120,5 @@ Signin.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withRouter(withStyles(styles)(Signin))
+export default withRouter(withStyles(Signin, styles))
 

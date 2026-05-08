@@ -26,7 +26,7 @@ app.use('/', postRoutes)
 if (process.env.NODE_ENV === 'production') {
   const clientDist = path.join(__dirname, '../dist/client')
   app.use(express.static(clientDist))
-  app.get('*', (req, res) => {
+  app.get('/{*path}', (req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'))
   })
 }

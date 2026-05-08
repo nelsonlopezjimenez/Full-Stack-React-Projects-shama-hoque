@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
@@ -78,5 +78,5 @@ Newsfeed.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Newsfeed)
+export default withStyles(Newsfeed, styles)
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Home from './core/Home'
 import Users from './user/Users'
@@ -10,12 +10,6 @@ import PrivateRoute from './auth/PrivateRoute'
 import Menu from './core/Menu'
 
 const MainRouter = () => {
-  useEffect(() => {
-    const jssStyles = document.getElementById('jss-server-side')
-    if (jssStyles && jssStyles.parentNode) {
-      jssStyles.parentNode.removeChild(jssStyles)
-    }
-  }, [])
 
   return (
     <div>

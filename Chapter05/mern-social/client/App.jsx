@@ -2,7 +2,6 @@ import React from 'react'
 import MainRouter from './MainRouter'
 import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-import { ThemeProvider as LegacyThemeProvider } from '@mui/styles'
 import { teal, orange } from '@mui/material/colors'
 
 const theme = createTheme({
@@ -28,9 +27,7 @@ const theme = createTheme({
 const App = () => (
   <BrowserRouter>
     <ThemeProvider theme={theme}>
-      <LegacyThemeProvider theme={theme}>
-        <MainRouter/>
-      </LegacyThemeProvider>
+      <MainRouter/>
     </ThemeProvider>
   </BrowserRouter>
 )

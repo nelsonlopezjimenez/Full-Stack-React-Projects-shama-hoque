@@ -13,7 +13,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import CommentIcon from '@mui/icons-material/Comment'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import { Link } from 'react-router-dom'
 import { remove, like, unlike } from './api-post.jsx'
 import Comments from './Comments'
@@ -176,5 +176,5 @@ Post.propTypes = {
   onRemove: PropTypes.func.isRequired
 }
 
-export default withStyles(styles)(Post)
+export default withStyles(Post, styles)
 

@@ -1,11 +1,10 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 import ListItemText from '@mui/material/ListItemText'
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
@@ -95,26 +94,29 @@ class FindPeople extends Component {
           <List>
             {this.state.users.map((item, i) => (
               <span key={i}>
-                <ListItem>
+                <ListItem
+                  secondaryAction={
+                    <span className={classes.follow}>
+                      <Link to={'/user/' + item._id}>
+                        <IconButton color="secondary" className={classes.viewButton}>
+                          <ViewIcon/>
+                        </IconButton>
+                      </Link>
+                      <Button
+                        aria-label="Follow"
+                        variant="contained"
+                        color="primary"
+                        onClick={this.clickFollow.bind(this, item, i)}
+                      >
+                        Follow
+                      </Button>
+                    </span>
+                  }
+                >
                   <ListItemAvatar className={classes.avatar}>
                     <Avatar src={'/api/users/photo/' + item._id}/>
                   </ListItemAvatar>
                   <ListItemText primary={item.name}/>
-                  <ListItemSecondaryAction className={classes.follow}>
-                    <Link to={'/user/' + item._id}>
-                      <IconButton variant="contained" color="secondary" className={classes.viewButton}>
-                        <ViewIcon/>
-                      </IconButton>
-                    </Link>
-                    <Button
-                      aria-label="Follow"
-                      variant="contained"
-                      color="primary"
-                      onClick={this.clickFollow.bind(this, item, i)}
-                    >
-                      Follow
-                    </Button>
-                  </ListItemSecondaryAction>
                 </ListItem>
               </span>
             ))}
@@ -136,5 +138,5 @@ FindPeople.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(FindPeople)
+export default withStyles(FindPeople, styles)
 

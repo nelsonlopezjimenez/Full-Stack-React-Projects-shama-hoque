@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField'
 import Avatar from '@mui/material/Avatar'
 import Icon from '@mui/material/Icon'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import { comment, uncomment } from './api-post.jsx'
 import { Link } from 'react-router-dom'
 
@@ -143,5 +143,5 @@ Comments.propTypes = {
   updateComments: PropTypes.func.isRequired
 }
 
-export default withStyles(styles)(Comments)
+export default withStyles(Comments, styles)
 

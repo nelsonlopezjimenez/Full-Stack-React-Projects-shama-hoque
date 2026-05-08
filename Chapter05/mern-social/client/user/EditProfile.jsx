@@ -9,7 +9,7 @@ import Icon from '@mui/material/Icon'
 import Avatar from '@mui/material/Avatar'
 import FileUpload from '@mui/icons-material/FileUpload'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import { Navigate } from 'react-router-dom'
 import auth from './../auth/auth-helper'
 import { read, update } from './api-user.jsx'
@@ -194,5 +194,5 @@ EditProfile.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withRouter(withStyles(styles)(EditProfile))
+export default withRouter(withStyles(EditProfile, styles))
 

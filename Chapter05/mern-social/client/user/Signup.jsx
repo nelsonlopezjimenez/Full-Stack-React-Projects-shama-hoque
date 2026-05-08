@@ -12,7 +12,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import { create } from './api-user.jsx'
 import { Link } from 'react-router-dom'
 
@@ -151,5 +151,5 @@ Signup.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Signup)
+export default withStyles(Signup, styles)
 

@@ -1,11 +1,11 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction'
 import ListItemText from '@mui/material/ListItemText'
 import Avatar from '@mui/material/Avatar'
 import IconButton from '@mui/material/IconButton'
@@ -52,21 +52,23 @@ class Users extends Component {
         </Typography>
         <List dense>
           {this.state.users.map((item, i) => (
-            <Link to={'/user/' + item._id} key={i}>
-              <ListItem button>
+            <ListItem
+              key={i}
+              secondaryAction={
+                <IconButton>
+                  <ArrowForward/>
+                </IconButton>
+              }
+            >
+              <ListItemButton component={Link} to={'/user/' + item._id}>
                 <ListItemAvatar>
                   <Avatar>
                     <Person/>
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText primary={item.name}/>
-                <ListItemSecondaryAction>
-                  <IconButton>
-                    <ArrowForward/>
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            </Link>
+              </ListItemButton>
+            </ListItem>
           ))}
         </List>
       </Paper>
@@ -78,5 +80,5 @@ Users.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Users)
+export default withStyles(Users, styles)
 

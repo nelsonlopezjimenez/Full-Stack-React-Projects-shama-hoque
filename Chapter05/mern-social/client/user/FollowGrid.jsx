@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { withStyles } from '@mui/styles'
+import { withStyles } from 'tss-react/mui'
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
 import ImageList from '@mui/material/ImageList'
@@ -56,5 +56,5 @@ FollowGrid.propTypes = {
   people: PropTypes.array.isRequired
 }
 
-export default withStyles(styles)(FollowGrid)
+export default withStyles(FollowGrid, styles)
 
