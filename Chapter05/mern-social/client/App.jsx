@@ -1,8 +1,8 @@
-import React from 'react'
-import MainRouter from './MainRouter'
-import { BrowserRouter } from 'react-router-dom'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
-import { teal, orange } from '@mui/material/colors'
+import React from 'react';
+import MainRouter from './MainRouter';
+import { BrowserRouter } from 'react-router';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { teal, orange } from '@mui/material/colors';
 
 const theme = createTheme({
   palette: {
@@ -20,16 +20,16 @@ const theme = createTheme({
     },
     openTitle: teal['700'],
     protectedTitle: orange['700'],
-    mode: 'light'
-  }
-})
+    mode: 'light',
+  },
+});
 
 const App = () => (
   <BrowserRouter>
     <ThemeProvider theme={theme}>
-      <MainRouter/>
+      <MainRouter />
     </ThemeProvider>
   </BrowserRouter>
-)
+);
 
-export default App
+export default App;

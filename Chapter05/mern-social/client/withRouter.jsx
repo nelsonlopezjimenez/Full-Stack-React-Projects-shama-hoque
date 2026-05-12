@@ -1,16 +1,16 @@
-import React from 'react'
-import { useNavigate, useLocation, useParams } from 'react-router-dom'
+import React from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router';
 
 function withRouter(WrappedComponent) {
   function ComponentWithRouterProp(props) {
-    const navigate = useNavigate()
-    const location = useLocation()
-    const params = useParams()
+    const navigate = useNavigate();
+    const location = useLocation();
+    const params = useParams();
     const history = {
       push: (path) => navigate(path),
       goBack: () => navigate(-1),
-      location
-    }
+      location,
+    };
     return (
       <WrappedComponent
         {...props}
@@ -18,12 +18,13 @@ function withRouter(WrappedComponent) {
         location={location}
         match={{ params }}
       />
-    )
+    );
   }
-  ComponentWithRouterProp.displayName =
-    `withRouter(${WrappedComponent.displayName || WrappedComponent.name})`
-  return ComponentWithRouterProp
+  ComponentWithRouterProp.displayName = `withRouter(${
+    WrappedComponent.displayName || WrappedComponent.name
+  })`;
+  return ComponentWithRouterProp;
 }
 
-export default withRouter
-export { withRouter }
+export default withRouter;
+export { withRouter };

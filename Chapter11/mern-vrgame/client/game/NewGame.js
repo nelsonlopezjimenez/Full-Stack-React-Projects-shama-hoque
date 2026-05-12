@@ -1,8 +1,8 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import auth from './../auth/auth-helper'
 import PropTypes from 'prop-types'
-import {create} from './api-game.js'
-import {Redirect} from 'react-router-dom'
+import { create } from './api-game.js'
+import { Redirect } from 'react-router'
 import GameForm from './GameForm'
 
 class NewGame extends Component {
@@ -18,19 +18,19 @@ class NewGame extends Component {
       t: jwt.token
     }, game).then((data) => {
       if (data.error) {
-        this.setState({error: data.error})
+        this.setState({ error: data.error })
       } else {
-        this.setState({error: '', redirect: true})
+        this.setState({ error: '', redirect: true })
       }
     })
   }
 
   render() {
     if (this.state.redirect) {
-      return (<Redirect to={'/user/'+auth.isAuthenticated().user._id}/>)
+      return (<Redirect to={'/user/' + auth.isAuthenticated().user._id} />)
     }
     return (
-      <GameForm onSubmit={this.clickSubmit} errorMsg={this.state.error}/>
+      <GameForm onSubmit={this.clickSubmit} errorMsg={this.state.error} />
     )
   }
 }

@@ -1,8 +1,8 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import {withStyles} from 'material-ui/styles'
+import { withStyles } from 'material-ui/styles'
 import Paper from 'material-ui/Paper'
-import List, {ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText} from 'material-ui/List'
+import List, { ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText } from 'material-ui/List'
 import Avatar from 'material-ui/Avatar'
 import IconButton from 'material-ui/IconButton'
 import Button from 'material-ui/Button'
@@ -12,8 +12,8 @@ import Person from 'material-ui-icons/Person'
 import Divider from 'material-ui/Divider'
 import DeleteUser from './DeleteUser'
 import auth from './../auth/auth-helper'
-import {read} from './api-user.js'
-import {Redirect, Link} from 'react-router-dom'
+import { read } from './api-user.js'
+import { Redirect, Link } from 'react-router'
 
 const styles = theme => ({
   root: theme.mixins.gutters({
@@ -29,7 +29,7 @@ const styles = theme => ({
 })
 
 class Profile extends Component {
-  constructor({match}) {
+  constructor({ match }) {
     super()
     this.state = {
       user: '',
@@ -41,11 +41,11 @@ class Profile extends Component {
     const jwt = auth.isAuthenticated()
     read({
       userId: userId
-    }, {t: jwt.token}).then((data) => {
+    }, { t: jwt.token }).then((data) => {
       if (data.error) {
-        this.setState({redirectToSignin: true})
+        this.setState({ redirectToSignin: true })
       } else {
-        this.setState({user: data})
+        this.setState({ user: data })
       }
     })
   }
@@ -56,10 +56,10 @@ class Profile extends Component {
     this.init(this.match.params.userId)
   }
   render() {
-    const {classes} = this.props
+    const { classes } = this.props
     const redirectToSignin = this.state.redirectToSignin
     if (redirectToSignin) {
-      return <Redirect to='/signin'/>
+      return <Redirect to='/signin' />
     }
     return (
       <Paper className={classes.root} elevation={4}>
@@ -70,25 +70,25 @@ class Profile extends Component {
           <ListItem>
             <ListItemAvatar>
               <Avatar>
-                <Person/>
+                <Person />
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={this.state.user.name} secondary={this.state.user.email}/> {
-             auth.isAuthenticated().user && auth.isAuthenticated().user._id == this.state.user._id && 
+            <ListItemText primary={this.state.user.name} secondary={this.state.user.email} /> {
+              auth.isAuthenticated().user && auth.isAuthenticated().user._id == this.state.user._id &&
               (<ListItemSecondaryAction>
                 <Link to={"/user/edit/" + this.state.user._id}>
                   <IconButton aria-label="Edit" color="primary">
-                    <Edit/>
+                    <Edit />
                   </IconButton>
                 </Link>
-                <DeleteUser userId={this.state.user._id}/>
+                <DeleteUser userId={this.state.user._id} />
               </ListItemSecondaryAction>)
             }
           </ListItem>
-          <Divider/>
+          <Divider />
           <ListItem>
             <ListItemText primary={"Joined: " + (
-              new Date(this.state.user.created)).toDateString()}/>
+              new Date(this.state.user.created)).toDateString()} />
           </ListItem>
         </List>
       </Paper>

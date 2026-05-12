@@ -1,14 +1,14 @@
-import React, {Component} from 'react'
-import Card, {CardActions, CardContent} from 'material-ui/Card'
+import React, { Component } from 'react'
+import Card, { CardActions, CardContent } from 'material-ui/Card'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 import Typography from 'material-ui/Typography'
 import Icon from 'material-ui/Icon'
 import PropTypes from 'prop-types'
-import {withStyles} from 'material-ui/styles'
-import {create} from './api-user.js'
-import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle} from 'material-ui/Dialog'
-import {Link} from 'react-router-dom'
+import { withStyles } from 'material-ui/styles'
+import { create } from './api-user.js'
+import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } from 'material-ui/Dialog'
+import { Link } from 'react-router'
 
 const styles = theme => ({
   card: {
@@ -38,15 +38,15 @@ const styles = theme => ({
 
 class Signup extends Component {
   state = {
-      name: '',
-      password: '',
-      email: '',
-      open: false,
-      error: ''
+    name: '',
+    password: '',
+    email: '',
+    open: false,
+    error: ''
   }
 
   handleChange = name => event => {
-    this.setState({[name]: event.target.value})
+    this.setState({ [name]: event.target.value })
   }
 
   clickSubmit = () => {
@@ -57,25 +57,25 @@ class Signup extends Component {
     }
     create(user).then((data) => {
       if (data.error) {
-        this.setState({error: data.error})
+        this.setState({ error: data.error })
       } else {
-        this.setState({error: '', open: true})
+        this.setState({ error: '', open: true })
       }
     })
   }
 
   render() {
-    const {classes} = this.props
+    const { classes } = this.props
     return (<div>
       <Card className={classes.card}>
         <CardContent>
           <Typography type="headline" component="h2" className={classes.title}>
             Sign Up
           </Typography>
-          <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal"/><br/>
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal"/><br/>
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal"/>
-          <br/> {
+          <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal" /><br />
+          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal" /><br />
+          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal" />
+          <br /> {
             this.state.error && (<Typography component="p" color="error">
               <Icon color="error" className={classes.error}>error</Icon>
               {this.state.error}</Typography>)

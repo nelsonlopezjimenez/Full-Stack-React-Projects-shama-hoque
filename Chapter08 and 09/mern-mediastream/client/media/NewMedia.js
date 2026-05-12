@@ -1,15 +1,15 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import auth from './../auth/auth-helper'
-import Card, {CardActions, CardContent} from 'material-ui/Card'
+import Card, { CardActions, CardContent } from 'material-ui/Card'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
 import Typography from 'material-ui/Typography'
 import FileUpload from 'material-ui-icons/FileUpload'
 import Icon from 'material-ui/Icon'
 import PropTypes from 'prop-types'
-import {withStyles} from 'material-ui/styles'
-import {create} from './api-media.js'
-import {Redirect} from 'react-router-dom'
+import { withStyles } from 'material-ui/styles'
+import { create } from './api-media.js'
+import { Redirect } from 'react-router'
 
 const styles = theme => ({
   card: {
@@ -39,20 +39,20 @@ const styles = theme => ({
   input: {
     display: 'none'
   },
-  filename:{
-    marginLeft:'10px'
+  filename: {
+    marginLeft: '10px'
   }
 })
 
 class NewMedia extends Component {
   state = {
-      title: '',
-      video: '',
-      description: '',
-      genre: '',
-      redirect: false,
-      error: '',
-      mediaId: ''
+    title: '',
+    video: '',
+    description: '',
+    genre: '',
+    redirect: false,
+    error: '',
+    mediaId: ''
   }
   componentDidMount = () => {
     this.mediaData = new FormData()
@@ -66,9 +66,9 @@ class NewMedia extends Component {
       t: jwt.token
     }, this.mediaData).then((data) => {
       if (data.error) {
-        this.setState({error: data.error})
+        this.setState({ error: data.error })
       } else {
-        this.setState({redirect: true, mediaId: data._id})
+        this.setState({ redirect: true, mediaId: data._id })
       }
     })
   }
@@ -82,9 +82,9 @@ class NewMedia extends Component {
   }
 
   render() {
-    const {classes} = this.props
+    const { classes } = this.props
     if (this.state.redirect) {
-      return (<Redirect to={'/media/' + this.state.mediaId}/>)
+      return (<Redirect to={'/media/' + this.state.mediaId} />)
     }
     return (
       <Card className={classes.card}>
@@ -96,10 +96,10 @@ class NewMedia extends Component {
           <label htmlFor="icon-button-file">
             <Button color="secondary" variant="raised" component="span">
               Upload
-              <FileUpload/>
+              <FileUpload />
             </Button>
-          </label> <span className={classes.filename}>{this.state.video ? this.state.video.name : ''}</span><br/>
-          <TextField id="title" label="Title" className={classes.textField} value={this.state.title} onChange={this.handleChange('title')} margin="normal"/><br/>
+          </label> <span className={classes.filename}>{this.state.video ? this.state.video.name : ''}</span><br />
+          <TextField id="title" label="Title" className={classes.textField} value={this.state.title} onChange={this.handleChange('title')} margin="normal" /><br />
           <TextField
             id="multiline-flexible"
             label="Description"
@@ -109,14 +109,14 @@ class NewMedia extends Component {
             onChange={this.handleChange('description')}
             className={classes.textField}
             margin="normal"
-          /><br/>
-          <TextField id="genre" label="Genre" className={classes.textField} value={this.state.genre} onChange={this.handleChange('genre')} margin="normal"/><br/>
-          <br/> {
-                  this.state.error && (<Typography component="p" color="error">
-                      <Icon color="error" className={classes.error}>error</Icon>
-                      {this.state.error}
-                    </Typography>)
-                }
+          /><br />
+          <TextField id="genre" label="Genre" className={classes.textField} value={this.state.genre} onChange={this.handleChange('genre')} margin="normal" /><br />
+          <br /> {
+            this.state.error && (<Typography component="p" color="error">
+              <Icon color="error" className={classes.error}>error</Icon>
+              {this.state.error}
+            </Typography>)
+          }
         </CardContent>
         <CardActions>
           <Button color="primary" variant="raised" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>

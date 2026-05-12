@@ -1,13 +1,13 @@
-﻿import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { withStyles } from 'tss-react/mui'
-import Avatar from '@mui/material/Avatar'
-import Typography from '@mui/material/Typography'
-import ImageList from '@mui/material/ImageList'
-import ImageListItem from '@mui/material/ImageListItem'
-import { Link } from 'react-router-dom'
+﻿import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from 'tss-react/mui';
+import Avatar from '@mui/material/Avatar';
+import Typography from '@mui/material/Typography';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import { Link } from 'react-router';
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     paddingTop: theme.spacing(2),
     display: 'flex',
@@ -19,7 +19,7 @@ const styles = theme => ({
   bigAvatar: {
     width: 60,
     height: 60,
-    margin: 'auto'
+    margin: 'auto',
   },
   imageList: {
     width: 500,
@@ -27,34 +27,45 @@ const styles = theme => ({
   },
   tileText: {
     textAlign: 'center',
-    marginTop: 10
-  }
-})
+    marginTop: 10,
+  },
+});
 
 class FollowGrid extends Component {
   render() {
-    const { classes } = this.props
+    const { classes } = this.props;
     return (
       <div className={classes.root}>
-        <ImageList rowHeight={160} className={classes.imageList} cols={4}>
+        <ImageList
+          rowHeight={160}
+          className={classes.imageList}
+          cols={4}
+        >
           {this.props.people.map((person, i) => (
-            <ImageListItem style={{ height: 120 }} key={i}>
+            <ImageListItem
+              style={{ height: 120 }}
+              key={i}
+            >
               <Link to={'/user/' + person._id}>
-                <Avatar src={'/api/users/photo/' + person._id} className={classes.bigAvatar}/>
-                <Typography className={classes.tileText}>{person.name}</Typography>
+                <Avatar
+                  src={'/api/users/photo/' + person._id}
+                  className={classes.bigAvatar}
+                />
+                <Typography className={classes.tileText}>
+                  {person.name}
+                </Typography>
               </Link>
             </ImageListItem>
           ))}
         </ImageList>
       </div>
-    )
+    );
   }
 }
 
 FollowGrid.propTypes = {
   classes: PropTypes.object.isRequired,
-  people: PropTypes.array.isRequired
-}
+  people: PropTypes.array.isRequired,
+};
 
-export default withStyles(FollowGrid, styles)
-
+export default withStyles(FollowGrid, styles);

@@ -1,60 +1,60 @@
-﻿import React, { Component } from 'react'
-import Card from '@mui/material/Card'
-import CardActions from '@mui/material/CardActions'
-import CardContent from '@mui/material/CardContent'
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import Icon from '@mui/material/Icon'
-import Avatar from '@mui/material/Avatar'
-import FileUpload from '@mui/icons-material/FileUpload'
-import PropTypes from 'prop-types'
-import { withStyles } from 'tss-react/mui'
-import { Navigate } from 'react-router-dom'
-import auth from './../auth/auth-helper'
-import { read, update } from './api-user.jsx'
-import { withRouter } from './../withRouter'
+﻿import React, { Component } from 'react';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Icon from '@mui/material/Icon';
+import Avatar from '@mui/material/Avatar';
+import FileUpload from '@mui/icons-material/FileUpload';
+import PropTypes from 'prop-types';
+import { withStyles } from 'tss-react/mui';
+import { Navigate } from 'react-router';
+import auth from './../auth/auth-helper';
+import { read, update } from './api-user.jsx';
+import { withRouter } from './../withRouter';
 
-const styles = theme => ({
+const styles = (theme) => ({
   card: {
     maxWidth: 600,
     margin: 'auto',
     textAlign: 'center',
     marginTop: theme.spacing(5),
-    paddingBottom: theme.spacing(2)
+    paddingBottom: theme.spacing(2),
   },
   title: {
     margin: theme.spacing(2),
-    color: theme.palette.protectedTitle
+    color: theme.palette.protectedTitle,
   },
   error: {
-    verticalAlign: 'middle'
+    verticalAlign: 'middle',
   },
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
-    width: 300
+    width: 300,
   },
   submit: {
     margin: 'auto',
-    marginBottom: theme.spacing(2)
+    marginBottom: theme.spacing(2),
   },
   bigAvatar: {
     width: 60,
     height: 60,
-    margin: 'auto'
+    margin: 'auto',
   },
   input: {
-    display: 'none'
+    display: 'none',
   },
   filename: {
-    marginLeft: '10px'
-  }
-})
+    marginLeft: '10px',
+  },
+});
 
 class EditProfile extends Component {
   constructor({ match }) {
-    super()
+    super();
     this.state = {
       name: '',
       about: '',
@@ -62,123 +62,155 @@ class EditProfile extends Component {
       email: '',
       password: '',
       redirectToProfile: false,
-      error: ''
-    }
-    this.match = match
+      error: '',
+    };
+    this.match = match;
   }
 
   componentDidMount = () => {
-    this.userData = new FormData()
-    const jwt = auth.isAuthenticated()
-    read({ userId: this.match.params.userId }, { t: jwt.token }).then((data) => {
-      if (data.error) {
-        this.setState({ error: data.error })
-      } else {
-        this.setState({ id: data._id, name: data.name, email: data.email, about: data.about })
+    this.userData = new FormData();
+    const jwt = auth.isAuthenticated();
+    read({ userId: this.match.params.userId }, { t: jwt.token }).then(
+      (data) => {
+        if (data.error) {
+          this.setState({ error: data.error });
+        } else {
+          this.setState({
+            id: data._id,
+            name: data.name,
+            email: data.email,
+            about: data.about,
+          });
+        }
       }
-    })
-  }
+    );
+  };
 
   clickSubmit = () => {
-    const jwt = auth.isAuthenticated()
+    const jwt = auth.isAuthenticated();
     update(
       { userId: this.match.params.userId },
       { t: jwt.token },
       this.userData
     ).then((data) => {
+      console.log(data);
       if (data.error) {
-        this.setState({ error: data.error })
+        this.setState({ error: data.error });
       } else {
-        this.setState({ redirectToProfile: true })
+        this.setState({ redirectToProfile: true });
       }
-    })
-  }
+    });
+  };
 
-  handleChange = name => event => {
-    const value = name === 'photo' ? event.target.files[0] : event.target.value
-    this.userData.set(name, value)
-    this.setState({ [name]: value })
-  }
+  handleChange = (name) => (event) => {
+    const value = name === 'photo' ? event.target.files[0] : event.target.value;
+    this.userData.set(name, value);
+    this.setState({ [name]: value });
+  };
 
   render() {
-    const { classes } = this.props
+    const { classes } = this.props;
     const photoUrl = this.state.id
       ? `/api/users/photo/${this.state.id}?${new Date().getTime()}`
-      : '/api/users/defaultphoto'
+      : '/api/users/defaultphoto';
     if (this.state.redirectToProfile) {
-      return <Navigate to={'/user/' + this.state.id}/>
+      return <Navigate to={'/user/' + this.state.id} />;
     }
     return (
       <Card className={classes.card}>
         <CardContent>
-          <Typography variant="h5" component="h2" className={classes.title}>
+          <Typography
+            variant='h5'
+            component='h2'
+            className={classes.title}
+          >
             Edit Profile
           </Typography>
-          <Avatar src={photoUrl} className={classes.bigAvatar}/><br/>
+          <Avatar
+            src={photoUrl}
+            className={classes.bigAvatar}
+          />
+          <br />
           <input
-            accept="image/*"
+            accept='image/*'
             onChange={this.handleChange('photo')}
             className={classes.input}
-            id="icon-button-file"
-            type="file"
+            id='icon-button-file'
+            type='file'
           />
-          <label htmlFor="icon-button-file">
-            <Button variant="contained" color="inherit" component="span">
+          <label htmlFor='icon-button-file'>
+            <Button
+              variant='contained'
+              color='inherit'
+              component='span'
+            >
               Upload
-              <FileUpload/>
+              <FileUpload />
             </Button>
           </label>
           <span className={classes.filename}>
             {this.state.photo ? this.state.photo.name : ''}
-          </span><br/>
+          </span>
+          <br />
           <TextField
-            id="name"
-            label="Name"
+            id='name'
+            label='Name'
             className={classes.textField}
             value={this.state.name}
             onChange={this.handleChange('name')}
-            margin="normal"
-          /><br/>
+            margin='normal'
+          />
+          <br />
           <TextField
-            id="multiline-flexible"
-            label="About"
+            id='multiline-flexible'
+            label='About'
             multiline
             rows={2}
             value={this.state.about}
             onChange={this.handleChange('about')}
             className={classes.textField}
-            margin="normal"
-          /><br/>
+            margin='normal'
+          />
+          <br />
           <TextField
-            id="email"
-            type="email"
-            label="Email"
+            id='email'
+            type='email'
+            label='Email'
             className={classes.textField}
             value={this.state.email}
             onChange={this.handleChange('email')}
-            margin="normal"
-          /><br/>
+            margin='normal'
+          />
+          <br />
           <TextField
-            id="password"
-            type="password"
-            label="Password"
+            id='password'
+            type='password'
+            label='Password'
             className={classes.textField}
             value={this.state.password}
             onChange={this.handleChange('password')}
-            margin="normal"
+            margin='normal'
           />
-          <br/>
+          <br />
           {this.state.error && (
-            <Typography component="p" color="error">
-              <Icon color="error" className={classes.error}>error</Icon>
+            <Typography
+              component='p'
+              color='error'
+            >
+              <Icon
+                color='error'
+                className={classes.error}
+              >
+                error
+              </Icon>
               {this.state.error}
             </Typography>
           )}
         </CardContent>
         <CardActions>
           <Button
-            color="primary"
-            variant="contained"
+            color='primary'
+            variant='contained'
             onClick={this.clickSubmit}
             className={classes.submit}
           >
@@ -186,13 +218,12 @@ class EditProfile extends Component {
           </Button>
         </CardActions>
       </Card>
-    )
+    );
   }
 }
 
 EditProfile.propTypes = {
-  classes: PropTypes.object.isRequired
-}
+  classes: PropTypes.object.isRequired,
+};
 
-export default withRouter(withStyles(EditProfile, styles))
-
+export default withRouter(withStyles(EditProfile, styles));

@@ -1,7 +1,7 @@
 import React from 'react'
 import MainRouter from './MainRouter'
-import {BrowserRouter} from 'react-router-dom'
-import {MuiThemeProvider, createMuiTheme} from 'material-ui/styles'
+import { BrowserRouter } from 'react-router'
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles'
 import { hot } from 'react-hot-loader'
 
 // Create a theme instance.
@@ -28,7 +28,7 @@ const theme = createMuiTheme({
 const App = () => (
   <BrowserRouter>
     <MuiThemeProvider theme={theme}>
-      <MainRouter/>
+      <MainRouter />
     </MuiThemeProvider>
   </BrowserRouter>
 )

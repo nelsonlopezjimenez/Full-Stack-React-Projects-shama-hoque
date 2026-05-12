@@ -1,13 +1,13 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import {withStyles} from 'material-ui/styles'
+import { withStyles } from 'material-ui/styles'
 import Paper from 'material-ui/Paper'
-import List, {ListItem, ListItemAvatar} from 'material-ui/List'
+import List, { ListItem, ListItemAvatar } from 'material-ui/List'
 import Avatar from 'material-ui/Avatar'
 import Typography from 'material-ui/Typography'
 import Divider from 'material-ui/Divider'
-import {list} from './api-shop.js'
-import {Link} from 'react-router-dom'
+import { list } from './api-shop.js'
+import { Link } from 'react-router'
 const styles = theme => ({
   root: theme.mixins.gutters({
     maxWidth: 600,
@@ -22,7 +22,7 @@ const styles = theme => ({
     textAlign: 'center',
     fontSize: '1.2em'
   },
-  avatar:{
+  avatar: {
     width: 100,
     height: 100
   },
@@ -39,14 +39,14 @@ const styles = theme => ({
 })
 class Shops extends Component {
   state = {
-      shops:[]
+    shops: []
   }
   loadShops = () => {
     list().then((data) => {
       if (data.error) {
         console.log(data.error)
       } else {
-        this.setState({shops: data})
+        this.setState({ shops: data })
       }
     })
   }
@@ -54,35 +54,36 @@ class Shops extends Component {
     this.loadShops()
   }
   render() {
-    const {classes} = this.props
+    const { classes } = this.props
     return (
-    <div>
-      <Paper className={classes.root} elevation={4}>
-        <Typography type="title" className={classes.title}>
-          All Shops
-        </Typography>
-        <List dense>
-          {this.state.shops.map((shop, i) => {
-            return <Link to={"/shops/"+shop._id} key={i}>
-              <Divider/>
-              <ListItem button>
-                <ListItemAvatar>
-                  <Avatar className={classes.avatar}  src={'/api/shops/logo/'+shop._id+"?" + new Date().getTime()}/>
-                </ListItemAvatar>
-                <div className={classes.details}>
-                  <Typography type="headline" component="h2" color="primary" className={classes.shopTitle}>
-                    {shop.name}
-                  </Typography>
-                  <Typography type="subheading" component="h4" className={classes.subheading}>
-                    {shop.description}
-                  </Typography>
-                </div>
-              </ListItem>
-              <Divider/>
-            </Link>})}
-        </List>
-      </Paper>
-    </div>)
+      <div>
+        <Paper className={classes.root} elevation={4}>
+          <Typography type="title" className={classes.title}>
+            All Shops
+          </Typography>
+          <List dense>
+            {this.state.shops.map((shop, i) => {
+              return <Link to={"/shops/" + shop._id} key={i}>
+                <Divider />
+                <ListItem button>
+                  <ListItemAvatar>
+                    <Avatar className={classes.avatar} src={'/api/shops/logo/' + shop._id + "?" + new Date().getTime()} />
+                  </ListItemAvatar>
+                  <div className={classes.details}>
+                    <Typography type="headline" component="h2" color="primary" className={classes.shopTitle}>
+                      {shop.name}
+                    </Typography>
+                    <Typography type="subheading" component="h4" className={classes.subheading}>
+                      {shop.description}
+                    </Typography>
+                  </div>
+                </ListItem>
+                <Divider />
+              </Link>
+            })}
+          </List>
+        </Paper>
+      </div>)
   }
 }
 Shops.propTypes = {

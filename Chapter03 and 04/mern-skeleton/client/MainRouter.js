@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import {Route, Switch} from 'react-router-dom'
+import React, { Component } from 'react'
+import { Route, Switch } from 'react-router'
 import Home from './core/Home'
 import Users from './user/Users'
 import Signup from './user/Signup'
@@ -20,14 +20,14 @@ class MainRouter extends Component {
 
   render() {
     return (<div>
-      <Menu/>
+      <Menu />
       <Switch>
-        <Route exact path="/" component={Home}/>
-        <Route path="/users" component={Users}/>
-        <Route path="/signup" component={Signup}/>
-        <Route path="/signin" component={Signin}/>
-        <PrivateRoute path="/user/edit/:userId" component={EditProfile}/>
-        <Route path="/user/:userId" component={Profile}/>
+        <Route exact path="/" component={Home} />
+        <Route path="/users" component={Users} />
+        <Route path="/signup" component={Signup} />
+        <Route path="/signin" component={Signin} />
+        <PrivateRoute path="/user/edit/:userId" component={EditProfile} />
+        <Route path="/user/:userId" component={Profile} />
       </Switch>
     </div>)
   }

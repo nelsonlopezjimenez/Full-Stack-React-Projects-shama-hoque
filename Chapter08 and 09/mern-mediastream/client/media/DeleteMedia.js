@@ -1,12 +1,12 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import IconButton from 'material-ui/IconButton'
 import Button from 'material-ui/Button'
 import DeleteIcon from 'material-ui-icons/Delete'
-import Dialog, {DialogActions, DialogContent, DialogContentText, DialogTitle} from 'material-ui/Dialog'
+import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } from 'material-ui/Dialog'
 import auth from './../auth/auth-helper'
-import {remove} from './api-media.js'
-import {Redirect} from 'react-router-dom'
+import { remove } from './api-media.js'
+import { Redirect } from 'react-router'
 
 class DeleteMedia extends Component {
   state = {
@@ -14,35 +14,35 @@ class DeleteMedia extends Component {
     open: false
   }
   clickButton = () => {
-    this.setState({open: true})
+    this.setState({ open: true })
   }
   deleteMedia = () => {
     const jwt = auth.isAuthenticated()
     remove({
       mediaId: this.props.mediaId
-    }, {t: jwt.token}).then((data) => {
+    }, { t: jwt.token }).then((data) => {
       if (data.error) {
         console.log(data.error)
       } else {
-        this.setState({redirect: true})
+        this.setState({ redirect: true })
       }
     })
   }
   handleRequestClose = () => {
-    this.setState({open: false})
+    this.setState({ open: false })
   }
   render() {
     const redirect = this.state.redirect
     if (redirect) {
-      return <Redirect to='/'/>
+      return <Redirect to='/' />
     }
     return (<span>
       <IconButton aria-label="Delete" onClick={this.clickButton} color="secondary">
-        <DeleteIcon/>
+        <DeleteIcon />
       </IconButton>
 
       <Dialog open={this.state.open} onClose={this.handleRequestClose}>
-        <DialogTitle>{"Delete "+this.props.mediaTitle}</DialogTitle>
+        <DialogTitle>{"Delete " + this.props.mediaTitle}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Confirm to delete {this.props.mediaTitle} from your account.

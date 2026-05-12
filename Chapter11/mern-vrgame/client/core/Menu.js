@@ -7,15 +7,15 @@ import HomeIcon from 'material-ui-icons/Home'
 import AddBoxIcon from 'material-ui-icons/AddBox'
 import Button from 'material-ui/Button'
 import auth from './../auth/auth-helper'
-import {Link, withRouter} from 'react-router-dom'
+import { Link, withRouter } from 'react-router'
 
 const isActive = (history, path) => {
   if (history.location.pathname == path)
-    return {color: '#cddc39'}
+    return { color: '#cddc39' }
   else
-    return {color: '#ffffff'}
+    return { color: '#ffffff' }
 }
-const Menu = withRouter(({history}) => (
+const Menu = withRouter(({ history }) => (
   <AppBar position="static">
     <Toolbar>
       <Typography type="title" color="inherit">
@@ -24,11 +24,11 @@ const Menu = withRouter(({history}) => (
       <div>
         <Link to="/">
           <IconButton aria-label="Home" style={isActive(history, "/")}>
-            <HomeIcon/>
+            <HomeIcon />
           </IconButton>
         </Link>
       </div>
-      <div style={{'position':'absolute', 'right': '10px'}}><span style={{'float': 'right'}}>
+      <div style={{ 'position': 'absolute', 'right': '10px' }}><span style={{ 'float': 'right' }}>
         {
           !auth.isAuthenticated() && (<span>
             <Link to="/signup">
@@ -45,15 +45,15 @@ const Menu = withRouter(({history}) => (
           auth.isAuthenticated() && (<span>
             <Link to="/game/new">
               <Button style={isActive(history, "/game/new")}>
-                <AddBoxIcon color="secondary" style={{marginRight: '8px'}}/> Make Game
+                <AddBoxIcon color="secondary" style={{ marginRight: '8px' }} /> Make Game
               </Button>
             </Link>
             <Link to={"/user/" + auth.isAuthenticated().user._id}>
               <Button style={isActive(history, "/user/" + auth.isAuthenticated().user._id)}>My Profile</Button>
             </Link>
             <Button color="inherit" onClick={() => {
-                auth.signout(() => history.push('/'))
-              }}>Sign out</Button>
+              auth.signout(() => history.push('/'))
+            }}>Sign out</Button>
           </span>)
         }
       </span></div>

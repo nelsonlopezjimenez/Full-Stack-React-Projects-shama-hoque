@@ -1,9 +1,9 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import {withStyles} from 'material-ui/styles'
-import Card, {CardContent, CardMedia} from 'material-ui/Card'
+import { withStyles } from 'material-ui/styles'
+import Card, { CardContent, CardMedia } from 'material-ui/Card'
 import Typography from 'material-ui/Typography'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router'
 import Button from 'material-ui/Button'
 import auth from './../auth/auth-helper'
 import DeleteGame from './DeleteGame'
@@ -60,14 +60,14 @@ const styles = theme => ({
 })
 class GameDetail extends Component {
   render() {
-    const {classes} = this.props
+    const { classes } = this.props
     return (<Card className={classes.card}>
       <div className={classes.heading}>
         <Typography type="headline" component="h2" className={classes.title}>
           {this.props.game.name}
         </Typography>
       </div>
-      <CardMedia className={classes.media} image={this.props.game.world} title={this.props.game.name}/>
+      <CardMedia className={classes.media} image={this.props.game.world} title={this.props.game.name} />
       <div className={classes.heading}>
         <Typography type="subheading" component="h4" className={classes.maker}>
           <em>by</em>
@@ -89,13 +89,13 @@ class GameDetail extends Component {
       {
         auth.isAuthenticated().user && auth.isAuthenticated().user._id == this.props.game.maker._id
         && (<div>
-              <Link to={"/game/edit/" + this.props.game._id}>
-                <Button variant="raised" color="primary" className={classes.editbutton}>
-                  Edit
-                </Button>
-              </Link>
-              <DeleteGame game={this.props.game} removeGame={this.props.updateGames}/>
-            </div>)
+          <Link to={"/game/edit/" + this.props.game._id}>
+            <Button variant="raised" color="primary" className={classes.editbutton}>
+              Edit
+            </Button>
+          </Link>
+          <DeleteGame game={this.props.game} removeGame={this.props.updateGames} />
+        </div>)
       }
     </Card>)
   }
