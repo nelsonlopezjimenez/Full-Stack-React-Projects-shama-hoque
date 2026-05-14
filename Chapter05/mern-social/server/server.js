@@ -2,6 +2,7 @@ import config from './../config/config.js'
 import app from './express.js'
 import mongoose from 'mongoose'
 
+// mongoose.connect("mongodb://localhost:3010/mernproject")
 mongoose.connect(config.mongoUri)
   .then(() => {
     console.info('Connected to MongoDB: ' + config.mongoUri)
