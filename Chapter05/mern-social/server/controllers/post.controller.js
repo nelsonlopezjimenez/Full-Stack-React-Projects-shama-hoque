@@ -58,10 +58,10 @@ const listByUser = async (req, res) => {
 }
 
 const listNewsFeed = async (req, res) => {
-  const following = req.profile.following
+  const following = req.profile.following.map(f => f._id)
   following.push(req.profile._id)
   try {
-    const posts = await Post.find({ postedBy: { $in: req.profile.following } })
+    const posts = await Post.find({ postedBy: { $in: following } })
       .populate('comments', 'text created')
       .populate('comments.postedBy', '_id name')
       .populate('postedBy', '_id name')
