@@ -57,7 +57,7 @@ class Home extends Component {
             container
             spacing={3}
           >
-            <Grid xs={12}>
+            <Grid size={12}>
               <Card className={classes.card}>
                 <Typography
                   variant='h5'
@@ -88,16 +88,10 @@ class Home extends Component {
             container
             spacing={3}
           >
-            <Grid
-              xs={8}
-              sm={7}
-            >
+            <Grid size={{ xs: 8, sm: 7 }}>
               <Newsfeed />
             </Grid>
-            <Grid
-              xs={6}
-              sm={5}
-            >
+            <Grid size={{ xs: 6, sm: 5 }}>
               <FindPeople />
             </Grid>
           </Grid>

@@ -61,7 +61,7 @@ class NewPost extends Component {
     text: '',
     photo: '',
     error: '',
-    user: {}
+    user: auth.isAuthenticated() ? auth.isAuthenticated().user : {}
   }
 
   componentDidMount = () => {
