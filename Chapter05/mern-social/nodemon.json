@@ -1,6 +1,0 @@
-{
-  "verbose": false,
-  "watch": ["./server", "./config"],
-  "ext": "js,json",
-  "exec": "node server/server.js"
-}

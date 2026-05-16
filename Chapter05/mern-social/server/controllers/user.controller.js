@@ -99,7 +99,7 @@ const photo = (req, res, next) => {
 }
 
 const defaultPhoto = (req, res) => {
-  return res.sendFile(path.join(__dirname, '../../client/assets/images/profile-pic.png'))
+  return res.sendFile(path.join(__dirname, '../../client/src/assets/images/profile-pic.png'))
 }
 
 const addFollowing = async (req, res, next) => {
