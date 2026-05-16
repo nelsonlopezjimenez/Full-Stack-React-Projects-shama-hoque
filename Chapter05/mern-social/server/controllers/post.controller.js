@@ -89,8 +89,8 @@ const photo = (req, res, next) => {
 const like = async (req, res) => {
   try {
     const result = await Post.findByIdAndUpdate(
-      req.body.postId,
-      { $push: { likes: req.body.userId } },
+      req.post._id,
+      { $push: { likes: req.auth._id } },
       { new: true }
     )
     res.json(result)
@@ -102,8 +102,8 @@ const like = async (req, res) => {
 const unlike = async (req, res) => {
   try {
     const result = await Post.findByIdAndUpdate(
-      req.body.postId,
-      { $pull: { likes: req.body.userId } },
+      req.post._id,
+      { $pull: { likes: req.auth._id } },
       { new: true }
     )
     res.json(result)
@@ -114,10 +114,10 @@ const unlike = async (req, res) => {
 
 const comment = async (req, res) => {
   const commentData = req.body.comment
-  commentData.postedBy = req.body.userId
+  commentData.postedBy = req.auth._id
   try {
     const result = await Post.findByIdAndUpdate(
-      req.body.postId,
+      req.post._id,
       { $push: { comments: commentData } },
       { new: true }
     )
@@ -130,11 +130,10 @@ const comment = async (req, res) => {
 }
 
 const uncomment = async (req, res) => {
-  const commentData = req.body.comment
   try {
     const result = await Post.findByIdAndUpdate(
-      req.body.postId,
-      { $pull: { comments: { _id: commentData._id } } },
+      req.post._id,
+      { $pull: { comments: { _id: req.params.commentId } } },
       { new: true }
     )
       .populate('comments.postedBy', '_id name')

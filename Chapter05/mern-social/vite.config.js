@@ -7,7 +7,6 @@ export default defineConfig({
     port: 5174,
     proxy: {
       '/api': 'http://localhost:3333',
-      '/auth': 'http://localhost:3333',
       '/media': 'http://localhost:3333',
     }
   },

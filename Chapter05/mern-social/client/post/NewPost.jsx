@@ -97,7 +97,7 @@ class NewPost extends Component {
       <div className={classes.root}>
         <Card className={classes.card}>
           <CardHeader
-            avatar={<Avatar src={'/api/users/photo/' + this.state.user._id}/>}
+            avatar={<Avatar src={`/api/users/${this.state.user._id}/photo`}/>}
             title={this.state.user.name}
             className={classes.cardHeader}
           />

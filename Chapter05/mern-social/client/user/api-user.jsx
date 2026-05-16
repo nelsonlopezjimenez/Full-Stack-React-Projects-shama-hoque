@@ -72,14 +72,12 @@ const remove = (params, credentials) => {
 };
 
 const follow = (params, credentials, followId) => {
-  return fetch('/api/users/follow/', {
+  return fetch(`/api/users/${params.userId}/following/${followId}`, {
     method: 'PUT',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + credentials.t,
     },
-    body: JSON.stringify({ userId: params.userId, followId: followId }),
   })
     .then((response) => {
       return response.json();
@@ -90,14 +88,12 @@ const follow = (params, credentials, followId) => {
 };
 
 const unfollow = (params, credentials, unfollowId) => {
-  return fetch('/api/users/unfollow/', {
-    method: 'PUT',
+  return fetch(`/api/users/${params.userId}/following/${unfollowId}`, {
+    method: 'DELETE',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + credentials.t,
     },
-    body: JSON.stringify({ userId: params.userId, unfollowId: unfollowId }),
   })
     .then((response) => {
       return response.json();
@@ -108,7 +104,7 @@ const unfollow = (params, credentials, unfollowId) => {
 };
 
 const findPeople = (params, credentials) => {
-  return fetch('/api/users/findpeople/' + params.userId, {
+  return fetch(`/api/users/${params.userId}/suggestions`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',

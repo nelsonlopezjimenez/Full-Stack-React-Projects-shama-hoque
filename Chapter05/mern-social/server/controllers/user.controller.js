@@ -104,7 +104,7 @@ const defaultPhoto = (req, res) => {
 
 const addFollowing = async (req, res, next) => {
   try {
-    await User.findByIdAndUpdate(req.body.userId, { $push: { following: req.body.followId } })
+    await User.findByIdAndUpdate(req.params.userId, { $push: { following: req.params.targetId } })
     next()
   } catch (err) {
     return res.status(400).json({ error: errorHandler.getErrorMessage(err) })
@@ -114,8 +114,8 @@ const addFollowing = async (req, res, next) => {
 const addFollower = async (req, res) => {
   try {
     const result = await User.findByIdAndUpdate(
-      req.body.followId,
-      { $push: { followers: req.body.userId } },
+      req.params.targetId,
+      { $push: { followers: req.params.userId } },
       { new: true }
     )
       .populate('following', '_id name')
@@ -130,7 +130,7 @@ const addFollower = async (req, res) => {
 
 const removeFollowing = async (req, res, next) => {
   try {
-    await User.findByIdAndUpdate(req.body.userId, { $pull: { following: req.body.unfollowId } })
+    await User.findByIdAndUpdate(req.params.userId, { $pull: { following: req.params.targetId } })
     next()
   } catch (err) {
     return res.status(400).json({ error: errorHandler.getErrorMessage(err) })
@@ -140,8 +140,8 @@ const removeFollowing = async (req, res, next) => {
 const removeFollower = async (req, res) => {
   try {
     const result = await User.findByIdAndUpdate(
-      req.body.unfollowId,
-      { $pull: { followers: req.body.userId } },
+      req.params.targetId,
+      { $pull: { followers: req.params.userId } },
       { new: true }
     )
       .populate('following', '_id name')

@@ -1,5 +1,5 @@
 const create = (params, credentials, post) => {
-  return fetch('/api/posts/new/'+ params.userId, {
+  return fetch(`/api/users/${params.userId}/posts`, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -14,7 +14,7 @@ const create = (params, credentials, post) => {
 }
 
 const listByUser = (params, credentials) => {
-  return fetch('/api/posts/by/'+ params.userId, {
+  return fetch(`/api/users/${params.userId}/posts`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
@@ -27,7 +27,7 @@ const listByUser = (params, credentials) => {
 }
 
 const listNewsFeed = (params, credentials) => {
-  return fetch('/api/posts/feed/'+ params.userId, {
+  return fetch(`/api/users/${params.userId}/feed`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
@@ -54,15 +54,13 @@ const remove = (params, credentials) => {
   })
 }
 
-const like = (params, credentials, postId) => {
-  return fetch('/api/posts/like/', {
-    method: 'PUT',
+const like = (credentials, postId) => {
+  return fetch(`/api/posts/${postId}/likes`, {
+    method: 'POST',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + credentials.t
-    },
-    body: JSON.stringify({userId:params.userId, postId: postId})
+    }
   }).then((response) => {
     return response.json()
   }).catch((err) => {
@@ -70,15 +68,13 @@ const like = (params, credentials, postId) => {
   })
 }
 
-const unlike = (params, credentials, postId) => {
-  return fetch('/api/posts/unlike/', {
-    method: 'PUT',
+const unlike = (credentials, postId) => {
+  return fetch(`/api/posts/${postId}/likes`, {
+    method: 'DELETE',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + credentials.t
-    },
-    body: JSON.stringify({userId:params.userId, postId: postId})
+    }
   }).then((response) => {
     return response.json()
   }).catch((err) => {
@@ -86,15 +82,15 @@ const unlike = (params, credentials, postId) => {
   })
 }
 
-const comment = (params, credentials, postId, comment) => {
-  return fetch('/api/posts/comment/', {
-    method: 'PUT',
+const comment = (credentials, postId, comment) => {
+  return fetch(`/api/posts/${postId}/comments`, {
+    method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + credentials.t
     },
-    body: JSON.stringify({userId:params.userId, postId: postId, comment: comment})
+    body: JSON.stringify({ comment })
   }).then((response) => {
     return response.json()
   }).catch((err) => {
@@ -102,15 +98,13 @@ const comment = (params, credentials, postId, comment) => {
   })
 }
 
-const uncomment = (params, credentials, postId, comment) => {
-  return fetch('/api/posts/uncomment/', {
-    method: 'PUT',
+const uncomment = (credentials, postId, commentId) => {
+  return fetch(`/api/posts/${postId}/comments/${commentId}`, {
+    method: 'DELETE',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + credentials.t
-    },
-    body: JSON.stringify({userId:params.userId, postId: postId, comment: comment})
+    }
   }).then((response) => {
     return response.json()
   }).catch((err) => {

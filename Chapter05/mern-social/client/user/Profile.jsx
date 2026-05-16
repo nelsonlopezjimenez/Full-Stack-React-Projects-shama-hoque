@@ -117,7 +117,7 @@ class Profile extends Component {
   render() {
     const { classes } = this.props;
     const photoUrl = this.state.user._id
-      ? `/api/users/photo/${this.state.user._id}?${new Date().getTime()}`
+      ? `/api/users/${this.state.user._id}/photo?${new Date().getTime()}`
       : '/api/users/defaultphoto';
     if (this.state.redirectToSignin) {
       return <Navigate to='/signin' />;
