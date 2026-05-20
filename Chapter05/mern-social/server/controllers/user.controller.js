@@ -39,7 +39,8 @@ const read = (req, res) => {
 
 const list = async (req, res) => {
   try {
-    const users = await User.find().select('name email updated created photo hashed_password')
+    const users = await User.find().select('name email updated created hashed_password') 
+    // const users = await User.find().select('name email updated created photo hashed_password')
     res.json(users)
   } catch (err) {
     return res.status(400).json({ error: errorHandler.getErrorMessage(err) })
