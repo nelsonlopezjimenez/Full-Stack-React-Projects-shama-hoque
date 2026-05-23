@@ -1,8 +1,8 @@
 # Architecture & Refactoring Decisions
 
 ## Project: mern-social (Chapter 05)
-**Branch:** brooks-dev
-**Last updated:** 2026-05-16
+**Branch:** refactor/separate-client-server (diverged from brooks-dev)
+**Last updated:** 2026-05-23
 
 ---
 
@@ -12,7 +12,7 @@ Migrated from the original book stack to:
 
 | Layer | Before | After |
 |---|---|---|
-| Node | <14 | >=20 |
+| Node | <14 | >=20 (tested on 24.x) |
 | React | 17 | 19 |
 | MUI | v4 | v6 |
 | React Router | v5 | v7 |
@@ -183,8 +183,135 @@ separation and before any external consumers existed.
 
 ---
 
-## 5. Next Steps
+## 5. Client / Server Folder Separation (completed)
 
-- [ ] Folder separation: split `client/` and `server/` into independent packages
-      with separate `package.json` files and a root orchestration `package.json`
-- [ ] Merge `brooks-dev` → `main` after folder separation is tested
+Split the single-package project into two independent packages, each with its
+own `package.json`, `node_modules`, and scripts. Motivated by: cleaner dependency
+graphs, separate deploy targets, and the ability to run `npm install` in only the
+layer that changed.
+
+```
+mern-social/
+├── package.json          ← root orchestration only (no node_modules of its own)
+├── client/
+│   ├── package.json      ← React/Vite/MUI/testing-library deps
+│   ├── index.html
+│   ├── vite.config.js
+│   └── src/              ← all React source (moved from client/ root)
+└── server/
+    ├── package.json      ← Express/Mongoose deps
+    ├── nodemon.json
+    └── config/
+```
+
+Root scripts delegate via `--prefix`:
+```
+npm run dev:server   → nodemon in server/
+npm run dev:client   → vite in client/
+npm run test:server  → vitest in server/
+npm run test:client  → vitest in client/
+npm start            → node server.js in server/
+```
+
+**Decision deferred:** npm workspaces — adds hoisting and cross-package linking
+but introduces risk at this stage. Postponed until the separation is proven stable.
+
+---
+
+## 6. Automated Testing (completed)
+
+Vitest added to both packages. Tests follow a deliberate 4-level progression
+designed for teaching — each level introduces exactly one new concept:
+
+| Level | File | New concept |
+|---|---|---|
+| 1 | `server/tests/unit/dbErrorHandler.test.js` | `describe/it/expect`, pure function |
+| 2 | `server/tests/unit/config.test.js` | `vi.resetModules()` + dynamic import for env vars |
+| 3 | `client/src/__tests__/auth-helper.test.js` | `vi.mock`, jsdom, `sessionStorage` |
+| 4 | `client/src/__tests__/Menu.test.jsx` | `render/screen`, `MemoryRouter`, `mockReturnValue` |
+
+All 24 tests pass on both machines (Windows, different Node versions). Tests are
+deliberately MongoDB-independent — no live database needed to run them. Full
+rationale documented in `TEST.md`.
+
+**Key finding during Level 1:** `dbErrorHandler.js` uses `err.message.lastIndexOf('.$')`
+to extract the field name from duplicate-key errors. This assumes the older MongoDB
+message format (`.$email_1`). Newer MongoDB versions emit a different format —
+the extraction silently produces a garbled string. This is one of the items flagged
+for the error handling refactor (Section 7).
+
+---
+
+## 7. Error Handling Analysis (in progress — not yet fixed)
+
+A full audit of unhandled and poorly handled error scenarios was completed.
+No code has been changed yet. The findings are grouped below by severity.
+
+### Refactoring order context
+The agreed sequence for this project was:
+1. ✅ Upgrade stack (Node 20+/24, React 19, MUI v6, React Router v7, Vite)
+2. ✅ Separate client / server packages
+3. ✅ REST route refactor
+4. ✅ Automated tests (foundation before error handling changes)
+5. ⬜ Error handling improvements ← current position
+
+### What dbErrorHandler.js covers today
+- MongoDB duplicate key errors (codes 11000/11001) — via brittle message parsing
+- Mongoose validation errors — but only the last field when multiple fail
+
+### What is NOT covered (findings)
+
+**Crashes — unhandled TypeErrors:**
+
+| Location | Scenario |
+|---|---|
+| `user.controller.js` → `remove` | `findByIdAndDelete` returns `null` if already deleted → `null.hashed_password` throws |
+| `user.controller.js` → `photo` | User with no photo subdocument → `req.profile.photo.data` throws |
+| `post.controller.js` → `photo` | Post with no photo → `req.post.photo.contentType` throws (no guard at all) |
+| `post.controller.js` → `comment` | `req.body.comment` missing → `undefined.postedBy` throws |
+| `user.controller.js` → `update` | `fs.readFileSync` is outside the try/catch — disk/permission errors uncaught |
+| `post.controller.js` → `create` | Same `fs.readFileSync` issue |
+
+**Silent empty-string responses:**
+
+| Scenario | `dbErrorHandler` result |
+|---|---|
+| MongoDB unreachable mid-session (`MongoServerSelectionError`) | `''` empty string |
+| Network timeout (`MongoNetworkTimeoutError`) | `''` empty string |
+| Invalid ObjectId in URL param (`CastError`) | `''` empty string |
+
+**Startup gap (`server.js`):**
+- `mongoose.connect()` and `app.listen()` run concurrently — the HTTP server
+  accepts requests before the DB connection is confirmed. During the connection
+  timeout window, operations are buffered by Mongoose and eventually fail silently
+  with empty error strings. The `.catch()` throws an unhandled promise rejection
+  that exits the process after several seconds.
+
+**Express pipeline gaps (`express.js`):**
+- No 404 handler — unknown routes return Express's default HTML page (wrong for a JSON API)
+- The `else { next(err) }` branch in the JWT error middleware has no final catch-all
+  handler — unrecognized errors return HTML, with stack trace exposed in development
+
+**Wrong status codes:**
+- `userByID` and `postByID` return 400 for all errors including genuine not-found
+  (should be 404) and DB-down (should be 503)
+
+**Fragile ObjectId comparison:**
+- `auth.controller.js` `hasAuthorization` and `post.controller.js` `isPoster`
+  use `==` between an ObjectId and a string — works via implicit coercion but
+  should be `.equals()` or `String(...) ===`
+
+**`dbErrorHandler` itself:**
+- Duplicate-key field extraction breaks on new MongoDB message format
+  (fix: use `err.keyValue` instead of parsing the message string)
+- Multiple validation errors: `for...in` loop overwrites — only last error survives
+
+### Planned fixes (not yet implemented)
+1. Rewrite `dbErrorHandler.js` — use `err.name` branching, `err.keyValue` for
+   duplicate keys, collect all validation errors
+2. Fix `server.js` startup — await connection before listening, `process.exit(1)` on failure
+3. Add 404 and catch-all error middleware to `express.js`
+4. Fix crash paths in controllers (null checks, move `fs.readFileSync` inside try/catch)
+5. Fix status codes (400 → 404/503 where appropriate)
+6. Fix ObjectId comparisons → `.equals()`
+7. Add tests for all new error branches (Level 1 tests will expand)
