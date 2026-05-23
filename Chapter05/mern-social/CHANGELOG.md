@@ -6,6 +6,31 @@ All notable changes to **mern-social** (Chapter 05) are documented here.
 
 ## [Unreleased] — refactor/separate-client-server branch
 
+### Bug Fix: remove photo buffer from user list response
+
+**File:** `server/controllers/user.controller.js` → `list()`
+
+```js
+// Before
+User.find().select('name email updated created photo hashed_password')
+
+// After
+User.find().select('name email updated created hashed_password')
+```
+
+**Why:** The `GET /api/users` endpoint is used by the Users page to show a list
+of names. Returning the binary photo buffer for every user in that list sent
+unnecessary large payloads over the wire. Photos are fetched on demand via
+`GET /api/users/:userId/photo`.
+
+**Origin:** This fix was made in a separate web session on another machine and
+committed directly to `origin/main` as commit `940d9c3` (author: localepsilon).
+It was not present on this branch. Applied here manually — see the
+*Cherry-picking* section at the bottom of this file for why manual was chosen
+over `git cherry-pick`.
+
+---
+
 ### Structural Refactor: Separate Client / Server Packages
 
 Split the single-package project into independent frontend and backend packages,
@@ -155,3 +180,79 @@ Initial implementation from the book
 - React Router v5
 - Mongoose v6
 - Node 13
+
+---
+
+## Reference: Cherry-picking — what it is and when to use it
+
+### What is a cherry-pick?
+
+`git cherry-pick <commit-sha>` takes a single commit from any branch and
+replays its diff on top of your current branch — without merging the entire
+branch history. You get exactly that one change and nothing else.
+
+```
+origin/main:                  A --- B --- C(fix) --- D
+                                           ↑
+refactor/separate-client-server:  X --- Y --- Z
+                                               ↓ cherry-pick C
+                                  X --- Y --- Z --- C'
+```
+
+`C'` is a new commit with the same change as `C` but a different SHA, because
+its parent is `Z` not `B`.
+
+### The basic command
+
+```bash
+git cherry-pick 940d9c3
+```
+
+If it succeeds cleanly: git creates the new commit automatically.
+If there are conflicts: git pauses, you resolve them, then:
+
+```bash
+git add <resolved-files>
+git cherry-pick --continue   # finish the cherry-pick
+# or
+git cherry-pick --abort      # undo and go back to where you were
+```
+
+### Why we applied this one manually instead
+
+The commit `940d9c3` touched `user.controller.js` on `origin/main`, which at
+that point still had the old `req.body` follow/unfollow pattern and the old
+`defaultPhoto` path. Our branch has the REST refactor and folder separation —
+the same file looks quite different. Running `git cherry-pick 940d9c3` would
+likely have produced a conflict in the lines surrounding the `list()` function.
+
+For a one-line change it was faster and clearer to:
+1. Read the diff (`git show 940d9c3`)
+2. Apply the change by hand in the editor
+3. Commit with a message referencing the original SHA
+
+The result is identical to a successful cherry-pick.
+
+### When to use cherry-pick vs. merge vs. manual
+
+| Situation | Prefer |
+|---|---|
+| One useful commit buried in a branch full of unrelated work | `cherry-pick` |
+| A hotfix on `main` that also needs to go on a release branch | `cherry-pick` |
+| You want all the commits from a branch | `merge` or `rebase` |
+| The target file has diverged significantly from the source | manual apply + reference commit in message |
+| The change is trivial (one line) and context has changed | manual apply + reference commit in message |
+
+### Keeping the audit trail
+
+Whether you cherry-pick or apply manually, always reference the original commit
+SHA in your commit message:
+
+```
+fix: remove photo buffer from list response
+
+Port of 940d9c3 from origin/main (localepsilon, 2026-05-19).
+Original commit left a commented-out line; cleaned up here.
+```
+
+This way `git log` tells the full story even when the SHA differs.
