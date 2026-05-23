@@ -24,6 +24,7 @@
   "scripts": {
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
+    "dev:client:host": "npm run dev:host --prefix client",
     "build": "npm run build --prefix client",
     "start": "npm start --prefix server",
     "test:server": "npm test --prefix server",
