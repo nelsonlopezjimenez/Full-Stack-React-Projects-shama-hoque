@@ -34,6 +34,7 @@ const userByID = async (req, res, next, id) => {
 const read = (req, res) => {
   req.profile.hashed_password = undefined
   req.profile.salt = undefined
+  req.profile.photo.data = null;
   return res.json(req.profile)
 }
 
