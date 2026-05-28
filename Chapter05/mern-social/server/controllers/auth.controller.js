@@ -3,7 +3,36 @@ import jwt from 'jsonwebtoken'
 import { expressjwt } from 'express-jwt'
 import config from './../../config/config.js'
 
+// at the top of auth.controller.js
+const isDev = process.env.NODE_ENV !== 'production'
+
 const signin = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email })
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' })
+    }
+    if (!user.authenticate(req.body.password)) {
+      return res.status(401).send({ error: "Email and password don't match." })
+    }
+    const token = jwt.sign({ _id: user._id }, config.jwtSecret)
+
+    // ✅ Dev-only — zero risk in production
+    if (isDev) {
+      console.log('\n--- DEV: JWT issued ---')
+      console.log('Token:', token)
+      console.log('Paste at https://jwt.io to decode it')
+      console.log('-----------------------\n')
+    }
+
+    res.cookie('t', token, { expire: new Date() + 9999 })
+    return res.json({ token, user: { _id: user._id, name: user.name, email: user.email } 
+    })
+  }catch (err) {
+    return res.status(401).json({ error: 'Could not sign in' })
+  }
+}
+const signin1withoutisDevFlag = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email })
     if (!user) {
