@@ -144,6 +144,7 @@ To list them: `git grep -n "\[BEGINNER\]\|\[ADVANCED\]" -- "Chapter03 and 04"`.
 | 7.10 | **(new)** Client URLs `/users/:userId` and `/users/:userId/edit` (plural, like the API) + a "not found" page | Consistent with the REST naming used on the server | S | 7.3 | do |
 | 7.11 | **(new)** React 19 form actions (`useActionState`) in Signin/Signup; EditProfile keeps controlled inputs so both patterns can be compared | Modern React 19 pattern | S | 7.5 | do |
 | 7.12 | **(new)** `VITE_API_URL` so the client can be deployed on its own origin | Keeps the client independent of where the server runs | S | 7.7 | do |
+| 7.13 | **(new, found during the migration)** Code splitting: pages loaded with `React.lazy` + `<Suspense>` | `vite build` warned that the single bundle was 510 kB (> 500 kB) | S | 7.5 | do |
 
 ## Phase 8 — Tests and verification
 
