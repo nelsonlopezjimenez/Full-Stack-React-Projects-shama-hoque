@@ -91,6 +91,7 @@ To list them: `git grep -n "\[BEGINNER\]\|\[ADVANCED\]" -- "Chapter03 and 04"`.
 | 3.7 | Add a JSON 404 handler for unknown `/api` routes | Gives a nicer API response | S | 3.5 | do |
 | 3.8 | **(new)** REST routes, as in the Ch05 discussion: `POST/DELETE /api/auth/sessions` instead of `POST /auth/signin` + `GET /auth/signout`; `PATCH /api/users/:userId` instead of `PUT` | Signout was a GET with a side effect; the prefix was inconsistent; the update is partial | S | 3.1 | do |
 | 3.9 | **(new)** Central error handling: `async` controllers without `try/catch`; Express 5 forwards rejected promises to the error handler, which maps them to status codes | The main benefit of Express 5; removes repeated code | M | 5.x | do |
+| 3.10 | **(new, found during the migration)** Load the user with explicit route middleware *after* `requireSignin` instead of `router.param` | Measured: `router.param` runs **before** `requireSignin`, so requests without a token hit the DB and got 404 vs 401 (leaks which ids exist). The Ch05 notes state the order the other way round | S | 3.9 | do |
 
 ## Phase 4 — Middleware dependencies
 
