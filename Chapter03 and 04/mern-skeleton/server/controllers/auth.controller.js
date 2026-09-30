@@ -13,36 +13,34 @@ const signin = async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' })
   }
 
-  try {
-    // [BEGINNER] `{ email }` is shorthand for `{ email: email }`.
-    const user = await User.findOne({ email })
+  // [BEGINNER] `{ email }` is shorthand for `{ email: email }`.
+  // No try/catch: a database error rejects the Promise and Express 5 sends it to the
+  // error handler in express.js (a 500, instead of pretending it was a wrong password).
+  const user = await User.findOne({ email })
 
-    if (!user)
-      return res.status(401).json({
-        error: "User not found"
-      })
-
-    if (!user.authenticate(password)) {
-      return res.status(401).send({
-        error: "Email and password don't match."
-      })
-    }
-
-    const token = jwt.sign({
-      _id: user._id
-    }, config.jwtSecret)
-
-    res.cookie("t", token, {
-      expire: new Date() + 9999
+  if (!user)
+    return res.status(401).json({
+      error: "User not found"
     })
 
-    return res.json({
-      token,
-      user: {_id: user._id, name: user.name, email: user.email}
+  if (!user.authenticate(password)) {
+    return res.status(401).send({
+      error: "Email and password don't match."
     })
-  } catch (err) {
-    return res.status(401).json({ error: "Could not sign in" })
   }
+
+  const token = jwt.sign({
+    _id: user._id
+  }, config.jwtSecret)
+
+  res.cookie("t", token, {
+    expire: new Date() + 9999
+  })
+
+  return res.json({
+    token,
+    user: {_id: user._id, name: user.name, email: user.email}
+  })
 }
 
 const signout = (req, res) => {

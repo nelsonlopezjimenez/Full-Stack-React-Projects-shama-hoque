@@ -5,6 +5,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
+import dbErrorHandler from './helpers/dbErrorHandler.js'
 
 // [BEGINNER] This file only *builds* the app and exports it. server.js is the file that
 // starts it (connects to the DB, calls listen). Keeping them apart lets tests import the
@@ -40,15 +41,36 @@ app.use('/api', (req, res) => {
   res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` })
 })
 
-// Catch unauthorised errors
+// Central error handler: every error from every route ends here.
 // [BEGINNER] Express recognises an error handler by its FOUR parameters (err, req, res, next).
+// It must be registered last, after all routes.
+// [ADVANCED] Errors arrive here three ways: next(err), a `throw` in a synchronous handler,
+// and (new in Express 5) a rejected Promise from an async handler.
 app.use((err, req, res, next) => {
+  // If part of the response was already sent, only Express's default handler can close it.
+  if (res.headersSent) return next(err)
+
+  // Missing or invalid JWT (thrown by express-jwt in requireSignin)
   if (err.name === 'UnauthorizedError') {
-    // `return` stops here; the original code had no return and no next(err), so every
+    // `return` stops here; the book's handler had no return and no next(err), so every
     // other kind of error left the request hanging until the client timed out.
     return res.status(401).json({ error: `${err.name}: ${err.message}` })
   }
-  next(err)
+  // Mongoose schema validation, or a duplicate email (MongoDB error code 11000)
+  if (err.name === 'ValidationError' || err.code === 11000) {
+    return res.status(400).json({ error: dbErrorHandler.getErrorMessage(err) })
+  }
+  // A value that cannot be converted to the schema type, e.g. /api/users/not-an-id
+  if (err.name === 'CastError') {
+    return res.status(400).json({ error: `Invalid ${err.path}: ${err.value}` })
+  }
+
+  // [ADVANCED] express.json() sets err.status = 400 for malformed JSON. Anything without a
+  // status is a bug or an outage → 500. Log the details on the server, but do not send the
+  // stack trace or the internal message to the client.
+  const status = err.status ?? err.statusCode ?? 500
+  if (status >= 500) console.error(err)
+  res.status(status).json({ error: status >= 500 ? 'Internal server error' : err.message })
 })
 
 export default app
