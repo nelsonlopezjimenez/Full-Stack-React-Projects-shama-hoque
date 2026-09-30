@@ -1,67 +1,62 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import IconButton from 'material-ui/IconButton'
-import Button from 'material-ui/Button'
-import DeleteIcon from 'material-ui-icons/Delete'
-import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } from 'material-ui/Dialog'
-import auth from './../auth/auth-helper'
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import DeleteIcon from '@mui/icons-material/Delete'
+import auth from '../auth/auth-helper.js'
 import { remove } from './api-user.js'
-import { Redirect, Link } from 'react-router'
+import FormError from '../core/FormError.jsx'
 
-class DeleteUser extends Component {
-  state = {
-    redirect: false,
-    open: false
-  }
-  clickButton = () => {
-    this.setState({ open: true })
-  }
-  deleteAccount = () => {
+// [BEGINNER] Props arrive as the function's first argument; `{ userId }` destructures the one
+// we need. The book declared DeleteUser.propTypes = { userId: PropTypes.string.isRequired }.
+// [ADVANCED] React 19 no longer checks propTypes at all (it silently ignores them), so the
+// `prop-types` package was dropped. TypeScript or JSDoc types are the modern replacement.
+const DeleteUser = ({ userId }) => {
+  const [open, setOpen] = useState(false)
+  const [error, setError] = useState('')
+  const navigate = useNavigate()
+
+  const deleteAccount = async () => {
     const jwt = auth.isAuthenticated()
-    remove({
-      userId: this.props.userId
-    }, { t: jwt.token }).then((data) => {
-      if (data.error) {
-        console.log(data.error)
-      } else {
-        auth.signout(() => console.log('deleted'))
-        this.setState({ redirect: true })
-      }
-    })
-  }
-  handleRequestClose = () => {
-    this.setState({ open: false })
-  }
-  render() {
-    const redirect = this.state.redirect
-    if (redirect) {
-      return <Redirect to='/' />
+    const data = await remove(userId, jwt.token)
+    if (data.error) {
+      setError(data.error) // the book only logged it to the console
+      return
     }
-    return (<span>
-      <IconButton aria-label="Delete" onClick={this.clickButton} color="secondary">
+    // Deleting the account also ends the session (sessionStorage + the server cookie).
+    auth.signout(() => navigate('/'))
+  }
+
+  return (
+    <>
+      <IconButton aria-label="Delete" onClick={() => setOpen(true)} color="secondary">
         <DeleteIcon />
       </IconButton>
 
-      <Dialog open={this.state.open} onClose={this.handleRequestClose}>
-        <DialogTitle>{"Delete Account"}</DialogTitle>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Delete Account</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Confirm to delete your account.
           </DialogContentText>
+          <FormError message={error} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.handleRequestClose} color="primary">
+          <Button onClick={() => setOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={this.deleteAccount} color="secondary" autoFocus="autoFocus">
+          <Button onClick={deleteAccount} color="secondary" autoFocus>
             Confirm
           </Button>
         </DialogActions>
       </Dialog>
-    </span>)
-  }
+    </>
+  )
 }
-DeleteUser.propTypes = {
-  userId: PropTypes.string.isRequired
-}
+
 export default DeleteUser

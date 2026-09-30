@@ -1,119 +1,95 @@
-import React, { Component } from 'react'
-import Card, { CardActions, CardContent } from 'material-ui/Card'
-import Button from 'material-ui/Button'
-import TextField from 'material-ui/TextField'
-import Typography from 'material-ui/Typography'
-import Icon from 'material-ui/Icon'
-import PropTypes from 'prop-types'
-import { withStyles } from 'material-ui/styles'
-import auth from './../auth/auth-helper'
+import { useEffect, useState } from 'react'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import auth from '../auth/auth-helper.js'
 import { read, update } from './api-user.js'
-import { Redirect } from 'react-router'
+import FormError from '../core/FormError.jsx'
 
-const styles = theme => ({
-  card: {
-    maxWidth: 600,
-    margin: 'auto',
-    textAlign: 'center',
-    marginTop: theme.spacing.unit * 5,
-    paddingBottom: theme.spacing.unit * 2
-  },
-  title: {
-    margin: theme.spacing.unit * 2,
-    color: theme.palette.protectedTitle
-  },
-  error: {
-    verticalAlign: 'middle'
-  },
-  textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-    width: 300
-  },
-  submit: {
-    margin: 'auto',
-    marginBottom: theme.spacing.unit * 2
-  }
-})
+const cardSx = { maxWidth: 600, mx: 'auto', mt: 5, pb: 2, textAlign: 'center' }
+const fieldSx = { mx: 1, width: 300 }
 
-class EditProfile extends Component {
-  constructor({ match }) {
-    super()
-    this.state = {
-      name: '',
-      email: '',
-      password: '',
-      redirectToProfile: false,
-      error: ''
-    }
-    this.match = match
-  }
+// [ADVANCED] This page keeps the CLASSIC pattern on purpose: "controlled inputs", where React
+// state holds every field value (value + onChange). Signin/Signup use React 19 form actions
+// instead. Controlled inputs fit here because the fields are filled from the server after the
+// page loads, and they allow live validation while typing. Compare the two approaches.
+const EditProfile = () => {
+  const { userId } = useParams()
+  const navigate = useNavigate()
+  const location = useLocation()
+  // [BEGINNER] One state object for the whole form instead of one useState per field.
+  const [values, setValues] = useState({ name: '', email: '', password: '' })
+  const [error, setError] = useState('')
+  const [redirectToSignin, setRedirectToSignin] = useState(false)
+  const jwt = auth.isAuthenticated()
 
-  componentDidMount = () => {
-    const jwt = auth.isAuthenticated()
-    read({
-      userId: this.match.params.userId
-    }, { t: jwt.token }).then((data) => {
-      if (data.error) {
-        this.setState({ error: data.error })
-      } else {
-        this.setState({ name: data.name, email: data.email })
-      }
+  useEffect(() => {
+    const controller = new AbortController()
+    read(userId, jwt.token, controller.signal).then((data) => {
+      if (controller.signal.aborted) return
+      if (data.status === 401) setRedirectToSignin(true)
+      else if (data.error) setError(data.error)
+      // [BEGINNER] Functional update: `(v) => ({ ...v, ... })` receives the latest state, and
+      // the spread (...) copies it so only name and email change. React state must be
+      // replaced, never mutated in place.
+      else setValues((v) => ({ ...v, name: data.name, email: data.email }))
     })
+    return () => controller.abort()
+  }, [userId])
+
+  // [BEGINNER] A function that returns a function ("currying", same as the book): each
+  // TextField gets its own handler, e.g. onChange={handleChange('email')}.
+  // [name] is a computed property key: the object key comes from the variable.
+  const handleChange = (name) => (event) => {
+    setValues((v) => ({ ...v, [name]: event.target.value }))
   }
-  clickSubmit = () => {
-    const jwt = auth.isAuthenticated()
+
+  const handleSubmit = async (event) => {
+    // [BEGINNER] Stop the browser from reloading the page, which is what a <form> does by default.
+    event.preventDefault()
+    // `|| undefined` leaves empty fields out of the JSON, so a blank password is not changed.
     const user = {
-      name: this.state.name || undefined,
-      email: this.state.email || undefined,
-      password: this.state.password || undefined
+      name: values.name || undefined,
+      email: values.email || undefined,
+      password: values.password || undefined
     }
-    update({
-      userId: this.match.params.userId
-    }, {
-      t: jwt.token
-    }, user).then((data) => {
-      if (data.error) {
-        this.setState({ error: data.error })
-      } else {
-        this.setState({ 'userId': data._id, 'redirectToProfile': true })
-      }
-    })
+    const data = await update(userId, jwt.token, user)
+    if (data.status === 401) return setRedirectToSignin(true)
+    if (data.error) return setError(data.error)
+    // The book stored redirectToProfile in state and rendered <Redirect>; navigate() is direct.
+    navigate(`/users/${data._id}`)
   }
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.value })
+
+  if (redirectToSignin) {
+    return <Navigate to="/signin" replace state={{ from: location }} />
   }
-  render() {
-    const { classes } = this.props
-    if (this.state.redirectToProfile) {
-      return (<Redirect to={'/user/' + this.state.userId} />)
-    }
-    return (
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography type="headline" component="h2" className={classes.title}>
-            Edit Profile
-          </Typography>
-          <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal" /><br />
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal" /><br />
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal" />
-          <br /> {
-            this.state.error && (<Typography component="p" color="error">
-              <Icon color="error" className={classes.error}>error</Icon>
-              {this.state.error}
-            </Typography>)
-          }
-        </CardContent>
-        <CardActions>
-          <Button color="primary" variant="raised" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
-        </CardActions>
-      </Card>
-    )
-  }
+
+  return (
+    <Card component="form" onSubmit={handleSubmit} sx={cardSx}>
+      <CardContent>
+        <Typography variant="h6" component="h2" sx={{ m: 2, color: (theme) => theme.palette.protectedTitle }}>
+          Edit Profile
+        </Typography>
+        <TextField id="name" label="Name" value={values.name} onChange={handleChange('name')}
+          autoComplete="name" sx={fieldSx} margin="normal" /><br />
+        <TextField id="email" type="email" label="Email" value={values.email} onChange={handleChange('email')}
+          autoComplete="email" sx={fieldSx} margin="normal" /><br />
+        <TextField id="password" type="password" label="Password" value={values.password}
+          onChange={handleChange('password')} helperText="Leave empty to keep the current password"
+          autoComplete="new-password" sx={fieldSx} margin="normal" />
+        <FormError message={error} />
+      </CardContent>
+      <CardActions>
+        <Button type="submit" color="primary" variant="contained" sx={{ mx: 'auto', mb: 2 }}>
+          Submit
+        </Button>
+      </CardActions>
+    </Card>
+  )
 }
 
-EditProfile.propTypes = {
-  classes: PropTypes.object.isRequired
-}
-
-export default withStyles(styles)(EditProfile)
+export default EditProfile

@@ -1,102 +1,94 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { withStyles } from 'material-ui/styles'
-import Paper from 'material-ui/Paper'
-import List, { ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText } from 'material-ui/List'
-import Avatar from 'material-ui/Avatar'
-import IconButton from 'material-ui/IconButton'
-import Button from 'material-ui/Button'
-import Typography from 'material-ui/Typography'
-import Edit from 'material-ui-icons/Edit'
-import Person from 'material-ui-icons/Person'
-import Divider from 'material-ui/Divider'
-import DeleteUser from './DeleteUser'
-import auth from './../auth/auth-helper'
+import { useEffect, useState } from 'react'
+import { Link, Navigate, useLocation, useParams } from 'react-router'
+import Paper from '@mui/material/Paper'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import ListItemText from '@mui/material/ListItemText'
+import Avatar from '@mui/material/Avatar'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
+import Edit from '@mui/icons-material/Edit'
+import Person from '@mui/icons-material/Person'
+import DeleteUser from './DeleteUser.jsx'
+import auth from '../auth/auth-helper.js'
 import { read } from './api-user.js'
-import { Redirect, Link } from 'react-router'
+import FormError from '../core/FormError.jsx'
 
-const styles = theme => ({
-  root: theme.mixins.gutters({
-    maxWidth: 600,
-    margin: 'auto',
-    padding: theme.spacing.unit * 3,
-    marginTop: theme.spacing.unit * 5
-  }),
-  title: {
-    margin: `${theme.spacing.unit * 3}px 0 ${theme.spacing.unit * 2}px`,
-    color: theme.palette.protectedTitle
-  }
-})
+const Profile = () => {
+  // [BEGINNER] useParams() reads :userId from the URL /users/:userId (the book used
+  // this.props.match.params.userId, passed in by React Router 4).
+  const { userId } = useParams()
+  const location = useLocation()
+  const [user, setUser] = useState(null)
+  const [error, setError] = useState('')
+  const [redirectToSignin, setRedirectToSignin] = useState(false)
+  const jwt = auth.isAuthenticated()
 
-class Profile extends Component {
-  constructor({ match }) {
-    super()
-    this.state = {
-      user: '',
-      redirectToSignin: false
-    }
-    this.match = match
-  }
-  init = (userId) => {
-    const jwt = auth.isAuthenticated()
-    read({
-      userId: userId
-    }, { t: jwt.token }).then((data) => {
-      if (data.error) {
-        this.setState({ redirectToSignin: true })
-      } else {
-        this.setState({ user: data })
-      }
+  // [BEGINNER] [userId] is the dependency list: the effect runs again whenever userId changes,
+  // e.g. going from someone else's profile to "My Profile". The book needed a second lifecycle
+  // method for this, componentWillReceiveProps, which React has since deprecated.
+  useEffect(() => {
+    const controller = new AbortController()
+    setError('')
+    read(userId, jwt.token, controller.signal).then((data) => {
+      // [ADVANCED] If userId changed (or the page was left) before this answer arrived, the
+      // cleanup below already aborted the request: ignore it, or an OLD profile could overwrite
+      // the new one (a race condition the book had). In development, StrictMode runs every
+      // effect twice on purpose, so the first request is always aborted: that is expected.
+      if (controller.signal.aborted) return
+      if (data.status === 401) setRedirectToSignin(true) // token expired or invalid
+      else if (data.error) setError(data.error)
+      else setUser(data)
     })
+    return () => controller.abort()
+    // [ADVANCED] jwt.token is read once per userId on purpose. The linter rule
+    // react-hooks/exhaustive-deps (if you add ESLint) would ask to list it too; both work.
+  }, [userId])
+
+  if (redirectToSignin) {
+    return <Navigate to="/signin" replace state={{ from: location }} />
   }
-  componentWillReceiveProps = (props) => {
-    this.init(props.match.params.userId)
-  }
-  componentDidMount = () => {
-    this.init(this.match.params.userId)
-  }
-  render() {
-    const { classes } = this.props
-    const redirectToSignin = this.state.redirectToSignin
-    if (redirectToSignin) {
-      return <Redirect to='/signin' />
-    }
-    return (
-      <Paper className={classes.root} elevation={4}>
-        <Typography type="title" className={classes.title}>
-          Profile
-        </Typography>
+
+  const isOwnProfile = user && jwt.user._id === user._id
+
+  return (
+    <Paper elevation={4} sx={{ maxWidth: 600, mx: 'auto', mt: 5, p: 3 }}>
+      <Typography variant="h6" component="h2" sx={{ mt: 1, mb: 2, color: (theme) => theme.palette.protectedTitle }}>
+        Profile
+      </Typography>
+      <FormError message={error} />
+      {/* [BEGINNER] The book started with user = '' and rendered "Joined: Invalid Date" until the
+          data arrived. Rendering nothing until `user` exists avoids that flash. */}
+      {user && (
         <List dense>
-          <ListItem>
+          {/* [ADVANCED] `secondaryAction` replaces MUI's deprecated <ListItemSecondaryAction>. */}
+          <ListItem
+            secondaryAction={isOwnProfile && (
+              <>
+                <IconButton component={Link} to={`/users/${user._id}/edit`} aria-label="Edit" color="primary">
+                  <Edit />
+                </IconButton>
+                <DeleteUser userId={user._id} />
+              </>
+            )}
+          >
             <ListItemAvatar>
               <Avatar>
                 <Person />
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={this.state.user.name} secondary={this.state.user.email} /> {
-              auth.isAuthenticated().user && auth.isAuthenticated().user._id == this.state.user._id &&
-              (<ListItemSecondaryAction>
-                <Link to={"/user/edit/" + this.state.user._id}>
-                  <IconButton aria-label="Edit" color="primary">
-                    <Edit />
-                  </IconButton>
-                </Link>
-                <DeleteUser userId={this.state.user._id} />
-              </ListItemSecondaryAction>)
-            }
+            <ListItemText primary={user.name} secondary={user.email} />
           </ListItem>
           <Divider />
           <ListItem>
-            <ListItemText primary={"Joined: " + (
-              new Date(this.state.user.created)).toDateString()} />
+            <ListItemText primary={`Joined: ${new Date(user.created).toDateString()}`} />
           </ListItem>
         </List>
-      </Paper>
-    )
-  }
-}
-Profile.propTypes = {
-  classes: PropTypes.object.isRequired
+      )}
+    </Paper>
+  )
 }
 
-export default withStyles(styles)(Profile)
+export default Profile
