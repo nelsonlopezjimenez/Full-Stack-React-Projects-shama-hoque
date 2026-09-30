@@ -45,3 +45,12 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
   - **Existing bug found:** signing up twice with the same email *succeeded* on a fresh database. `unique: true` only creates an index, and Mongoose builds it in the background after connecting while the server already accepts requests. This is fixed in the Mongoose step (wait for the indexes before `listen`).
   - `GET /api/users/not-an-id` answers 400 "User not found" — the real problem is an invalid id (CastError). Handled in step 3.9.
 - **Commit:** `refactor(ch03-server): native ESM package, node --watch, .env; remove webpack and SSR`
+
+### 2026-09-30 — 3.1, 3.2, 3.5, 3.6, 3.7 Express 4 → 5
+- **Changed:** `express` ^4.21 → ^5.2.1, `body-parser` removed. `express.js`: `express.json()` / `express.urlencoded({ extended: true })`, JSON 404 for unknown `/api/*`, error handler now `return`s and calls `next(err)`. Controllers: the five `res.status('4xx')` → integers. `signin`: `const { email, password } = req.body ?? {}` + 400 when either is missing.
+- **Why:** the breaking changes of Express 5 that affect this server (see [ch03-express5-bodyparser-migration.md](ch03-express5-bodyparser-migration.md)).
+- **Verified:**
+  - *Before the code fix* (Express 5 installed, old code): the first wrong-password signin threw `TypeError: Invalid status code: "401". Status code must be an integer.` inside a Mongoose callback — an unhandled exception, so **the whole server process died** and every later request got no answer (`HTTP 000`). Good demo for students: run the old code on Express 5 first.
+  - *After:* all smoke requests answer as before; signin with no body → 400 "Email and password are required"; `GET /api/nope` → 404 JSON instead of an HTML page.
+- **Notes / surprises:** routes, `router.param`, `cookie-parser`, `cors`, `helmet` 3 all worked unchanged on Express 5.
+- **Commit:** `refactor(ch03-server): Express 5 (built-in body parsing, integer status codes, error handler)`
