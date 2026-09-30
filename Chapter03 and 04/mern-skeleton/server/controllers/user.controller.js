@@ -22,7 +22,9 @@ const create = (req, res, next) => {
 const userByID = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
     if (err || !user)
-      return res.status('400').json({
+      // [BEGINNER] Status codes must be numbers. The book wrote res.status('400'); Express 5
+      // throws "Invalid status code" for a string, and inside this callback that crashes the process.
+      return res.status(400).json({
         error: "User not found"
       })
     req.profile = user
