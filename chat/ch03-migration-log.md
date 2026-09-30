@@ -175,3 +175,57 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** `npm test` → 4 files, 13 tests pass (~18 s, mostly jsdom start-up). `vite build` unchanged, no size warning.
 - **Notes / surprises:** jest-dom 7 no longer has the `@testing-library/jest-dom/vitest` entry used in Ch05; the setup file registers `@testing-library/jest-dom/matchers` with `expect.extend`.
 - **Commit:** `test(ch03-client): Vitest + Testing Library suite in four levels`
+
+### 2026-09-30 — 9.1, 9.3, 9.4 Docs and summary
+- **Changed:** `mern-skeleton/README.md` rewritten (two packages, how to run, API table, links to this log); new `server/README.md` and `client/README.md` (scripts, env vars, layout).
+- **Verified:** the full end-to-end run (28 checks) also passes through the **Vite dev server + proxy** (not only the built client served by Express), with no React/MUI warnings. In dev, each profile request shows up twice in the server log: StrictMode runs effects twice, and the first request is aborted by the effect cleanup, as intended.
+- **Notes / surprises:** while testing, my cleanup command stopped the process listening on port 5173 — that was the user's **Ch02 Vite dev server**, started after my port check. The Ch02 API on port 3000 was not touched. Later runs used port 5180 and stopped only their own process IDs.
+- **Commit:** `docs(ch03): READMEs for the two packages and migration summary`
+
+---
+
+## Summary
+
+**Result:** all `do` steps done (the `later` steps are 6.9 rate limiting and 9.2 Docker). The server has 18 `node:test` tests (no DB) and the client has 13 Vitest tests. A 28-step end-to-end browser run passes against both the built app and the dev server. Every dependency is on its latest version, and the code has 151 teaching comments (100 `[BEGINNER]`, 51 `[ADVANCED]`).
+
+### Commit map (to redo it step by step: `git show <hash>`, or `git checkout <hash>`)
+
+| Commit | Step |
+|---|---|
+| `07cf12f` | docs: checklist decisions and log baseline |
+| `18c7c4e` | move server and client into separate folders (renames only) |
+| `3df2e99` | server: native ESM, node --watch, .env; remove webpack and SSR (old library versions) |
+| `5eb10e8` | server: Express 5 |
+| `606c69e` | server: Mongoose 9, async/await (with try/catch) |
+| `ed49774` | server: readable DB error messages, schema syntax |
+| `4799cda` | server: central error handler (async without try/catch) — diff against 606c69e |
+| `74847d5` | server: REST routes |
+| `3498aaa` | server: JWT/cookie hardening, toJSON |
+| `3db2a19` | server: scrypt passwords |
+| `cb19e78` | server: helmet 8, CORS allow-list, no lodash (mass-assignment fix) |
+| `a06f3ae` | server: logger, optional CLIENT_DIST |
+| `ba0b951` | server: userByID after requireSignin (router.param order) |
+| `5e31f0f` | server: tests + api.http |
+| `61cb7fd` | client: Vite shell, API layer, Home, Menu |
+| `018d252` | client: Signin/Signup with useActionState |
+| `665bcc2` | client: Users, Profile, EditProfile, DeleteUser |
+| `7051e92` | client: lazy-loaded pages |
+| `302417b` | client: tests |
+
+### Findings worth showing students (bugs in the book's code that the migration exposed)
+
+1. `server.js` referenced an undefined `mongoUri` in the DB error handler (2.5).
+2. **Duplicate sign-ups** were possible right after startup: `unique` is an index, built in the background (5.1).
+3. Express 5 + `res.status('401')` inside a Mongoose callback **crashed the whole process** (3.2).
+4. The error handler left every non-JWT error hanging (3.5).
+5. The duplicate-email message was garbled on MongoDB ≥ 4.2; only the last validation error was shown (5.6).
+6. The cookie option `expire` did not exist; tokens never expired; the fallback secret is public (6.3–6.5).
+7. `_.extend(user, req.body)` allowed **mass assignment** of `hashed_password`/`salt` (4.4).
+8. `router.param` runs **before** `requireSignin`: anonymous requests hit the DB and could probe which ids exist (3.10). The Ch05 notes describe the order the other way round.
+9. Client: `componentWillReceiveProps` without cancelling → possible stale profile (race); `<Button>` inside `<Link>` (invalid HTML); list keys were array indexes.
+
+### Open decisions for the user
+
+- Merge `refactor/ch03-migration` into `main`, or keep it as a separate branch for teaching.
+- Ch05 follow-ups found here: the `router.param` order note in `docs/rest-routes.md`, the `dbErrorHandler` fix, `PUT` vs `PATCH`, jest-dom 7 setup.
+- `later` steps: 6.9 rate limiting, 9.2 Docker.
