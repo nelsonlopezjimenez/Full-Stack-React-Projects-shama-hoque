@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 // the book's default import `import expressJwt from 'express-jwt'` no longer exists.
 import { expressjwt } from 'express-jwt'
 import config from '../config/config.js'
+import logger from '../helpers/logger.js'
 
 // [ADVANCED] httpOnly: JavaScript in the page cannot read the cookie (limits XSS damage).
 // sameSite 'strict': the browser does not send it on requests started by other sites (CSRF).
@@ -46,6 +47,9 @@ const signin = async (req, res) => {
     algorithm: 'HS256',
     expiresIn: config.jwtExpiresIn // the book's tokens never expired
   })
+
+  // Development only: paste the token at https://jwt.io to look inside it.
+  logger.debug('JWT issued for %s: %s', user.email, token)
 
   res.cookie('t', token, { ...cookieOptions, maxAge: config.jwtCookieMaxAgeMs })
 

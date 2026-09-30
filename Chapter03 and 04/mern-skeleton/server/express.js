@@ -1,3 +1,4 @@
+import path from 'node:path'
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import compress from 'compression'
@@ -7,11 +8,15 @@ import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
 import config from './config/config.js'
+import logger, { requestLogger } from './helpers/logger.js'
 
 // [BEGINNER] This file only *builds* the app and exports it. server.js is the file that
 // starts it (connects to the DB, calls listen). Keeping them apart lets tests import the
 // app without opening a port or a database connection.
 const app = express()
+
+// development only: one line per request, e.g. "GET /api/users → 200 (3.1 ms)"
+app.use(requestLogger)
 
 // parse body params and attach them to req.body
 // [BEGINNER] express.json() is built into Express (since 4.16), so the separate
@@ -44,15 +49,32 @@ if (config.corsOrigins.length > 0) {
 app.use('/', userRoutes)
 app.use('/', authRoutes)
 
-// [ADVANCED] Server-side rendering (React renderToString + MUI/JSS + devBundle + the
-// app.get('*') catch-all) was removed. The client is now its own Vite project, and the
-// server does not import any client code, so the two packages stay independent.
-
 // [BEGINNER] Any /api request that did not match a route above ends here.
 // Without it, Express answers with an HTML "Cannot GET ..." page, which a JSON client cannot parse.
 app.use('/api', (req, res) => {
   res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` })
 })
+
+// Optional: serve a built client (step 3.4 / 7.9)
+// [ADVANCED] Server-side rendering (React renderToString + MUI/JSS + devBundle + the
+// app.get('*') catch-all) was removed. The client is its own Vite project and the server
+// imports NO client code, so the packages stay independent. For a single-process deploy, run
+// `npm run build` in ../client and start the server with CLIENT_DIST=../client/dist.
+// Without CLIENT_DIST the server is a pure JSON API (the client can live on a CDN).
+if (config.clientDist) {
+  app.use(express.static(config.clientDist))
+
+  // [BEGINNER] SPA fallback: a page URL such as /users/123 exists only in React Router, not on
+  // the server, so every other GET returns index.html and React Router picks the page.
+  // [ADVANCED] Express 5 (path-to-regexp v8) no longer accepts a bare '*'. A wildcard needs a
+  // name: '/*splat' matches everything except '/', '/{*splat}' also matches '/'.
+  // (React Router still writes its catch-all as path="*": different library, different syntax.)
+  app.get('/{*splat}', (req, res, next) => {
+    // A missing file such as /assets/app-123.js should be a real 404, not index.html.
+    if (path.extname(req.path)) return next()
+    res.sendFile(path.join(config.clientDist, 'index.html'))
+  })
+}
 
 // Central error handler: every error from every route ends here.
 // [BEGINNER] Express recognises an error handler by its FOUR parameters (err, req, res, next).
@@ -82,7 +104,7 @@ app.use((err, req, res, next) => {
   // status is a bug or an outage → 500. Log the details on the server, but do not send the
   // stack trace or the internal message to the client.
   const status = err.status ?? err.statusCode ?? 500
-  if (status >= 500) console.error(err)
+  if (status >= 500) logger.error(err)
   res.status(status).json({ error: status >= 500 ? 'Internal server error' : err.message })
 })
 

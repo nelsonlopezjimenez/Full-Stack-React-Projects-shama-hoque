@@ -4,6 +4,7 @@ import config from './config/config.js'
 import app from './express.js'
 import mongoose from 'mongoose'
 import User from './models/user.model.js'
+import logger from './helpers/logger.js'
 
 // [BEGINNER] Top-level await: in an ES module you can `await` outside any function.
 // The server only starts listening AFTER the database is ready, so no request can arrive
@@ -17,11 +18,11 @@ try {
   // Model.init() resolves once the indexes exist. In production, indexes are usually created
   // by a migration script and autoIndex is turned off.
   await User.init()
-  console.info('Connected to MongoDB: %s', config.mongoUri)
+  logger.info('Connected to MongoDB: %s', config.mongoUri)
 } catch (err) {
   // Bug fix (step 2.5): the original used `${mongoUri}`, a variable that does not exist here,
   // so this handler crashed with a ReferenceError instead of showing the real problem.
-  console.error('Unable to connect to database %s: %s', config.mongoUri, err.message)
+  logger.error('Unable to connect to database %s: %s', config.mongoUri, err.message)
   // [BEGINNER] A non-zero exit code tells the shell (or Docker, or systemd) that startup failed.
   process.exit(1)
 }
@@ -30,8 +31,9 @@ try {
 // (for example EADDRINUSE when the port is taken), so the check below now works.
 app.listen(config.port, (err) => {
   if (err) {
-    console.error(err.message)
+    logger.error(err.message)
     process.exit(1)
   }
-  console.info('Server started on port %s.', config.port)
+  logger.info('Server started on port %s.', config.port)
+  if (config.clientDist) logger.info('Serving client from %s', config.clientDist)
 })
