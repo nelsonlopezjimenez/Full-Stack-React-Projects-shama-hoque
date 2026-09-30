@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import expressJwt from 'express-jwt'
 import config from '../config/config.js'
 
-const signin = (req, res) => {
+const signin = async (req, res) => {
   // [BEGINNER] Destructuring pulls two properties out of an object in one line.
   // `?? {}` (nullish coalescing) uses {} when req.body is null or undefined. In Express 5,
   // req.body stays undefined when no body parser ran (e.g. a request without a
@@ -13,9 +13,11 @@ const signin = (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' })
   }
 
-  User.findOne({ email }, (err, user) => {
+  try {
+    // [BEGINNER] `{ email }` is shorthand for `{ email: email }`.
+    const user = await User.findOne({ email })
 
-    if (err || !user)
+    if (!user)
       return res.status(401).json({
         error: "User not found"
       })
@@ -38,8 +40,9 @@ const signin = (req, res) => {
       token,
       user: {_id: user._id, name: user.name, email: user.email}
     })
-
-  })
+  } catch (err) {
+    return res.status(401).json({ error: "Could not sign in" })
+  }
 }
 
 const signout = (req, res) => {

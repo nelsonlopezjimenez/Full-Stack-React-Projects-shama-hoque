@@ -54,3 +54,14 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
   - *After:* all smoke requests answer as before; signin with no body → 400 "Email and password are required"; `GET /api/nope` → 404 JSON instead of an HTML page.
 - **Notes / surprises:** routes, `router.param`, `cookie-parser`, `cors`, `helmet` 3 all worked unchanged on Express 5.
 - **Commit:** `refactor(ch03-server): Express 5 (built-in body parsing, integer status codes, error handler)`
+
+### 2026-09-30 — 5.1–5.5 Mongoose 5 → 9 (callbacks → async/await)
+- **Changed:** `mongoose` ^5.13 → ^9.10.3. `user.controller.js` and `signin`: every callback → `async`/`await` with `try/catch` (same responses as before); `user.remove()` → `user.deleteOne()`. `server.js`: top-level `await mongoose.connect()` + `await User.init()` **before** `app.listen()`, `process.exit(1)` when the DB is unreachable, `mongoose.Promise` line removed, `listen` callback exits on error (Express 5 passes the error). `.env.example`: `?directConnection=true`.
+- **Why:** Mongoose 7+ removed callbacks. Waiting for the connection and the indexes fixes the duplicate-signup race found in the ESM step.
+- **Verified:** smoke test — signup, the **second signup with the same email is now rejected (400)**, signin, list, read, update, delete, signout all OK.
+- **Notes / surprises:**
+  - Read the [Mongoose 9 migration guide](https://mongoosejs.com/docs/migrating_to_9.html): its breaking changes (no `next()` in pre hooks, update pipelines, `returnDocument`, Node 20.19+) do not touch this code.
+  - **Connection problem on this machine:** Mongoose 9 (MongoDB driver 7) failed with `getaddrinfo ENOTFOUND mongodb`, while Mongoose 5 had worked. The local MongoDB is a replica set whose member calls itself `mongodb` (a container name). New drivers discover the set and then connect to that name. `?directConnection=true` (same as Ch02) makes the driver talk only to `localhost:27017`.
+  - The duplicate-email error text is garbled: `"11000 duplicate key error collection: mernskeleton.users index: email already exists"` → this is bug 5.6, fixed in the next commit.
+  - `GET /api/users/not-an-id` now answers "Could not retrieve user" (a CastError), still 400 → step 3.9.
+- **Commit:** `refactor(ch03-server): Mongoose 9, async/await controllers, wait for DB before listen`

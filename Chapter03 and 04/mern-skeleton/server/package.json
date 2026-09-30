@@ -23,6 +23,6 @@
     "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
-    "mongoose": "^5.13.23"
+    "mongoose": "^9.10.3"
   }
 }
