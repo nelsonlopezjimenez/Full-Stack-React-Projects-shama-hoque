@@ -1,28 +1,50 @@
 import { signout } from './api-auth.js'
 
-const auth = {
-  isAuthenticated() {
-    if (typeof window == "undefined")
-      return false
+const STORAGE_KEY = 'jwt'
 
-    if (sessionStorage.getItem('jwt'))
-      return JSON.parse(sessionStorage.getItem('jwt'))
-    else
+// [ADVANCED] The payload (middle part) of a JWT is base64url-encoded JSON, readable by anyone.
+// Reading `exp` here only improves the user experience (an expired session looks signed out
+// immediately); the server still checks the signature and the expiry on every request.
+const isExpired = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return typeof payload.exp === 'number' && payload.exp * 1000 < Date.now()
+  } catch {
+    // [BEGINNER] `catch {` without `(err)` (ES2019) when the error itself is not needed
+    return true
+  }
+}
+
+// [ADVANCED] The token lives in sessionStorage (cleared when the tab closes), as in the book.
+// Any script running on the page can read it, so an XSS bug would leak it. The server also
+// sets the same token as an httpOnly cookie that scripts cannot read; switching the API to
+// read that cookie (and dropping this storage) is the more secure design.
+const auth = {
+  // Returns { token, user } when signed in, otherwise false (same contract as the book)
+  isAuthenticated() {
+    // [BEGINNER] The book checked `typeof window == "undefined"` because the same code also
+    // ran on the server (SSR). Without SSR this code only runs in the browser.
+    try {
+      const jwt = JSON.parse(sessionStorage.getItem(STORAGE_KEY))
+      if (!jwt?.token || isExpired(jwt.token)) return false
+      return jwt
+    } catch {
       return false
+    }
   },
+
   authenticate(jwt, cb) {
-    if (typeof window !== "undefined")
-      sessionStorage.setItem('jwt', JSON.stringify(jwt))
-    cb()
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(jwt))
+    // [BEGINNER] `cb?.()` calls cb only if it was passed (optional call).
+    cb?.()
   },
-  signout(cb) {
-    if (typeof window !== "undefined")
-      sessionStorage.removeItem('jwt')
-    cb()
-    //optional
-    signout().then((data) => {
-      document.cookie = "t=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-    })
+
+  async signout(cb) {
+    sessionStorage.removeItem(STORAGE_KEY)
+    cb?.()
+    // The server clears the httpOnly cookie. The book also tried
+    // `document.cookie = "t=; expires=..."`, which cannot touch an httpOnly cookie.
+    await signout()
   }
 }
 

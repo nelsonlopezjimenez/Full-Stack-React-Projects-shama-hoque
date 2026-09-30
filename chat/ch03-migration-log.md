@@ -133,3 +133,14 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** `npm test` → 18 tests, 4 suites, all pass in ~0.4 s. Test 4 "rejects a protected route without a token" depends on step 3.10: with `router.param`, the request would wait for a DB lookup (Mongoose buffers for 10 s without a connection) instead of answering 401.
 - **Notes / surprises:** `api.http` uses port 3000 (the normal dev port); change `@baseUrl` if 3000 is busy, as it is on this machine.
 - **Commit:** `test(ch03-server): node:test suite in four levels (no DB) and api.http smoke file`
+
+### 2026-09-30 — 7.1, 7.2, 7.6, 7.7, 7.8, 7.12 + part of 7.3/7.4/7.5 Client: Vite, API layer, router shell
+- **Changed:** new `client/package.json` (React 19.3, React Router 8.4, MUI 9.4 + emotion, `@fontsource/roboto`, Vite 8), `vite.config.js` (`/api` proxy to `API_PROXY_TARGET`, default `:3000`), `index.html` (replaces `template.js`), `.env.example`. React files renamed `.js` → `.jsx` with `git mv`. Ported: `main.jsx` (`createRoot` + `StrictMode`), `App.jsx` (`createTheme`, `CssBaseline`, no `react-hot-loader`), `MainRouter.jsx` (`Routes`/`element`, protected layout route, `path="*"` → new `core/NotFound.jsx`), `PrivateRoute.jsx` (layout route with `<Outlet/>`), `Menu.jsx` (`NavLink` + `&.active` instead of `isActive`, hooks instead of `withRouter`), `Home.jsx` (`sx`). API layer: new `core/request.js` (one `fetch` helper, `VITE_API_URL`, never throws, returns `{ error }`), `api-auth.js` (`/api/auth/sessions`), `api-user.js` (`PATCH`, plain `(userId, token)` arguments), `auth-helper.js` (no SSR checks, treats an expired JWT as signed out, no `document.cookie` hack).
+- **Why:** the book's client needs webpack 4/Babel 6/React 16/material-ui beta and cannot be installed today.
+- **Verified:** `vite build` OK (397 kB JS, 127 kB gzip). Headless Edge against the server with `CLIENT_DIST=../client/dist`: `/` renders menu + Home card; `/nope` renders "Page not found"; no console errors.
+- **Notes / surprises:**
+  - Still the old book code, not imported yet: `Signin`, `Signup`, `Users`, `Profile`, `EditProfile`, `DeleteUser` (next two commits). Vite only bundles imported files, so the build works in the meantime.
+  - React Router 8 needs React ≥ 19.2.7 and Node ≥ 22.22 → `engines.node` of the client is `>=22.22.0`.
+  - MUI 9 removed system props on `Typography` (`color="error"` etc.), so every style goes through `sx`.
+  - On this machine the client's own `.env` sets `API_PROXY_TARGET=http://localhost:3100` (port 3000 is busy).
+- **Commit:** `feat(ch03-client): Vite + React 19 + React Router 8 + MUI 9 shell, API layer, Home and Menu`
