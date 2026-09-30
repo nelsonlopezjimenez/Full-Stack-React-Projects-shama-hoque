@@ -168,3 +168,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** main bundle 510 kB → 256 kB (81 kB gzip); each page is its own 1–10 kB chunk, and shared MUI parts (TextField, Modal, Button) are separate chunks. No warning. End-to-end run: 28/28 pass, no console errors.
 - **Notes / surprises:** Rolldown (Vite 8's bundler) names shared chunks after one of the modules inside them, so a 131 kB chunk is called `request-*.js` even though it is mostly MUI code.
 - **Commit:** `perf(ch03-client): lazy-load pages with React.lazy and Suspense`
+
+### 2026-09-30 — 8.3 Client tests (Vitest + Testing Library)
+- **Changed:** dev dependencies `vitest` 5, `jsdom` 30, `@testing-library/react` 16, `@testing-library/jest-dom` 7; `test` block in `vite.config.js` (jsdom + setup file); `npm test` / `npm run test:watch`. `src/test/`: `setup.js`, `helpers.js` (`fakeToken`, `signInAs`) and four levels — `1-auth-helper` (sessionStorage, expired token, `vi.mock` of the API), `2-request` (`vi.stubGlobal('fetch')`: PATCH + Bearer header, error status, server down), `3-Menu` (`MemoryRouter`, `getByRole`, NavLink `active`), `4-PrivateRoute` (redirect with `state.from`, `<Outlet/>` when signed in).
+- **Why:** same four-level idea as Ch05 (`TEST.md`) and the server tests.
+- **Verified:** `npm test` → 4 files, 13 tests pass (~18 s, mostly jsdom start-up). `vite build` unchanged, no size warning.
+- **Notes / surprises:** jest-dom 7 no longer has the `@testing-library/jest-dom/vitest` entry used in Ch05; the setup file registers `@testing-library/jest-dom/matchers` with `expect.extend`.
+- **Commit:** `test(ch03-client): Vitest + Testing Library suite in four levels`
