@@ -27,6 +27,12 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': env.API_PROXY_TARGET || 'http://localhost:3000'
       }
+    },
+    // [BEGINNER] Vitest reuses this Vite config, so tests understand JSX and image imports
+    // exactly like the app. jsdom gives the tests a fake browser (document, sessionStorage).
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./src/test/setup.js']
     }
   }
 })
