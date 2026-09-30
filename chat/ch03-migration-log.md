@@ -79,3 +79,13 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** smoke test: `GET /api/users/000000000000000000000000` → 404; `GET /api/users/not-an-id` → 400 `Invalid _id: not-an-id`; `POST /api/users` with `{bad json` → 400; `PUT` with `{"email":"bad"}` → 400 with the validation message; signup → 201. The rest unchanged.
 - **Notes / surprises:** diff this commit against the previous one (`git diff HEAD~1 -- '*controller*'`) to show students "Express 4 style vs Express 5 style" side by side.
 - **Commit:** `refactor(ch03-server): central error handler, async controllers without try/catch`
+
+### 2026-09-30 — 3.8 REST routes (from the Ch05 routing discussion)
+- **Changed:** `auth.routes.js`: `POST /auth/signin` + `GET /auth/signout` → `POST` / `DELETE /api/auth/sessions` (same as Ch05). `user.routes.js`: `PUT /api/users/:userId` → `PATCH`. Both route files now carry a route table and the reasoning in `[BEGINNER]`/`[ADVANCED]` comments.
+- **Why:** from the Ch05 review — GET must not have side effects (sign out); one `/api` prefix for everything; the update is partial, so PATCH (`Chapter05/mern-social/docs/rest-routes.md` §2, §4, §5). The Ch05 remark that `GET /api/users` is public is recorded in a comment; the route stays public because the client's Users page is public.
+- **Verified:** smoke test run with the new routes: all OK. The old URLs now answer 404 (`GET /auth/signout` → Express's default page, because it is outside `/api`; `PUT /api/users/:id` → JSON 404 from the `/api` handler).
+- **Notes / surprises:**
+  - This is the first commit that breaks the old client contract; the client is migrated in Phase 7 and uses the new URLs from the start.
+  - Ch05 kept `PUT` for the user update; Ch03 now uses `PATCH`. Decide whether to align Ch05 later.
+  - [ADVANCED] Strictly, a wrong method on an existing URL should be `405 Method Not Allowed` with an `Allow` header; a 404 is the common, simpler answer.
+- **Commit:** `refactor(ch03-server): REST routes /api/auth/sessions and PATCH /api/users/:userId`
