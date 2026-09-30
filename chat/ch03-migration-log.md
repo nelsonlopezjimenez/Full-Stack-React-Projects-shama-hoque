@@ -98,3 +98,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
   - **Existing security issue found:** `update` uses `_.extend(user, req.body)`, so a signed-in user can write *any* field of their own document (`hashed_password`, `salt`, `created`, ...). Fixed with an allow-list in step 4.4.
   - "Account enumeration" fix changes a visible message: signing in with an unknown email now says "Email and password don't match." instead of "User not found".
 - **Commit:** `feat(ch03-server): express-jwt 8, token expiry, httpOnly cookie, toJSON hides password fields`
+
+### 2026-09-30 — 6.6 Password hashing: HMAC-SHA1 → scrypt
+- **Changed:** `user.model.js`: `encryptPassword` uses `crypto.scryptSync(password, salt, 64)`; `makeSalt` uses `crypto.randomBytes(16)`; `authenticate` compares with `crypto.timingSafeEqual` (and length check); method shorthand syntax; `import crypto from 'node:crypto'`.
+- **Why:** SHA1/HMAC is a fast hash (easy to brute-force after a leak), and a salt built from `Date` × `Math.random()` is predictable.
+- **Verified:** full smoke test passes (signup → signin → ... → delete). Direct model check: salt 32 hex chars, hash 128 hex chars, right password `true`, wrong password `false`, an old 40-char SHA1 hash → `false` (no crash thanks to the length check). One `scryptSync` call ≈ 22 ms on this machine.
+- **Notes / surprises:** existing users from an old database cannot sign in after this change (they would need a password reset). The `mernskeleton` test database starts empty, so nothing is lost here.
+- **Commit:** `feat(ch03-server): scrypt password hashing with random salt and timing-safe compare`
