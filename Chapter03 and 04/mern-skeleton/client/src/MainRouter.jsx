@@ -5,6 +5,9 @@ import NotFound from './core/NotFound.jsx'
 import PrivateRoute from './auth/PrivateRoute.jsx'
 import Signin from './auth/Signin.jsx'
 import Signup from './user/Signup.jsx'
+import Users from './user/Users.jsx'
+import Profile from './user/Profile.jsx'
+import EditProfile from './user/EditProfile.jsx'
 
 // [BEGINNER] The book's MainRouter was a class whose componentDidMount removed the CSS that
 // server-side rendering had injected (#jss-server-side). No SSR now → a plain function.
@@ -25,11 +28,17 @@ const MainRouter = () => (
     <Menu />
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/users" element={<Users />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/signin" element={<Signin />} />
 
-      {/* Protected pages: everything inside this route needs a signed-in user. */}
+      {/* Protected pages: everything inside this route needs a signed-in user.
+          [ADVANCED] The book only protected the edit page. A profile needs a token anyway
+          (GET /api/users/:userId requires sign-in), so it is protected here too instead of
+          loading, failing with 401 and then redirecting. */}
       <Route element={<PrivateRoute />}>
+        <Route path="/users/:userId" element={<Profile />} />
+        <Route path="/users/:userId/edit" element={<EditProfile />} />
       </Route>
 
       {/* [ADVANCED] React Router's catch-all is still path="*". The Express 5 server writes
