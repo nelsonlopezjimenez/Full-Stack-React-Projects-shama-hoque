@@ -33,3 +33,15 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** `git status` shows only renames (`R`), so `git log --follow` still works for every file.
 - **Notes / surprises:** the old root `package.json`, webpack configs, `.babelrc`, `nodemon.json` and `template.js` stay for one more commit, so this step removes nothing.
 - **Commit:** `refactor(ch03): move server and client into separate folders`
+
+### 2026-09-30 — 1.3, 2.1–2.5, 3.3 Server as its own ESM package (old major versions kept)
+- **Changed:** new `server/package.json` (`"type": "module"`, `node --watch`, `--env-file-if-exists=.env`, `engines.node >=22.9.0`) with the **same major versions as the book** (Express 4, Mongoose 5, express-jwt 5, helmet 3), each at its last release. `.js` added to every relative import. `server/.env.example`. `express.js`: removed SSR (React/MUI/JSS imports, `devBundle`, `app.get('*')`, `/dist` static). `server.js`: `${mongoUri}` → `${config.mongoUri}`. Deleted the root `package.json`/lock, `.babelrc`, `nodemon.json`, `template.js`, the three webpack configs and `server/devBundle.js`.
+- **Why:** change the *tooling* first and the *libraries* later, one per commit, so every commit runs and each breaking change can be seen on its own.
+- **Verified:** smoke test with curl on port 3100 against the local MongoDB (db `mernskeleton`): signup, signin (token + cookie), wrong password 401, list, read with/without token, update, delete, signout all behave like the book.
+- **Notes / surprises:**
+  - Port 3000 was already in use by another local server (the Ch02 app), so all the manual checks in this log use `PORT=3100`.
+  - Express 4.21 already prints `express deprecated res.status("401"): use res.status(401)` — a warning of the Express 5 change in step 3.2.
+  - Mongoose 5 prints driver deprecation warnings (`useNewUrlParser`, `useUnifiedTopology`, `ensureIndex`); they disappear with Mongoose 9.
+  - **Existing bug found:** signing up twice with the same email *succeeded* on a fresh database. `unique: true` only creates an index, and Mongoose builds it in the background after connecting while the server already accepts requests. This is fixed in the Mongoose step (wait for the indexes before `listen`).
+  - `GET /api/users/not-an-id` answers 400 "User not found" — the real problem is an invalid id (CastError). Handled in step 3.9.
+- **Commit:** `refactor(ch03-server): native ESM package, node --watch, .env; remove webpack and SSR`
