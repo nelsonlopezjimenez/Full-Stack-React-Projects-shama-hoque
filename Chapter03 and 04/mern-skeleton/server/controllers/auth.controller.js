@@ -1,7 +1,20 @@
 import User from '../models/user.model.js'
 import jwt from 'jsonwebtoken'
-import expressJwt from 'express-jwt'
+// [BEGINNER] Named import (curly braces): express-jwt v7+ exports `expressjwt` by name,
+// the book's default import `import expressJwt from 'express-jwt'` no longer exists.
+import { expressjwt } from 'express-jwt'
 import config from '../config/config.js'
+
+// [ADVANCED] httpOnly: JavaScript in the page cannot read the cookie (limits XSS damage).
+// sameSite 'strict': the browser does not send it on requests started by other sites (CSRF).
+// secure: only sent over HTTPS — turned on in production only, because localhost is plain HTTP.
+// The book passed { expire: new Date() + 9999 }: `expire` is not a cookie option (so it was
+// ignored) and Date + number concatenates to a string. maxAge is in milliseconds.
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: 'strict',
+  secure: config.env === 'production'
+}
 
 const signin = async (req, res) => {
   // [BEGINNER] Destructuring pulls two properties out of an object in one line.
@@ -18,46 +31,60 @@ const signin = async (req, res) => {
   // error handler in express.js (a 500, instead of pretending it was a wrong password).
   const user = await User.findOne({ email })
 
-  if (!user)
-    return res.status(401).json({
-      error: "User not found"
-    })
-
-  if (!user.authenticate(password)) {
-    return res.status(401).send({
-      error: "Email and password don't match."
-    })
+  // [ADVANCED] One message for "no such email" and "wrong password". The book answered
+  // "User not found" for the first case, which lets anyone test which emails have an account
+  // (account enumeration). `user?.authenticate(...)` is optional chaining: when user is null
+  // the call is skipped and the result is undefined (falsy).
+  if (!user?.authenticate(password)) {
+    return res.status(401).json({ error: "Email and password don't match." })
   }
 
-  const token = jwt.sign({
-    _id: user._id
-  }, config.jwtSecret)
-
-  res.cookie("t", token, {
-    expire: new Date() + 9999
+  // [BEGINNER] The token only contains the user id (never the password), signed with the
+  // server's secret. Paste a token at https://jwt.io to see that the payload is readable,
+  // only tamper-proof — so never put secrets in it.
+  const token = jwt.sign({ _id: user._id }, config.jwtSecret, {
+    algorithm: 'HS256',
+    expiresIn: config.jwtExpiresIn // the book's tokens never expired
   })
 
+  res.cookie('t', token, { ...cookieOptions, maxAge: config.jwtCookieMaxAgeMs })
+
+  // [ADVANCED] The token is sent twice: in the httpOnly cookie and in the body. The React
+  // client stores the body copy in sessionStorage and sends it as "Authorization: Bearer ..."
+  // (requireSignin below reads that header). Showing both is useful for teaching; a real app
+  // picks one: cookie only (safer against XSS, needs CSRF care) or header only.
   return res.json({
     token,
-    user: {_id: user._id, name: user.name, email: user.email}
+    user: { _id: user._id, name: user.name, email: user.email }
   })
 }
 
 const signout = (req, res) => {
-  res.clearCookie("t")
+  // [BEGINNER] A cookie is only removed when the same options (path, sameSite, secure) are given.
+  res.clearCookie('t', cookieOptions)
   return res.status(200).json({
     message: "signed out"
   })
 }
 
-const requireSignin = expressJwt({
+// [BEGINNER] requireSignin is middleware: it reads "Authorization: Bearer <token>", verifies the
+// signature and the expiry, and puts the decoded payload in req.auth. If the token is
+// missing or invalid it calls next(err) with an UnauthorizedError (→ 401 in express.js).
+// [ADVANCED] `algorithms` is required since express-jwt v6: without an allow-list an attacker
+// could send a token signed with a different algorithm (the "alg: none" family of attacks).
+// `requestProperty` replaced the book's `userProperty` (its default is already 'auth').
+const requireSignin = expressjwt({
   secret: config.jwtSecret,
-  userProperty: 'auth'
+  algorithms: ['HS256'],
+  requestProperty: 'auth'
 })
 
 const hasAuthorization = (req, res, next) => {
-  const authorized = req.profile && req.auth && req.profile._id == req.auth._id
-  if (!(authorized)) {
+  // [BEGINNER] req.profile._id is an ObjectId and req.auth._id is a string. The book compared
+  // them with `==`, which only worked because JavaScript converted the ObjectId to a string.
+  // .equals() compares ObjectIds explicitly and also accepts a hex string.
+  const authorized = req.profile && req.auth && req.profile._id.equals(req.auth._id)
+  if (!authorized) {
     return res.status(403).json({
       error: "User is not authorized"
     })

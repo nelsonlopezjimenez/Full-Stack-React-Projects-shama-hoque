@@ -89,3 +89,12 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
   - Ch05 kept `PUT` for the user update; Ch03 now uses `PATCH`. Decide whether to align Ch05 later.
   - [ADVANCED] Strictly, a wrong method on an existing URL should be `405 Method Not Allowed` with an `Allow` header; a 404 is the common, simpler answer.
 - **Commit:** `refactor(ch03-server): REST routes /api/auth/sessions and PATCH /api/users/:userId`
+
+### 2026-09-30 — 6.1–6.5, 6.7, 6.8 JWT, cookie and config hardening
+- **Changed:** `express-jwt` ^5 → ^8.5.1 (`import { expressjwt }`, `algorithms: ['HS256']`, `requestProperty: 'auth'`), `jsonwebtoken` ^8 → ^9.0.3. `signin`: token with `expiresIn` (default `1d`), cookie `httpOnly` + `sameSite: 'strict'` + `secure` in production + `maxAge`; the same 401 message for "unknown email" and "wrong password"; `signout` clears the cookie with the same options. `hasAuthorization`: `.equals()` instead of `==`. `config.js`: throws at startup when `NODE_ENV=production` and no `JWT_SECRET`; new `JWT_EXPIRES_IN` / `JWT_COOKIE_MAX_AGE_MS`; `??` instead of `||`; `port` as a number. `user.model.js`: `toJSON` transform removes `hashed_password`/`salt`; the three manual `= undefined` blocks removed from the controller.
+- **Why:** the book's tokens never expired, the cookie option was ignored, the fallback secret is public on GitHub, and the password hash was only hidden where someone remembered to hide it.
+- **Verified:** `Set-Cookie: t=…; Max-Age=86400; Path=/; Expires=…; HttpOnly; SameSite=Strict`. No response in the smoke test contains `hashed_password` or `salt` (grep count 0). With `JWT_EXPIRES_IN=1s`: the token works, then 2 s later → 401 `jwt expired`. A hand-made `alg: none` token → 401 `jwt signature is required`. `NODE_ENV=production` without `JWT_SECRET` → the server refuses to start.
+- **Notes / surprises:**
+  - **Existing security issue found:** `update` uses `_.extend(user, req.body)`, so a signed-in user can write *any* field of their own document (`hashed_password`, `salt`, `created`, ...). Fixed with an allow-list in step 4.4.
+  - "Account enumeration" fix changes a visible message: signing in with an unknown email now says "Email and password don't match." instead of "User not found".
+- **Commit:** `feat(ch03-server): express-jwt 8, token expiry, httpOnly cookie, toJSON hides password fields`

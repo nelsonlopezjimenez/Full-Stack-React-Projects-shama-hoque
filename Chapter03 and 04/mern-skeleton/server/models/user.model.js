@@ -29,6 +29,19 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  // [BEGINNER] res.json(user) calls user.toJSON() behind the scenes. Removing the secret fields
+  // here means NO route can leak them by accident; the book set them to undefined by hand in
+  // read, update and remove, and a new route that forgot would have sent the hash.
+  // [ADVANCED] The alternative is `select: false` on the fields; then signin must ask for them
+  // with .select('+hashed_password +salt'). toJSON keeps the queries unchanged.
+  toJSON: {
+    transform: (doc, ret) => {
+      delete ret.hashed_password
+      delete ret.salt
+      return ret
+    }
+  }
 })
 
 // [BEGINNER] Mongoose calls these with `this` set to the document, so they must be regular
