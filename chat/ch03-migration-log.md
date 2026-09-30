@@ -161,3 +161,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
   - `vite build` now warns that the bundle (510 kB) is over 500 kB → next commit (code splitting).
   - No imports of `material-ui`, `react-router-dom`, `withStyles` or `PropTypes` remain in `client/src`.
 - **Commit:** `feat(ch03-client): Users, Profile, EditProfile, DeleteUser as function components with hooks`
+
+### 2026-09-30 — 7.13 (new) Code splitting with React.lazy
+- **Changed:** `MainRouter.jsx`: Signin, Signup, Users, Profile and EditProfile loaded with `lazy(() => import(...))`; `<Suspense fallback={<LinearProgress />}>` around `<Routes>`. Menu, Home, NotFound and PrivateRoute stay in the main bundle. Checklist row 7.13 added.
+- **Why:** `vite build` warned "Some chunks are larger than 500 kB" (510 kB) after the last commit.
+- **Verified:** main bundle 510 kB → 256 kB (81 kB gzip); each page is its own 1–10 kB chunk, and shared MUI parts (TextField, Modal, Button) are separate chunks. No warning. End-to-end run: 28/28 pass, no console errors.
+- **Notes / surprises:** Rolldown (Vite 8's bundler) names shared chunks after one of the modules inside them, so a 131 kB chunk is called `request-*.js` even though it is mostly MUI code.
+- **Commit:** `perf(ch03-client): lazy-load pages with React.lazy and Suspense`
