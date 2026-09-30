@@ -26,3 +26,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** baseline — `package.json` requires `node 8.11.1`, Babel 6 and webpack 4, and `material-ui@1.0.0-beta` has peer dependencies on React 16. `npm install` cannot produce a working build on Node 24.13 (the machine's Node), so there is no runnable "before" state. The behaviour to keep is the one described in the book: signup, signin, list users, view/edit/delete own profile, signout.
 - **Notes / surprises:** MongoDB is already running locally on `localhost:27017` and is used as it is (no Docker, step 9.2 = later).
 - **Commit:** `docs(ch03): migration checklist decisions and log baseline`
+
+### 2026-09-30 — 1.1, 1.2, 1.4 Split into server/ and client/ (moves only)
+- **Changed:** `config/` → `server/config/`; `client/*` → `client/src/*` (still the old React 16 code). Added `server/.gitignore` and `client/.gitignore`. No file contents changed.
+- **Why:** each package gets its own folder before anything is upgraded, so later diffs show real changes and not moves.
+- **Verified:** `git status` shows only renames (`R`), so `git log --follow` still works for every file.
+- **Notes / surprises:** the old root `package.json`, webpack configs, `.babelrc`, `nodemon.json` and `template.js` stay for one more commit, so this step removes nothing.
+- **Commit:** `refactor(ch03): move server and client into separate folders`
