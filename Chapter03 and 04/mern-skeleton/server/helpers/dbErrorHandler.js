@@ -1,42 +1,35 @@
-'use strict'
+// [BEGINNER] ES modules always run in strict mode, so the book's 'use strict' line is gone.
 
 /**
  * Get unique error field name
  */
+// [ADVANCED] The book parsed err.message looking for '.$email_1'. That message format
+// changed in MongoDB 4.2 ('... index: email_1 dup key: { email: "a@b.c" }'), so users saw a
+// garbled text. The driver now gives the offending field(s) as an object: err.keyValue.
 const getUniqueErrorMessage = (err) => {
-    let output
-    try {
-        let fieldName = err.message.substring(err.message.lastIndexOf('.$') + 2, err.message.lastIndexOf('_1'))
-        output = fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + ' already exists'
-    } catch (ex) {
-        output = 'Unique field already exists'
-    }
-
-    return output
+  // [BEGINNER] Array destructuring: take the first key of { email: 'a@b.c' } → 'email'.
+  const [field] = Object.keys(err.keyValue ?? {})
+  if (!field) return 'Unique field already exists'
+  return `${field.charAt(0).toUpperCase()}${field.slice(1)} already exists`
 }
 
 /**
  * Get the error message from error object
  */
 const getErrorMessage = (err) => {
-    let message = ''
-
-    if (err.code) {
-        switch (err.code) {
-            case 11000:
-            case 11001:
-                message = getUniqueErrorMessage(err)
-                break
-            default:
-                message = 'Something went wrong'
-        }
-    } else {
-        for (let errName in err.errors) {
-            if (err.errors[errName].message) message = err.errors[errName].message
-        }
-    }
-
-    return message
+  // 11000 = duplicate key (a `unique` index was violated)
+  if (err.code === 11000 || err.code === 11001) {
+    return getUniqueErrorMessage(err)
+  }
+  if (err.name === 'ValidationError') {
+    // [BEGINNER] Object.values() turns { name: {...}, email: {...} } into an array, so we can
+    // map() it. The book's for...in loop kept overwriting `message`, so only the LAST
+    // failing field was reported; now every message is returned.
+    return Object.values(err.errors)
+      .map((e) => e.message)
+      .join(' ')
+  }
+  return 'Something went wrong'
 }
 
-export default {getErrorMessage}
+export default { getErrorMessage }
