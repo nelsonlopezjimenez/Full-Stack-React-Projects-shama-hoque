@@ -65,3 +65,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
   - The duplicate-email error text is garbled: `"11000 duplicate key error collection: mernskeleton.users index: email already exists"` → this is bug 5.6, fixed in the next commit.
   - `GET /api/users/not-an-id` now answers "Could not retrieve user" (a CastError), still 400 → step 3.9.
 - **Commit:** `refactor(ch03-server): Mongoose 9, async/await controllers, wait for DB before listen`
+
+### 2026-09-30 — 5.6, 5.7 dbErrorHandler and schema cleanup
+- **Changed:** `helpers/dbErrorHandler.js`: duplicate key → field name from `err.keyValue`; validation errors → **all** messages joined (the `for...in` loop kept only the last one); `'use strict'` removed (ES modules are always strict). `models/user.model.js`: `required: [true, 'msg']` form, `unique: true`, regex without the useless `\@` escape, messages end with a period; the password-length check moved from a hollow `hashed_password` validator to a `pre('validate')` hook (no `next`, as Mongoose 9 requires); the book's second "Password is required" check removed because the `required` rule already reports it.
+- **Why:** the duplicate-email message was garbled on modern MongoDB (seen in the previous step); students only saw one validation problem at a time.
+- **Verified:** duplicate signup → `"Email already exists"`; `{"name":"","email":"bad","password":"1"}` → `"Password must be at least 6 characters. Name is required. Please fill a valid email address."`; `{}` → `"Password is required. Email is required. Name is required."`; the rest of the smoke test unchanged.
+- **Notes / surprises:** the same garbled-message bug is listed as "not yet fixed" in Ch05 `DECISIONS.md` §7 — this fix can be copied there.
+- **Commit:** `fix(ch03-server): readable duplicate-key and validation messages; modern schema syntax`
