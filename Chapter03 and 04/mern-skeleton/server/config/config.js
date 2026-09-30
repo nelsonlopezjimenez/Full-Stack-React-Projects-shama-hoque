@@ -19,6 +19,13 @@ const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
   // The cookie should expire together with the token (1 day in milliseconds by default).
   jwtCookieMaxAgeMs: Number(process.env.JWT_COOKIE_MAX_AGE_MS ?? 24 * 60 * 60 * 1000),
+  // Comma-separated list of browser origins allowed to call the API, e.g.
+  // CORS_ORIGIN=https://app.example.com,http://localhost:4173 — empty means CORS stays off.
+  corsOrigins: (process.env.CORS_ORIGIN ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean), // [BEGINNER] filter(Boolean) drops empty strings
+
   mongoUri: process.env.MONGODB_URI ||
     process.env.MONGO_HOST ||
     'mongodb://' + (process.env.IP || 'localhost') + ':' +

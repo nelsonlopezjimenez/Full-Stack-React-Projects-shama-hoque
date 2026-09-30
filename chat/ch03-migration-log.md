@@ -105,3 +105,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** full smoke test passes (signup → signin → ... → delete). Direct model check: salt 32 hex chars, hash 128 hex chars, right password `true`, wrong password `false`, an old 40-char SHA1 hash → `false` (no crash thanks to the length check). One `scryptSync` call ≈ 22 ms on this machine.
 - **Notes / surprises:** existing users from an old database cannot sign in after this change (they would need a password reset). The `mernskeleton` test database starts empty, so nothing is lost here.
 - **Commit:** `feat(ch03-server): scrypt password hashing with random salt and timing-safe compare`
+
+### 2026-09-30 — 4.1–4.4 helmet 8, CORS allow-list, lodash removed (mass-assignment fix)
+- **Changed:** `helmet` ^3 → ^8.3.0 (same `app.use(helmet())`). `cors` only mounted when `CORS_ORIGIN` is set (comma-separated allow-list, `credentials: true`); `config.corsOrigins`. `update`: `_.extend(user, req.body)` → allow-list `['name', 'email', 'password']` + `Object.fromEntries` + `Object.assign`; `lodash` uninstalled. `cookie-parser`/`compression` were already at their latest versions since the ESM step (4.3). `.env.example`: commented `CORS_ORIGIN`.
+- **Why:** helmet 3 is years old; `cors()` with no options allowed every origin; the mass-assignment issue found in the JWT step.
+- **Verified:** smoke test status codes unchanged. `PATCH` with `{"name":"Mass2","hashed_password":"x","salt":"y","created":"2000-01-01"}` → only the name changed and the old password still signs in (200). `PATCH {"password":"newpass1"}` → the new password signs in (200). With `CORS_ORIGIN=http://localhost:4173`: that origin gets `Access-Control-Allow-Origin`; `http://evil.example` does not (the browser would block it). helmet 8 headers present (`Content-Security-Policy`, `Strict-Transport-Security`, no `X-Powered-By`).
+- **Notes / surprises:** `npm outdated` is empty — every server dependency is now on its latest version.
+- **Commit:** `refactor(ch03-server): helmet 8, opt-in CORS allow-list, allow-listed update without lodash`

@@ -1,5 +1,4 @@
 import User from '../models/user.model.js'
-import _ from 'lodash'
 
 // [BEGINNER] Mongoose 7+ removed callbacks: user.save(cb) or User.find(cb) no longer work.
 // Every query now returns a Promise, so the functions are `async` and use `await`.
@@ -52,10 +51,25 @@ const list = async (req, res) => {
   res.json(users)
 }
 
+// [ADVANCED] The book did `_.extend(user, req.body)`: every field in the request body was
+// copied onto the document, so a user could also send hashed_password, salt or created
+// ("mass assignment"). Only the fields in this allow-list can be changed now.
+const UPDATABLE_FIELDS = ['name', 'email', 'password']
+
 const update = async (req, res) => {
-  let user = req.profile
-  user = _.extend(user, req.body)
-  user.updated = Date.now()
+  const body = req.body ?? {}
+  // [BEGINNER] Object.fromEntries turns [['name', 'Ann'], ['email', 'a@b.c']] into
+  // { name: 'Ann', email: 'a@b.c' }. Fields the client did not send are left out, so a PATCH
+  // with only a new name does not touch the email.
+  const changes = Object.fromEntries(
+    UPDATABLE_FIELDS
+      .filter((field) => body[field] !== undefined)
+      .map((field) => [field, body[field]])
+  )
+  // [BEGINNER] Object.assign copies properties onto the existing document; it is the built-in
+  // replacement for lodash's _.extend, so the lodash dependency could be removed.
+  // Assigning `password` goes through the schema's `password` virtual, which hashes it.
+  const user = Object.assign(req.profile, changes, { updated: Date.now() })
   await user.save()
   res.json(user)
 }

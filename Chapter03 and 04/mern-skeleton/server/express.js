@@ -6,6 +6,7 @@ import helmet from 'helmet'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
+import config from './config/config.js'
 
 // [BEGINNER] This file only *builds* the app and exports it. server.js is the file that
 // starts it (connects to the DB, calls listen). Keeping them apart lets tests import the
@@ -23,9 +24,21 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(compress())
 // secure apps by setting various HTTP headers
+// [ADVANCED] helmet 8 (the book had v3) sets a Content-Security-Policy by default, plus HSTS,
+// X-Content-Type-Options, a strict Referrer-Policy, and removes X-Powered-By. For a JSON API
+// the defaults are fine; they also work for the built Vite client if it is served from here.
 app.use(helmet())
+
 // enable CORS - Cross Origin Resource Sharing
-app.use(cors())
+// [BEGINNER] CORS is only needed when the browser page and the API are on DIFFERENT origins
+// (scheme + host + port). In development the Vite proxy makes them the same origin, and in a
+// single-process deploy Express serves both, so CORS stays off unless CORS_ORIGIN is set.
+// [ADVANCED] The book's cors() with no options allowed EVERY origin. An explicit allow-list is
+// required anyway once `credentials: true` (cookies) is used: browsers reject
+// Access-Control-Allow-Origin: * together with credentials. (See chat/ch02-cors-express-client.md.)
+if (config.corsOrigins.length > 0) {
+  app.use(cors({ origin: config.corsOrigins, credentials: true }))
+}
 
 // mount routes
 app.use('/', userRoutes)
