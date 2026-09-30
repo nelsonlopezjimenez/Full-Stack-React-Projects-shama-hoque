@@ -119,3 +119,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** dev log shows `POST /api/users → 201 (40.6 ms)` and `JWT issued for …`. With `CLIENT_DIST` pointing at a fake build: `/` and `/users/123` → index.html (200), `/assets/app.js` → the file, `/assets/missing.js` → 404, `/api/nope` → JSON 404. Starting on the busy port 3000 prints `listen EADDRINUSE: address already in use :::3000` and exits (Express 5 passes the error to the `listen` callback).
 - **Notes / surprises:** none.
 - **Commit:** `feat(ch03-server): dev logger, request logging, optional CLIENT_DIST serving with Express 5 wildcard`
+
+### 2026-09-30 — 3.10 (new) userByID after requireSignin, instead of router.param
+- **Changed:** `user.routes.js`: `router.param('userId', …)` removed; `userCtrl.userByID` listed in each `:userId` route right after `requireSignin`. `userByID` is now `(req, res, next)` and reads `req.params.userId`. Comments rewritten in both files.
+- **Why:** a 10-line test app showed that Express runs a `router.param` callback **before** the route's own middleware: the order was `userByID → requireSignin → read`. The Ch05 notes (`docs/rest-routes.md` §2) say `requireSignin → userByID → read`, which is not what Express does.
+- **Verified:** `GET /api/users/000000000000000000000000` **without** a token: before this commit → 404 "User not found" (a DB query ran, and the answer tells an anonymous caller whether the id exists); after → 401. With a token → 404 as before. The rest of the smoke test unchanged.
+- **Notes / surprises:** added as checklist step 3.10. The same order applies to Ch05 (`userByID`, `postByID`), and its notes should be corrected there.
+- **Commit:** `fix(ch03-server): run userByID after requireSignin (router.param ran first)`
