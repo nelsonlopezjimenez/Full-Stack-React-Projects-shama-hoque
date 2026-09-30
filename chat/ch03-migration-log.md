@@ -112,3 +112,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** smoke test status codes unchanged. `PATCH` with `{"name":"Mass2","hashed_password":"x","salt":"y","created":"2000-01-01"}` → only the name changed and the old password still signs in (200). `PATCH {"password":"newpass1"}` → the new password signs in (200). With `CORS_ORIGIN=http://localhost:4173`: that origin gets `Access-Control-Allow-Origin`; `http://evil.example` does not (the browser would block it). helmet 8 headers present (`Content-Security-Policy`, `Strict-Transport-Security`, no `X-Powered-By`).
 - **Notes / surprises:** `npm outdated` is empty — every server dependency is now on its latest version.
 - **Commit:** `refactor(ch03-server): helmet 8, opt-in CORS allow-list, allow-listed update without lodash`
+
+### 2026-09-30 — 2.6, 3.4, 7.9 Logger and optional client serving
+- **Changed:** new `helpers/logger.js` (`info`/`error` always, `debug` in development only) + a dev-only `requestLogger` middleware (method, URL, status, ms — no `morgan` needed). `server.js`, `express.js`, `signin` use the logger; `signin` prints the issued JWT in development. `config.clientDist` from `CLIENT_DIST` (resolved from the server folder with `import.meta.dirname`); when set, `express.js` serves it with `express.static` + SPA fallback `app.get('/{*splat}')`, skipping paths with a file extension.
+- **Why:** consistent with Ch05 (commit a28fe85 / CLAUDE-GUIDE Strategy A). Serving the client is optional, so the server never depends on the client being there.
+- **Verified:** dev log shows `POST /api/users → 201 (40.6 ms)` and `JWT issued for …`. With `CLIENT_DIST` pointing at a fake build: `/` and `/users/123` → index.html (200), `/assets/app.js` → the file, `/assets/missing.js` → 404, `/api/nope` → JSON 404. Starting on the busy port 3000 prints `listen EADDRINUSE: address already in use :::3000` and exits (Express 5 passes the error to the `listen` callback).
+- **Notes / surprises:** none.
+- **Commit:** `feat(ch03-server): dev logger, request logging, optional CLIENT_DIST serving with Express 5 wildcard`

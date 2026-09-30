@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 // [BEGINNER] process.env is filled from the real environment and, in development, from the
 // .env file: the npm scripts start Node with --env-file-if-exists=.env (Node 22.9+), so the
 // `dotenv` package is no longer needed.
@@ -25,7 +27,11 @@ const config = {
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean), // [BEGINNER] filter(Boolean) drops empty strings
-
+  // Folder of a built client to serve (e.g. ../client/dist), relative to the server folder.
+  // [BEGINNER] import.meta.dirname (Node 20.11+) is the ES-module replacement for __dirname.
+  clientDist: process.env.CLIENT_DIST
+    ? path.resolve(import.meta.dirname, '..', process.env.CLIENT_DIST)
+    : null,
   mongoUri: process.env.MONGODB_URI ||
     process.env.MONGO_HOST ||
     'mongodb://' + (process.env.IP || 'localhost') + ':' +
