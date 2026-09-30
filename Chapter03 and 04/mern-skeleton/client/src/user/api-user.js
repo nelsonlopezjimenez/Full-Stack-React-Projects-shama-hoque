@@ -1,69 +1,23 @@
-const create = (user) => {
-  return fetch('/api/users/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(user)
-    })
-    .then((response) => {
-      return response.json()
-    }).catch((err) => console.log(err))
-}
+import { request } from '../core/request.js'
 
-const list = () => {
-  return fetch('/api/users/', {
-    method: 'GET',
-  }).then(response => {
-    return response.json()
-  }).catch((err) => console.log(err))
-}
+// [BEGINNER] Arrow functions with an implicit return: `(x) => request(...)` returns the
+// Promise from request() without writing `{ return ... }`.
+//
+// The book's signatures were read(params, credentials) with params = { userId } and
+// credentials = { t: token }. Plain arguments (userId, token) are easier to read and to call.
 
-const read = (params, credentials) => {
-  return fetch('/api/users/' + params.userId, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + credentials.t
-    }
-  }).then((response) => {
-    return response.json()
-  }).catch((err) => console.log(err))
-}
+export const create = (user) =>
+  request('/api/users', { method: 'POST', body: user })
 
-const update = (params, credentials, user) => {
-  return fetch('/api/users/' + params.userId, {
-    method: 'PUT',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + credentials.t
-    },
-    body: JSON.stringify(user)
-  }).then((response) => {
-    return response.json()
-  }).catch((err) => console.log(err))
-}
+export const list = (signal) =>
+  request('/api/users', { signal })
 
-const remove = (params, credentials) => {
-  return fetch('/api/users/' + params.userId, {
-    method: 'DELETE',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + credentials.t
-    }
-  }).then((response) => {
-    return response.json()
-  }).catch((err) => console.log(err))
-}
+export const read = (userId, token, signal) =>
+  request(`/api/users/${userId}`, { token, signal })
 
-export {
-  create,
-  list,
-  read,
-  update,
-  remove
-}
+// PATCH, not the book's PUT: only the changed fields are sent (server step 3.8)
+export const update = (userId, token, user) =>
+  request(`/api/users/${userId}`, { method: 'PATCH', token, body: user })
+
+export const remove = (userId, token) =>
+  request(`/api/users/${userId}`, { method: 'DELETE', token })

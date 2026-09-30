@@ -1,27 +1,10 @@
-const signin = (user) => {
-  return fetch('/auth/signin/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include',
-      body: JSON.stringify(user)
-    })
-    .then((response) => {
-      return response.json()
-    }).catch((err) => console.log(err))
-}
+import { request } from '../core/request.js'
 
-const signout = () => {
-  return fetch('/auth/signout/', {
-    method: 'GET',
-  }).then(response => {
-      return response.json()
-  }).catch((err) => console.log(err))
-}
+// [BEGINNER] REST routes from the server refactor (checklist step 3.8):
+// a login session is a resource that is created (POST) and deleted (DELETE).
+// Book: POST /auth/signin and GET /auth/signout.
+export const signin = (user) =>
+  request('/api/auth/sessions', { method: 'POST', body: user })
 
-export {
-  signin,
-  signout
-}
+export const signout = () =>
+  request('/api/auth/sessions', { method: 'DELETE' })
