@@ -126,3 +126,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** `GET /api/users/000000000000000000000000` **without** a token: before this commit → 404 "User not found" (a DB query ran, and the answer tells an anonymous caller whether the id exists); after → 401. With a token → 404 as before. The rest of the smoke test unchanged.
 - **Notes / surprises:** added as checklist step 3.10. The same order applies to Ch05 (`userByID`, `postByID`), and its notes should be corrected there.
 - **Commit:** `fix(ch03-server): run userByID after requireSignin (router.param ran first)`
+
+### 2026-09-30 — 8.1, 8.2 Server tests (node:test) and api.http
+- **Changed:** `server/tests/` with four levels (same progression idea as Ch05 `TEST.md`): `1-dbErrorHandler` (pure function), `2-config` (env vars + fresh ESM import via `?fresh=n`), `3-hasAuthorization` (middleware with fake `res` and `mock.fn()`), `4-api` (the whole app on `listen(0)` + built-in `fetch`). `npm test` = `node --test`, `npm run test:watch`. `server/api.http`: the full flow for the VS Code REST Client extension, with the token captured from the sign-in response.
+- **Why:** protect the fixes from this migration. Built-in runner, so **no test dependencies** and **no database** needed (every API test is answered before a DB query).
+- **Verified:** `npm test` → 18 tests, 4 suites, all pass in ~0.4 s. Test 4 "rejects a protected route without a token" depends on step 3.10: with `router.param`, the request would wait for a DB lookup (Mongoose buffers for 10 s without a connection) instead of answering 401.
+- **Notes / surprises:** `api.http` uses port 3000 (the normal dev port); change `@baseUrl` if 3000 is busy, as it is on this machine.
+- **Commit:** `test(ch03-server): node:test suite in four levels (no DB) and api.http smoke file`
