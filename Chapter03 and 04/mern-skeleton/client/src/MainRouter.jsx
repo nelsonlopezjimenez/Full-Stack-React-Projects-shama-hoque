@@ -3,6 +3,8 @@ import Home from './core/Home.jsx'
 import Menu from './core/Menu.jsx'
 import NotFound from './core/NotFound.jsx'
 import PrivateRoute from './auth/PrivateRoute.jsx'
+import Signin from './auth/Signin.jsx'
+import Signup from './user/Signup.jsx'
 
 // [BEGINNER] The book's MainRouter was a class whose componentDidMount removed the CSS that
 // server-side rendering had injected (#jss-server-side). No SSR now → a plain function.
@@ -23,6 +25,8 @@ const MainRouter = () => (
     <Menu />
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/signin" element={<Signin />} />
 
       {/* Protected pages: everything inside this route needs a signed-in user. */}
       <Route element={<PrivateRoute />}>

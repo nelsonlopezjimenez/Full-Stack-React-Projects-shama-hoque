@@ -1,107 +1,76 @@
-import React, { Component } from 'react'
-import Card, { CardActions, CardContent } from 'material-ui/Card'
-import Button from 'material-ui/Button'
-import TextField from 'material-ui/TextField'
-import Typography from 'material-ui/Typography'
-import Icon from 'material-ui/Icon'
-import PropTypes from 'prop-types'
-import { withStyles } from 'material-ui/styles'
-import auth from './../auth/auth-helper'
-import { Redirect } from 'react-router'
+import { useActionState } from 'react'
+import { useLocation, useNavigate } from 'react-router'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import auth from './auth-helper.js'
 import { signin } from './api-auth.js'
+import FormError from '../core/FormError.jsx'
 
-const styles = theme => ({
-  card: {
-    maxWidth: 600,
-    margin: 'auto',
-    textAlign: 'center',
-    marginTop: theme.spacing.unit * 5,
-    paddingBottom: theme.spacing.unit * 2
-  },
-  error: {
-    verticalAlign: 'middle'
-  },
-  title: {
-    marginTop: theme.spacing.unit * 2,
-    color: theme.palette.openTitle
-  },
-  textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-    width: 300
-  },
-  submit: {
-    margin: 'auto',
-    marginBottom: theme.spacing.unit * 2
-  }
-})
+// The same layout values appear in Signup and EditProfile (repeated, as in the book).
+const cardSx = { maxWidth: 600, mx: 'auto', mt: 5, pb: 2, textAlign: 'center' }
+const fieldSx = { mx: 1, width: 300 }
 
-class Signin extends Component {
-  state = {
-    email: '',
-    password: '',
-    error: '',
-    redirectToReferrer: false
-  }
+const Signin = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
+  // [BEGINNER] Optional chaining + nullish coalescing: "the page PrivateRoute sent us away from,
+  // or the home page". Replaces the book's `this.props.location.state || { from: ... }`.
+  const from = location.state?.from?.pathname ?? '/'
 
-  clickSubmit = () => {
-    const user = {
-      email: this.state.email || undefined,
-      password: this.state.password || undefined
-    }
-
-    signin(user).then((data) => {
+  // [ADVANCED] React 19 form actions. useActionState(action, initialState) returns
+  //   state      → whatever the action returned last time (here: { error, email })
+  //   formAction → pass it to <form action={...}>
+  //   isPending  → true while the async action runs (disables the button, no double submit)
+  // The action receives the form's FormData, so there is no useState per input and no
+  // onChange handler. EditProfile.jsx keeps the classic "controlled inputs" pattern for comparison.
+  const [state, formAction, isPending] = useActionState(
+    async (previousState, formData) => {
+      const user = {
+        email: formData.get('email'),
+        password: formData.get('password')
+      }
+      const data = await signin(user)
       if (data.error) {
-        this.setState({ error: data.error })
-      } else {
-        auth.authenticate(data, () => {
-          this.setState({ redirectToReferrer: true })
-        })
+        // Returning the email puts it back in the field: after an action React resets the
+        // form to each input's defaultValue.
+        return { error: data.error, email: user.email }
       }
-    })
-  }
+      // replace: true → the sign-in page is not kept in history ("Back" skips it).
+      auth.authenticate(data, () => navigate(from, { replace: true }))
+      return { error: '', email: '' }
+    },
+    { error: '', email: '' }
+  )
 
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.value })
-  }
-
-  render() {
-    const { classes } = this.props
-    const { from } = this.props.location.state || {
-      from: {
-        pathname: '/'
-      }
-    }
-    const { redirectToReferrer } = this.state
-    if (redirectToReferrer) {
-      return (<Redirect to={from} />)
-    }
-
-    return (
-      <Card className={classes.card}>
-        <CardContent>
-          <Typography type="headline" component="h2" className={classes.title}>
-            Sign In
-          </Typography>
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal" /><br />
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal" />
-          <br /> {
-            this.state.error && (<Typography component="p" color="error">
-              <Icon color="error" className={classes.error}>error</Icon>
-              {this.state.error}
-            </Typography>)
-          }
-        </CardContent>
-        <CardActions>
-          <Button color="primary" variant="raised" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
-        </CardActions>
-      </Card>
-    )
-  }
+  return (
+    // [BEGINNER] A real <form> (Card rendered as component="form"): pressing Enter in a field
+    // submits it. The book only listened to the button's onClick, so Enter did nothing.
+    <Card component="form" action={formAction} sx={cardSx}>
+      <CardContent>
+        <Typography variant="h6" component="h2" sx={{ mt: 2, color: (theme) => theme.palette.openTitle }}>
+          Sign In
+        </Typography>
+        {/* `name` is the key used by formData.get('email'). `required` lets the browser
+            check for empty fields before the request is sent. */}
+        <TextField id="email" name="email" type="email" label="Email" required
+          defaultValue={state.email} autoComplete="email" sx={fieldSx} margin="normal" /><br />
+        <TextField id="password" name="password" type="password" label="Password" required
+          autoComplete="current-password" sx={fieldSx} margin="normal" />
+        <FormError message={state.error} />
+      </CardContent>
+      <CardActions>
+        {/* [BEGINNER] variant "contained" is the old "raised". type="submit" triggers the form action. */}
+        <Button type="submit" color="primary" variant="contained" disabled={isPending}
+          sx={{ mx: 'auto', mb: 2 }}>
+          {isPending ? 'Signing in…' : 'Submit'}
+        </Button>
+      </CardActions>
+    </Card>
+  )
 }
 
-Signin.propTypes = {
-  classes: PropTypes.object.isRequired
-}
-
-export default withStyles(styles)(Signin)
+export default Signin

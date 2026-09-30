@@ -144,3 +144,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
   - MUI 9 removed system props on `Typography` (`color="error"` etc.), so every style goes through `sx`.
   - On this machine the client's own `.env` sets `API_PROXY_TARGET=http://localhost:3100` (port 3000 is busy).
 - **Commit:** `feat(ch03-client): Vite + React 19 + React Router 8 + MUI 9 shell, API layer, Home and Menu`
+
+### 2026-09-30 — 7.11 + part of 7.3/7.4/7.5 Signin and Signup with React 19 form actions
+- **Changed:** `Signin.jsx` and `Signup.jsx` rewritten as function components using `useActionState` + `<Card component="form" action={formAction}>`: no `useState` per field, no `onChange`, `isPending` disables the button, Enter submits (the book only had `onClick`). Signin goes back to `location.state.from` (set by `PrivateRoute`) with `replace: true`. The Signup dialog has no `onClose` instead of the removed `disableBackdropClick`. New `core/FormError.jsx` (SVG `ErrorIcon` + `role="alert"`, replaces the Material Icons font ligature). Routes `/signup` and `/signin` added to `MainRouter`.
+- **Why:** the modern React 19 way to write forms; EditProfile (next commit) keeps controlled inputs so students can compare both.
+- **Verified:** new end-to-end check with headless Edge driven over the DevTools protocol (a scratch script, Node built-ins only): empty signup shows all three server messages; signup opens the dialog; duplicate email → "Email already exists"; after an error, name/email stay filled (the action returns them and they become the new `defaultValue` when React resets the form); wrong password → error with email kept; correct password → home, menu shows My Profile/Sign out; unknown URL → Page not found. No React/MUI warnings in the console.
+- **Notes / surprises:** MUI buttons are uppercased with CSS, so `innerText` returns "SUBMIT"; the check script reads `textContent` instead.
+- **Commit:** `feat(ch03-client): Signin and Signup with React 19 useActionState form actions`
