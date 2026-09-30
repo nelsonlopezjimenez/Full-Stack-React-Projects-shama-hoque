@@ -1,91 +1,68 @@
-import React, { Component } from 'react'
-import Card, { CardActions, CardContent } from 'material-ui/Card'
-import Button from 'material-ui/Button'
-import TextField from 'material-ui/TextField'
-import Typography from 'material-ui/Typography'
-import Icon from 'material-ui/Icon'
-import PropTypes from 'prop-types'
-import { withStyles } from 'material-ui/styles'
-import { create } from './api-user.js'
-import Dialog, { DialogActions, DialogContent, DialogContentText, DialogTitle } from 'material-ui/Dialog'
+import { useActionState } from 'react'
 import { Link } from 'react-router'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import { create } from './api-user.js'
+import FormError from '../core/FormError.jsx'
 
-const styles = theme => ({
-  card: {
-    maxWidth: 600,
-    margin: 'auto',
-    textAlign: 'center',
-    marginTop: theme.spacing.unit * 5,
-    paddingBottom: theme.spacing.unit * 2
-  },
-  error: {
-    verticalAlign: 'middle'
-  },
-  title: {
-    marginTop: theme.spacing.unit * 2,
-    color: theme.palette.openTitle
-  },
-  textField: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
-    width: 300
-  },
-  submit: {
-    margin: 'auto',
-    marginBottom: theme.spacing.unit * 2
-  }
-})
+const cardSx = { maxWidth: 600, mx: 'auto', mt: 5, pb: 2, textAlign: 'center' }
+const fieldSx = { mx: 1, width: 300 }
 
-class Signup extends Component {
-  state = {
-    name: '',
-    password: '',
-    email: '',
-    open: false,
-    error: ''
-  }
+const initialState = { error: '', open: false, values: { name: '', email: '' } }
 
-  handleChange = name => event => {
-    this.setState({ [name]: event.target.value })
-  }
-
-  clickSubmit = () => {
-    const user = {
-      name: this.state.name || undefined,
-      email: this.state.email || undefined,
-      password: this.state.password || undefined
+// Same React 19 form-action pattern as Signin.jsx (see the comments there).
+const Signup = () => {
+  const [state, formAction, isPending] = useActionState(async (previousState, formData) => {
+    // [BEGINNER] Object.fromEntries(formData) turns all named fields into one object:
+    // { name: '...', email: '...', password: '...' }
+    const user = Object.fromEntries(formData)
+    const data = await create(user)
+    if (data.error) {
+      // The server sends every validation problem at once (dbErrorHandler, server step 5.6).
+      // Keep name and email in the fields; the password is cleared on purpose.
+      return { error: data.error, open: false, values: { name: user.name, email: user.email } }
     }
-    create(user).then((data) => {
-      if (data.error) {
-        this.setState({ error: data.error })
-      } else {
-        this.setState({ error: '', open: true })
-      }
-    })
-  }
+    return { ...initialState, open: true }
+  }, initialState)
 
-  render() {
-    const { classes } = this.props
-    return (<div>
-      <Card className={classes.card}>
+  return (
+    <>
+      <Card component="form" action={formAction} sx={cardSx}>
         <CardContent>
-          <Typography type="headline" component="h2" className={classes.title}>
+          <Typography variant="h6" component="h2" sx={{ mt: 2, color: (theme) => theme.palette.openTitle }}>
             Sign Up
           </Typography>
-          <TextField id="name" label="Name" className={classes.textField} value={this.state.name} onChange={this.handleChange('name')} margin="normal" /><br />
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={this.state.email} onChange={this.handleChange('email')} margin="normal" /><br />
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={this.state.password} onChange={this.handleChange('password')} margin="normal" />
-          <br /> {
-            this.state.error && (<Typography component="p" color="error">
-              <Icon color="error" className={classes.error}>error</Icon>
-              {this.state.error}</Typography>)
-          }
+          <TextField id="name" name="name" label="Name" defaultValue={state.values.name}
+            autoComplete="name" sx={fieldSx} margin="normal" /><br />
+          <TextField id="email" name="email" type="email" label="Email" defaultValue={state.values.email}
+            autoComplete="email" sx={fieldSx} margin="normal" /><br />
+          <TextField id="password" name="password" type="password" label="Password"
+            autoComplete="new-password" sx={fieldSx} margin="normal" />
+          {/* [ADVANCED] No `required` attributes here on purpose: an empty form reaches the
+              server, which answers with all its validation messages (good for class demos).
+              Signin uses `required` to show the browser-side check instead. */}
+          <FormError message={state.error} />
         </CardContent>
         <CardActions>
-          <Button color="primary" variant="raised" onClick={this.clickSubmit} className={classes.submit}>Submit</Button>
+          <Button type="submit" color="primary" variant="contained" disabled={isPending}
+            sx={{ mx: 'auto', mb: 2 }}>
+            Submit
+          </Button>
         </CardActions>
       </Card>
-      <Dialog open={this.state.open} disableBackdropClick={true}>
+
+      {/* [BEGINNER] Without an onClose prop, clicking outside or pressing Escape does not close
+          the dialog; the book needed disableBackdropClick (removed from MUI) for that. */}
+      <Dialog open={state.open}>
         <DialogTitle>New Account</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -93,19 +70,13 @@ class Signup extends Component {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Link to="/signin">
-            <Button color="primary" autoFocus="autoFocus" variant="raised">
-              Sign In
-            </Button>
-          </Link>
+          <Button component={Link} to="/signin" color="primary" variant="contained" autoFocus>
+            Sign In
+          </Button>
         </DialogActions>
       </Dialog>
-    </div>)
-  }
+    </>
+  )
 }
 
-Signup.propTypes = {
-  classes: PropTypes.object.isRequired
-}
-
-export default withStyles(styles)(Signup)
+export default Signup
