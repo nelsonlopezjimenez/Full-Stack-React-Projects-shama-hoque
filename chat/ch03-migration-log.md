@@ -72,3 +72,10 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 - **Verified:** duplicate signup → `"Email already exists"`; `{"name":"","email":"bad","password":"1"}` → `"Password must be at least 6 characters. Name is required. Please fill a valid email address."`; `{}` → `"Password is required. Email is required. Name is required."`; the rest of the smoke test unchanged.
 - **Notes / surprises:** the same garbled-message bug is listed as "not yet fixed" in Ch05 `DECISIONS.md` §7 — this fix can be copied there.
 - **Commit:** `fix(ch03-server): readable duplicate-key and validation messages; modern schema syntax`
+
+### 2026-09-30 — 3.9 Central error handling (Express 5 async errors)
+- **Changed:** `user.controller.js` and `signin`: the `try/catch` blocks from the previous step removed — errors now reach the error handler on their own. `userByID`: 404 when the user does not exist (was 400). `create` answers `201 Created`. `express.js`: one error handler that maps `UnauthorizedError` → 401, `ValidationError`/`11000` → 400 (via `dbErrorHandler`), `CastError` → 400 "Invalid _id: …", errors that carry a `status` (malformed JSON) → that status, everything else → 500 "Internal server error" (logged on the server, no stack sent).
+- **Why:** Express 5 forwards rejected Promises from async handlers (including `router.param` callbacks) to `next(err)`, so each controller only has to handle the success path.
+- **Verified:** smoke test: `GET /api/users/000000000000000000000000` → 404; `GET /api/users/not-an-id` → 400 `Invalid _id: not-an-id`; `POST /api/users` with `{bad json` → 400; `PUT` with `{"email":"bad"}` → 400 with the validation message; signup → 201. The rest unchanged.
+- **Notes / surprises:** diff this commit against the previous one (`git diff HEAD~1 -- '*controller*'`) to show students "Express 4 style vs Express 5 style" side by side.
+- **Commit:** `refactor(ch03-server): central error handler, async controllers without try/catch`
