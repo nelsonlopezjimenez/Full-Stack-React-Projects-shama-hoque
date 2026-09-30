@@ -1,6 +1,6 @@
-import User from '../models/user.model'
+import User from '../models/user.model.js'
 import _ from 'lodash'
-import errorHandler from './../helpers/dbErrorHandler'
+import errorHandler from '../helpers/dbErrorHandler.js'
 
 const create = (req, res, next) => {
   const user = new User(req.body)

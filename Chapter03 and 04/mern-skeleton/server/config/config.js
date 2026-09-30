@@ -1,3 +1,6 @@
+// [BEGINNER] process.env is filled from the real environment and, in development, from the
+// .env file: the npm scripts start Node with --env-file-if-exists=.env (Node 22.9+), so the
+// `dotenv` package is no longer needed.
 const config = {
   env: process.env.NODE_ENV || 'development',
   port: process.env.PORT || 3000,
