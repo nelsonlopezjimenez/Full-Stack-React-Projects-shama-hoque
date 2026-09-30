@@ -1,0 +1,21 @@
+{
+  "name": "mern-simplesetup-server",
+  "version": "2.0.0",
+  "description": "Express server for the MERN simple setup check",
+  "author": "Shama Hoque",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=.env server.js",
+    "start": "node --env-file-if-exists=.env server.js"
+  },
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongodb": "^7.7.0"
+  }
+}

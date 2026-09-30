@@ -1,0 +1,24 @@
+{
+  "name": "mern-simplesetup-client",
+  "version": "2.0.0",
+  "description": "React client for the MERN simple setup check",
+  "author": "Shama Hoque",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.3.1"
+  }
+}

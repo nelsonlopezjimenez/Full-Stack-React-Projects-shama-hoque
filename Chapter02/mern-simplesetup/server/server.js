@@ -1,33 +1,47 @@
-import path from 'path'
+import path from 'node:path'
 import express from 'express'
 import { MongoClient } from 'mongodb'
-import template from './../template'
-//comment out before building for production
-import devBundle from './devBundle'
+
+const port = process.env.PORT || 3000
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/mernSimpleSetup?directConnection=true'
+// The client is a separate project; the server only needs to know where its build output lives.
+const clientDist = path.resolve(import.meta.dirname, process.env.CLIENT_DIST || '../client/dist')
 
 const app = express()
-//comment out before building for production
-devBundle.compile(app)
 
-const CURRENT_WORKING_DIR = process.cwd()
-app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')))
-
-app.get('/', (req, res) => {
-  res.status(200).send(template())
+app.get('/hello', (req, res) => {
+  res.send("HELLO WORLD!!!")
 })
 
-let port = process.env.PORT || 3000
-app.listen(port, function onStart(err) {
+// Built React app (client/dist, produced by `vite build`). The HTML comes from Vite's index.html.
+app.use(express.static(clientDist))
+
+// Any other GET returns the React app's index.html. Must stay after the API routes.
+// Paths with a file extension (e.g. a missing /assets/x.js) get a real 404 instead of HTML.
+app.get('/{*splat}', (req, res, next) => {
+  if (path.extname(req.path)) return next()
+  res.sendFile(path.join(clientDist, 'index.html'), (err) => {
+    if (err && !res.headersSent) {
+      res.status(404).send('Client not built. Run `npm run build` in ../client, or use the Vite dev server at http://localhost:5173')
+    }
+  })
+})
+
+app.listen(port, (err) => {
   if (err) {
-    console.log(err)
+    console.error(err)
+    return
   }
   console.info('Server started on port %s.', port)
 })
 
-// Database Connection URL
-const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/mernSimpleSetup'
-// Use connect method to connect to the server
-MongoClient.connect(url, (err, db)=>{
-  console.log("Connected successfully to mongodb server")
-  db.close()
-})
+// Database connection check
+const client = new MongoClient(mongoUri, { serverSelectionTimeoutMS: 5000 })
+try {
+  await client.connect()
+  console.info('Connected successfully to mongodb server')
+} catch (err) {
+  console.error('MongoDB connection failed: %s', err.message)
+} finally {
+  await client.close()
+}
