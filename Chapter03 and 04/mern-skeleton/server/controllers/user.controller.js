@@ -42,8 +42,7 @@ const userByID = async (req, res, next, id) => {
 }
 
 const read = (req, res) => {
-  req.profile.hashed_password = undefined
-  req.profile.salt = undefined
+  // hashed_password and salt are removed by the schema's toJSON transform (user.model.js)
   return res.json(req.profile)
 }
 
@@ -58,8 +57,6 @@ const update = async (req, res) => {
   user = _.extend(user, req.body)
   user.updated = Date.now()
   await user.save()
-  user.hashed_password = undefined
-  user.salt = undefined
   res.json(user)
 }
 
@@ -67,8 +64,6 @@ const remove = async (req, res) => {
   const user = req.profile
   // [BEGINNER] document.remove() was removed in Mongoose 7; deleteOne() is the replacement.
   await user.deleteOne()
-  user.hashed_password = undefined
-  user.salt = undefined
   res.json(user)
 }
 
