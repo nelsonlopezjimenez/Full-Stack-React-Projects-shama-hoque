@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
-import crypto from 'crypto'
+// [BEGINNER] The 'node:' prefix marks a built-in Node module, so it can never be confused
+// with an npm package of the same name.
+import crypto from 'node:crypto'
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -68,23 +70,35 @@ UserSchema.pre('validate', function() {
   }
 })
 
+// [BEGINNER] Method shorthand `authenticate(plainText) { ... }` is the modern way to write
+// `authenticate: function(plainText) { ... }`. It still gets its own `this` (unlike an arrow).
 UserSchema.methods = {
-  authenticate: function(plainText) {
-    return this.encryptPassword(plainText) === this.hashed_password
+  authenticate(plainText) {
+    if (!plainText || !this.hashed_password) return false
+    const candidate = Buffer.from(this.encryptPassword(plainText), 'hex')
+    const stored = Buffer.from(this.hashed_password, 'hex')
+    // [ADVANCED] timingSafeEqual takes the same time whether the first or the last byte
+    // differs, so an attacker cannot guess the hash byte by byte from response times
+    // (`===` stops at the first difference). It throws if the lengths differ, hence the check.
+    return candidate.length === stored.length && crypto.timingSafeEqual(candidate, stored)
   },
-  encryptPassword: function(password) {
+  // [ADVANCED] The book used HMAC-SHA1: very fast to compute, so a stolen database can be
+  // brute-forced at billions of guesses per second. scrypt is a *password* hashing function:
+  // deliberately slow and memory-hungry. (bcrypt and argon2 are the other common choices;
+  // scrypt is built into Node, so no extra package is needed.)
+  // scryptSync blocks the event loop for a few dozen milliseconds per call. It is used here
+  // because the `password` virtual setter above cannot be async; a busy production app would
+  // hash in an async pre('save') hook with the callback/promise version of crypto.scrypt.
+  // Passwords hashed with the old SHA1 code no longer match (different length) → those users
+  // must reset their password. A gentler path is "rehash on next successful login".
+  encryptPassword(password) {
     if (!password) return ''
-    try {
-      return crypto
-        .createHmac('sha1', this.salt)
-        .update(password)
-        .digest('hex')
-    } catch (err) {
-      return ''
-    }
+    return crypto.scryptSync(password, this.salt, 64).toString('hex')
   },
-  makeSalt: function() {
-    return Math.round((new Date().valueOf() * Math.random())) + ''
+  makeSalt() {
+    // [BEGINNER] The book built the salt from Date and Math.random(), which are predictable.
+    // crypto.randomBytes comes from the operating system's secure random generator.
+    return crypto.randomBytes(16).toString('hex')
   }
 }
 
