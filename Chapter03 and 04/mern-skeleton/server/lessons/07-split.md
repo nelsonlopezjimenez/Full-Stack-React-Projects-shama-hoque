@@ -75,3 +75,12 @@ Try: set `PORT=3001` in `.env`, restart, and change `@baseUrl` in `api.http`. Th
 - We pass `userCtrl.read`, the function itself, **without** `()`. Express calls it for each request.
 - Look at `read`, `update` and `remove`: all three still start with the same four lines. Now that they
   sit next to each other, the copy is easy to see. Step f removes it.
+
+## d) The URLs → `routes/user.routes.js`
+
+- `express.Router()` creates a mini-app that holds only routes. `server.js` plugs it in with
+  `app.use('/', userRoutes)`.
+- `router.route('/api/users/:userId').get(...).patch(...).delete(...)` writes the path **once** and
+  lists the methods under it. The file reads like the REST table from stage 06.
+- **One job:** "which URL and method runs which function". Stages 10 and 11 add security checks
+  here, between the URL and the handler.
