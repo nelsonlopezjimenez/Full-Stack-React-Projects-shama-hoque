@@ -66,3 +66,12 @@ Try: set `PORT=3001` in `.env`, restart, and change `@baseUrl` in `api.http`. Th
   using `User` exactly as before.
 - **One job:** this file answers "what does a user look like, and what rules apply?" Stages 09 and 14
   (passwords) change only this file and the auth code.
+
+## c) The handlers → `controllers/user.controller.js`
+
+- Each route's function gets a name (`create`, `list`, `read`, `update`, `remove`) and moves to the
+  controller. `server.js` keeps only one line per route:
+  `app.get('/api/users/:userId', userCtrl.read)`.
+- We pass `userCtrl.read`, the function itself, **without** `()`. Express calls it for each request.
+- Look at `read`, `update` and `remove`: all three still start with the same four lines. Now that they
+  sit next to each other, the copy is easy to see. Step f removes it.

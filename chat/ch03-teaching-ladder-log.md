@@ -77,3 +77,6 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   although its `.env.example` already said `mernskeleton`).
 - **07b model:** schema + model moved verbatim to `models/user.model.js` (`export default`).
   Verified: regression passes.
+- **07c controllers:** handlers named and moved to `controllers/user.controller.js` (order and
+  export as in the final file); the 404 lookup is still copied in read/update/remove on purpose.
+  `server.js` down to 66 lines. Verified: regression passes.
