@@ -1,5 +1,6 @@
 import express from 'express'
 import userRoutes from './routes/user.routes.js'
+import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
 
 // [BEGINNER] This file only *builds* the app and exports it. server.js is the file that
@@ -14,9 +15,10 @@ const app = express()
 app.use(express.json())
 
 // mount routes
-// [BEGINNER] Every route for /api/users is defined in routes/user.routes.js. app.use() plugs the
-// whole router into the app. To find "what happens on PATCH /api/users/:id", open the routes file.
+// [BEGINNER] Every route for /api/users is defined in routes/user.routes.js, every route for
+// /api/auth in routes/auth.routes.js. app.use() plugs each router into the app.
 app.use('/', userRoutes)
+app.use('/', authRoutes)
 
 // [BEGINNER] Any /api request that did not match a route above ends here.
 // Without it, Express answers with an HTML "Cannot GET ..." page, which a JSON client cannot parse.

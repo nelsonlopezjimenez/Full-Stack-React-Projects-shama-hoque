@@ -112,3 +112,8 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   list hides it (`.select`); **read and patch return `"password":"secret1"`**, the leak part b fixes.
 - **09b toJSON:** schema `toJSON.transform` deletes `password`; controller comments updated.
   Verified: read and patch no longer contain the password.
+- **09c sign-in:** `routes/auth.routes.js` (`POST /api/auth/sessions` only) and
+  `controllers/auth.controller.js` (`signin` with `===`, taken from the saved simple-auth work),
+  mounted in `express.js`. `api.http` 19–22. Lesson 09 part c ends with "HTTP is stateless".
+  Verified: sign-in → 200 `{ user }` without the password; wrong password and unknown email → the
+  same 401; `{}` and no body → 400; `GET /api/auth/sessions` → JSON 404.

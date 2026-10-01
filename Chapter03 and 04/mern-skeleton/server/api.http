@@ -95,3 +95,27 @@ POST {{baseUrl}}/api/users
 Content-Type: application/json
 
 { "name": "Eve", "email": "eve@test.io", "password": "123" }
+
+### 19. Sign in → 200 { user }
+POST {{baseUrl}}/api/auth/sessions
+Content-Type: application/json
+
+{ "email": "ann@test.io", "password": "{{password}}" }
+
+### 20. Wrong password → 401 (the same message as an unknown email)
+POST {{baseUrl}}/api/auth/sessions
+Content-Type: application/json
+
+{ "email": "ann@test.io", "password": "wrong-password" }
+
+### 21. Unknown email → 401, same message
+POST {{baseUrl}}/api/auth/sessions
+Content-Type: application/json
+
+{ "email": "nobody@test.io", "password": "{{password}}" }
+
+### 22. Missing fields → 400
+POST {{baseUrl}}/api/auth/sessions
+Content-Type: application/json
+
+{}
