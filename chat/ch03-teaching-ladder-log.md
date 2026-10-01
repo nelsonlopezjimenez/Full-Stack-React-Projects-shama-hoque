@@ -82,3 +82,6 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   `server.js` down to 66 lines. Verified: regression passes.
 - **07d routes:** `routes/user.routes.js` with `express.Router()` + `router.route()`, mounted with
   `app.use('/', userRoutes)` (as in the final `express.js`). Verified: regression passes.
+- **07e express.js / server.js:** `express.js` builds and exports the app (json + routes);
+  `server.js` only connects and listens. The hello route on `/` is removed (the final code has none);
+  `api.http` request 1 now expects 404. Verified: regression passes, `GET /` → 404.
