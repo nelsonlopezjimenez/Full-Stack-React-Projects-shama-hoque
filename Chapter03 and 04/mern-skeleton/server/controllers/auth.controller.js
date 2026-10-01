@@ -72,8 +72,25 @@ const requireSignin = (req, res, next) => {
   next()
 }
 
+// [BEGINNER] Authentication = WHO are you (requireSignin). Authorization = are you ALLOWED to do
+// this (hasAuthorization). Being signed in as Ann does not allow changing Bob's account.
+const hasAuthorization = (req, res, next) => {
+  // [BEGINNER] req.profile._id is an ObjectId and req.auth._id is a string. Comparing them with
+  // `===` would always be false (different types). .equals() compares ObjectIds explicitly
+  // and also accepts a hex string.
+  const authorized = req.profile && req.auth && req.profile._id.equals(req.auth._id)
+  if (!authorized) {
+    // [BEGINNER] 403 Forbidden: "I know who you are, and the answer is no".
+    return res.status(403).json({
+      error: "User is not authorized"
+    })
+  }
+  next()
+}
+
 export default {
   signin,
   signout,
-  requireSignin
+  requireSignin,
+  hasAuthorization
 }
