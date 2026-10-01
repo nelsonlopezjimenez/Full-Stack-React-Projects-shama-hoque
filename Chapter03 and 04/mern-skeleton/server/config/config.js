@@ -3,7 +3,9 @@ const env = process.env.NODE_ENV || 'development'
 const config = {
   env,
   port: Number(process.env.PORT ?? 3000),
-  cookieSecret: process.env.COOKIE_SECRET ?? 'dev-only-secret-do-not-use-in-production',
+  jwtSecret: process.env.JWT_SECRET ?? 'dev-only-secret-do-not-use-in-production',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
+  jwtCookieMaxAgeMs: Number(process.env.JWT_COOKIE_MAX_AGE_MS ?? 24 * 60 * 60 * 1000),
   mongoUri: process.env.MONGODB_URI ||
     process.env.MONGO_HOST ||
     'mongodb://' + (process.env.IP || 'localhost') + ':' +

@@ -1,4 +1,6 @@
 import User from '../models/user.model.js'
+import jwt from 'jsonwebtoken'
+import { expressjwt } from 'express-jwt'
 import config from '../config/config.js'
 
 const cookieOptions = {
@@ -6,8 +8,6 @@ const cookieOptions = {
   sameSite: 'strict',
   secure: config.env === 'production'
 }
-
-const ONE_DAY_MS = 24 * 60 * 60 * 1000
 
 const signin = async (req, res) => {
   const { email, password } = req.body ?? {}
@@ -21,28 +21,38 @@ const signin = async (req, res) => {
     return res.status(401).json({ error: "Email and password don't match." })
   }
 
-  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS, signed: true })
+  const token = jwt.sign({ _id: user._id }, config.jwtSecret, {
+    algorithm: 'HS256',
+    expiresIn: config.jwtExpiresIn
+  })
+
+  res.cookie('t', token, { ...cookieOptions, maxAge: config.jwtCookieMaxAgeMs })
 
   return res.json({
+    token,
     user: { _id: user._id, name: user.name, email: user.email }
   })
 }
 
 const signout = (req, res) => {
-  res.clearCookie('userId', cookieOptions)
+  res.clearCookie('t', cookieOptions)
   return res.status(200).json({
     message: "signed out"
   })
 }
 
-const requireSignin = (req, res, next) => {
-  const userId = req.signedCookies.userId
-  if (!userId) {
-    return res.status(401).json({ error: 'Please sign in' })
-  }
-  req.auth = { _id: userId }
-  next()
+const getToken = (req) => {
+  if (req.cookies?.t) return req.cookies.t
+  const [scheme, token] = req.headers.authorization?.split(' ') ?? []
+  if (scheme === 'Bearer') return token
 }
+
+const requireSignin = expressjwt({
+  secret: config.jwtSecret,
+  algorithms: ['HS256'],
+  requestProperty: 'auth',
+  getToken
+})
 
 const hasAuthorization = (req, res, next) => {
   const authorized = req.profile && req.auth && req.profile._id.equals(req.auth._id)

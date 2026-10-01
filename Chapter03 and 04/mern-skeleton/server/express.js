@@ -2,13 +2,12 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
-import config from './config/config.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
 
 const app = express()
 
 app.use(express.json())
-app.use(cookieParser(config.cookieSecret))
+app.use(cookieParser())
 
 app.use('/', userRoutes)
 app.use('/', authRoutes)
@@ -20,6 +19,9 @@ app.use('/api', (req, res) => {
 app.use((err, req, res, next) => {
   if (res.headersSent) return next(err)
 
+  if (err.name === 'UnauthorizedError') {
+    return res.status(401).json({ error: `${err.name}: ${err.message}` })
+  }
   if (err.name === 'ValidationError' || err.code === 11000) {
     return res.status(400).json({ error: dbErrorHandler.getErrorMessage(err) })
   }

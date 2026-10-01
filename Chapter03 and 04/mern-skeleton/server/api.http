@@ -87,7 +87,8 @@ Content-Type: application/json
 
 { "name": "Eve", "email": "eve@test.io", "password": "123" }
 
-### 19. Sign in → 200 { user }
+### 19. Sign in → 200 { token, user } + httpOnly cookie "t"
+# @name signin
 POST {{baseUrl}}/api/auth/sessions
 Content-Type: application/json
 
@@ -111,17 +112,17 @@ Content-Type: application/json
 
 {}
 
-### 23. Read a user WITHOUT the cookie → 401 "Please sign in"
+### 23. Read a user WITHOUT the cookie → 401 "UnauthorizedError: No authorization token was found"
 # @no-cookie-jar
 GET {{baseUrl}}/api/users/{{userId}}
 
 ### 24. Sign out → 200, cookie cleared. Request 8 now answers 401 until you sign in again.
 DELETE {{baseUrl}}/api/auth/sessions
 
-### 25. A cookie made up by hand, without any sign-in → 401 since stage 12 (it was 200 before)
+### 25. A cookie made up by hand, without any sign-in → 401 "jwt malformed"
 # @no-cookie-jar
 GET {{baseUrl}}/api/users/{{userId}}
-Cookie: userId={{userId}}
+Cookie: t={{userId}}
 
 ### 26. Signed in as Ann, change BOB's account → 403 "User is not authorized"
 @bobId = {{list.response.body.$[1]._id}}
@@ -130,10 +131,16 @@ Content-Type: application/json
 
 { "name": "Bob was here" }
 
-### 27. A hand-made cookie with BOB's id → 401 since stage 12 (it was 200 before)
+### 27. A hand-made cookie with BOB's id → 401 "jwt malformed"
 # @no-cookie-jar
 PATCH {{baseUrl}}/api/users/{{bobId}}
-Cookie: userId={{bobId}}
+Cookie: t={{bobId}}
 Content-Type: application/json
 
 { "name": "Bob, hacked" }
+
+### 28. No cookie, the token in a header instead (what a mobile app would do) → 200
+@token = {{signin.response.body.token}}
+# @no-cookie-jar
+GET {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{token}}
