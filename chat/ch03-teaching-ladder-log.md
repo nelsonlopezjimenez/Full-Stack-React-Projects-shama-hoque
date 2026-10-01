@@ -139,3 +139,13 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   Bob's id still reads and deletes Bob (fixed in 12); cookie `userId=hello` → PATCH 403
   (`ObjectId.equals('hello')` is false, no crash), GET 200 (read only needs *a* cookie: the exercise
   of lesson 10).
+
+## Stage 12 — signed-cookie (`teach/ch03-server-12-signed-cookie`)
+
+- **Changed:** `config.cookieSecret` (`COOKIE_SECRET`, dev fallback), `.env.example`,
+  `cookieParser(config.cookieSecret)` (so `express.js` now imports `config`, as in the final file),
+  `signed: true` + `req.signedCookies`. `api.http` 25/27 → 401. Lesson 12 (signed ≠ encrypted, what is
+  still missing → JWT).
+- **Verified:** stage 10 script with stage-12 expectations (hand-made cookies → 401): all pass; the cookie
+  looks like `userId=s%3A<id>.<signature>`; a genuine cookie → 200; the same cookie with one character
+  of the id changed → 401.

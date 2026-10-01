@@ -2,6 +2,7 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
+import config from './config/config.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
 
 // [BEGINNER] This file only *builds* the app and exports it. server.js is the file that
@@ -15,7 +16,9 @@ const app = express()
 // parsed object in req.body. Without it, req.body is undefined.
 app.use(express.json())
 // [BEGINNER] cookie-parser reads the Cookie header of every request into the object req.cookies.
-app.use(cookieParser())
+// With a secret it also checks SIGNED cookies: those with a valid signature end up in
+// req.signedCookies, a tampered one is set to false there, and an unsigned one stays in req.cookies.
+app.use(cookieParser(config.cookieSecret))
 
 // mount routes
 // [BEGINNER] Every route for /api/users is defined in routes/user.routes.js, every route for

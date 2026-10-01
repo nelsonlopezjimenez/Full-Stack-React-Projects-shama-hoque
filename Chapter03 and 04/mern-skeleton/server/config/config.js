@@ -13,6 +13,9 @@ const config = {
   // [BEGINNER] `??` only falls back when the value is null/undefined; `||` also replaces '' and 0.
   // Environment variables are always strings, so Number() turns '3000' into 3000.
   port: Number(process.env.PORT ?? 3000),
+  // [BEGINNER] The secret that signs the sign-in cookie. Whoever knows it can make valid cookies,
+  // so the real value lives only in .env (never in git). The fallback is for development only.
+  cookieSecret: process.env.COOKIE_SECRET ?? 'dev-only-secret-do-not-use-in-production',
   // [BEGINNER] `||` on purpose here, not `??`: an empty line like `MONGODB_URI=` in .env gives ''
   // and should fall back to the next choice too. The last choice is a template literal: text in
   // backticks, where ${…} puts a value into the text (the book glued the parts together with +).

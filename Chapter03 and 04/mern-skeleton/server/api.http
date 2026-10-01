@@ -131,8 +131,8 @@ GET {{baseUrl}}/api/users/{{userId}}
 ### 24. Sign out → 200, cookie cleared. Request 8 now answers 401 until you sign in again.
 DELETE {{baseUrl}}/api/auth/sessions
 
-### 25. The weakness: a cookie made up by hand, without any sign-in → 200 !
-# [BEGINNER] The server only checks that a userId cookie EXISTS. Anyone can type one.
+### 25. A cookie made up by hand, without any sign-in → 401 since stage 12 (it was 200 before)
+# [BEGINNER] It has no valid signature, so the server ignores it.
 # @no-cookie-jar
 GET {{baseUrl}}/api/users/{{userId}}
 Cookie: userId={{userId}}
@@ -145,7 +145,7 @@ Content-Type: application/json
 
 { "name": "Bob was here" }
 
-### 27. Still the weakness: a hand-made cookie with BOB's id can change Bob → 200 !
+### 27. A hand-made cookie with BOB's id → 401 since stage 12 (it was 200 before)
 # @no-cookie-jar
 PATCH {{baseUrl}}/api/users/{{bobId}}
 Cookie: userId={{bobId}}

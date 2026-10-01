@@ -42,10 +42,10 @@ const signin = async (req, res) => {
     return res.status(401).json({ error: "Email and password don't match." })
   }
 
-  // [BEGINNER] TEACHING VERSION: the cookie simply contains the user's id. Every later request
-  // carries it, and requireSignin (below) believes it. Believes it a bit too much:
-  // see the lesson, and stage 12.
-  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS })
+  // [BEGINNER] signed: true adds a signature computed from the value and config.cookieSecret:
+  // the browser stores "s:<id>.<signature>". The id is still READABLE, but it cannot be CHANGED
+  // without the secret: a different id needs a different signature.
+  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS, signed: true })
 
   return res.json({
     user: { _id: user._id, name: user.name, email: user.email }
@@ -60,11 +60,12 @@ const signout = (req, res) => {
   })
 }
 
-// [BEGINNER] requireSignin is middleware: it lets the request continue only if it carries the
-// sign-in cookie, and records WHO is asking in req.auth for the functions after it.
-// cookie-parser (express.js) has already turned the Cookie header into the object req.cookies.
+// [BEGINNER] requireSignin is middleware: it lets the request continue only if it carries a
+// correctly SIGNED sign-in cookie, and records WHO is asking in req.auth for the functions after it.
+// cookie-parser (express.js) has already checked the signature: req.signedCookies.userId is the id
+// for a genuine cookie, false for a tampered one, and undefined for a missing or unsigned one.
 const requireSignin = (req, res, next) => {
-  const userId = req.cookies.userId
+  const userId = req.signedCookies.userId
   if (!userId) {
     return res.status(401).json({ error: 'Please sign in' })
   }
