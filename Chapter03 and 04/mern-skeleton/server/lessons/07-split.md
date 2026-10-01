@@ -58,3 +58,11 @@ View here because the server only answers JSON; the React client will be the vie
 - `server.js` imports `config` and uses `config.port` and `config.mongoUri`.
 
 Try: set `PORT=3001` in `.env`, restart, and change `@baseUrl` in `api.http`. Then set it back.
+
+## b) The schema → `models/user.model.js`
+
+- The schema and `mongoose.model('User', ...)` move to their own file, which ends with `export default`.
+- `server.js` gets the model with `import User from './models/user.model.js'`. Every route keeps
+  using `User` exactly as before.
+- **One job:** this file answers "what does a user look like, and what rules apply?" Stages 09 and 14
+  (passwords) change only this file and the auth code.
