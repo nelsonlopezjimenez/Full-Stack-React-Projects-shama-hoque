@@ -4,6 +4,7 @@
 # (JetBrains IDEs run .http files natively.) Blocks are separated by lines starting with ###.
 
 @baseUrl = http://localhost:3000
+@password = secret1
 
 ### 1. The root URL → 404 "Cannot GET /" (since stage 07e the server only answers under /api)
 GET {{baseUrl}}/
@@ -17,7 +18,7 @@ GET {{baseUrl}}/api/users
 POST {{baseUrl}}/api/users
 Content-Type: application/json
 
-{ "name": "Ann", "email": "ann@test.io" }
+{ "name": "Ann", "email": "ann@test.io", "password": "{{password}}" }
 
 ### 4. Create a user with NO data → 400 with ALL validation messages
 POST {{baseUrl}}/api/users
@@ -29,13 +30,13 @@ Content-Type: application/json
 POST {{baseUrl}}/api/users
 Content-Type: application/json
 
-{ "name": "Ann", "email": "ann@test.io" }
+{ "name": "Ann", "email": "ann@test.io", "password": "{{password}}" }
 
 ### 6. A second user, for the next stages → 201
 POST {{baseUrl}}/api/users
 Content-Type: application/json
 
-{ "name": "Bob", "email": "bob@test.io" }
+{ "name": "Bob", "email": "bob@test.io", "password": "{{password}}" }
 
 ### 7. List users and store the answer
 # [BEGINNER] "# @name list" saves this response, so the next requests can use the first user's id.
@@ -45,7 +46,7 @@ GET {{baseUrl}}/api/users
 ###
 @userId = {{list.response.body.$[0]._id}}
 
-### 8. Read one user → 200 and the user
+### 8. Read one user → 200 and the user (look for "password"!)
 GET {{baseUrl}}/api/users/{{userId}}
 
 ### 9. A valid id that belongs to nobody → 404 { "error": "User not found" }
@@ -58,7 +59,7 @@ GET {{baseUrl}}/api/users/not-an-id
 POST {{baseUrl}}/api/users
 Content-Type: application/json
 
-{ "name": "Dan", "email": "dan@test.io" }
+{ "name": "Dan", "email": "dan@test.io", "password": "{{password}}" }
 
 ### 12. Delete a user → 200 and the deleted user
 # [BEGINNER] Send request 2, copy Dan's "_id" and paste it after `@deleteId =` below.
@@ -88,3 +89,9 @@ POST {{baseUrl}}/api/users
 Content-Type: application/json
 
 { "name": "Ann, "email": "x@test.io" }
+
+### 18. A password that is too short → 400 "Password must be at least 6 characters."
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{ "name": "Eve", "email": "eve@test.io", "password": "123" }
