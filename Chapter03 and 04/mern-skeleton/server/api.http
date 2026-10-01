@@ -150,3 +150,9 @@ PATCH {{baseUrl}}/api/users/{{userId}}
 Content-Type: application/json
 
 { "password": "secret2" }
+
+### 30. Fields outside name/email/password are ignored → 200, only the name changes
+PATCH {{baseUrl}}/api/users/{{userId}}
+Content-Type: application/json
+
+{ "name": "Ann Updated", "salt": "ignored", "hashed_password": "ignored", "created": "2000-01-01" }

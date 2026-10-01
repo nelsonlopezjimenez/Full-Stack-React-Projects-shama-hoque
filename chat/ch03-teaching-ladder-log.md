@@ -178,3 +178,11 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   PATCH password → old fails, new works; PATCH a 2-character password → 400; a leftover plain-text
   document → 401 (no crash); **`PATCH {hashed_password, salt}` is accepted and locks the user out**,
   the hole for stage 15.
+
+## Stage 15 — mass-assignment (`teach/ch03-server-15-mass-assignment`)
+
+- **Changed:** `UPDATABLE_FIELDS` allow-list + `Object.fromEntries` in `update` (the final code;
+  comments adapted). `api.http` 30. Lesson 15 (the attack table, allow-list vs deny-list).
+- **Verified:** PATCH with `salt`, `hashed_password`, `created`, `_id` → 200, only the name changed,
+  sign-in still works; email-only PATCH keeps the name; PATCH without a body → 200; the stage 14
+  script with `STAGE=15` now shows the hash fields ignored and sign-in working afterwards.

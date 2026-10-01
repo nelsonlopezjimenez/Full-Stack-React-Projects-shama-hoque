@@ -26,8 +26,16 @@ const list = async (req, res) => {
   res.json(users)
 }
 
+const UPDATABLE_FIELDS = ['name', 'email', 'password']
+
 const update = async (req, res) => {
-  const user = Object.assign(req.profile, req.body, { updated: Date.now() })
+  const body = req.body ?? {}
+  const changes = Object.fromEntries(
+    UPDATABLE_FIELDS
+      .filter((field) => body[field] !== undefined)
+      .map((field) => [field, body[field]])
+  )
+  const user = Object.assign(req.profile, changes, { updated: Date.now() })
   await user.save()
   res.json(user)
 }
