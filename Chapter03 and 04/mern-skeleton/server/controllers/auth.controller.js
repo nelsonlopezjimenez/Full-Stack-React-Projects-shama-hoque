@@ -2,6 +2,7 @@ import User from '../models/user.model.js'
 import jwt from 'jsonwebtoken'
 import { expressjwt } from 'express-jwt'
 import config from '../config/config.js'
+import logger from '../helpers/logger.js'
 
 const cookieOptions = {
   httpOnly: true,
@@ -25,6 +26,8 @@ const signin = async (req, res) => {
     algorithm: 'HS256',
     expiresIn: config.jwtExpiresIn
   })
+
+  logger.debug('JWT issued for %s: %s', user.email, token)
 
   res.cookie('t', token, { ...cookieOptions, maxAge: config.jwtCookieMaxAgeMs })
 

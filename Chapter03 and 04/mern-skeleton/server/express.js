@@ -5,8 +5,11 @@ import helmet from 'helmet'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
+import logger, { requestLogger } from './helpers/logger.js'
 
 const app = express()
+
+app.use(requestLogger)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -35,7 +38,7 @@ app.use((err, req, res, next) => {
   }
 
   const status = err.status ?? err.statusCode ?? 500
-  if (status >= 500) console.error(err)
+  if (status >= 500) logger.error(err)
   res.status(status).json({ error: status >= 500 ? 'Internal server error' : err.message })
 })
 
