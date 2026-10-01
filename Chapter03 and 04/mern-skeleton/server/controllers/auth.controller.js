@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 // the book's default import `import expressJwt from 'express-jwt'` no longer exists.
 import { expressjwt } from 'express-jwt'
 import config from '../config/config.js'
+import logger from '../helpers/logger.js'
 
 // [BEGINNER] A cookie is a small named value the server asks the browser to store. The browser
 // then sends it back automatically with every request to this server.
@@ -51,6 +52,9 @@ const signin = async (req, res) => {
     algorithm: 'HS256',
     expiresIn: config.jwtExpiresIn // the book's tokens never expired
   })
+
+  // Development only: paste the token at https://jwt.io to look inside it.
+  logger.debug('JWT issued for %s: %s', user.email, token)
 
   res.cookie('t', token, { ...cookieOptions, maxAge: config.jwtCookieMaxAgeMs })
 

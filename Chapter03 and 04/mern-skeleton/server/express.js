@@ -5,11 +5,17 @@ import helmet from 'helmet'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
+import logger, { requestLogger } from './helpers/logger.js'
 
 // [BEGINNER] This file only *builds* the app and exports it. server.js is the file that
 // starts it (connects to the DB, calls listen). Keeping them apart lets tests import the
 // app without opening a port or a database connection.
 const app = express()
+
+// development only: one line per request, e.g. "GET /api/users → 200 (3.1 ms)"
+// [BEGINNER] It is the first middleware, so it sees every request, including the ones that
+// end in a 404 or an error.
+app.use(requestLogger)
 
 // parse body params and attach them to req.body
 // [BEGINNER] Middleware: a function that runs for EVERY request, before the routes.
@@ -74,7 +80,7 @@ app.use((err, req, res, next) => {
   // status is a bug or an outage → 500. Log the details on the server, but do not send the
   // stack trace or the internal message to the client.
   const status = err.status ?? err.statusCode ?? 500
-  if (status >= 500) console.error(err)
+  if (status >= 500) logger.error(err)
   res.status(status).json({ error: status >= 500 ? 'Internal server error' : err.message })
 })
 
