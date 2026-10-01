@@ -2,6 +2,11 @@ import mongoose from 'mongoose'
 
 // [BEGINNER] A schema describes what a user looks like and which rules every user must follow.
 // MongoDB itself would store anything; Mongoose checks these rules before saving.
+//
+// [BEGINNER] TEACHING VERSION: the password is stored exactly as the user typed it, so the
+// sign-in lesson can focus on "check the password, remember who signed in".
+// NEVER do this in a real app: anyone who can read the database (or a backup of it) can read
+// every password. Stage 14 stores a salted hash instead.
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -18,6 +23,12 @@ const UserSchema = new mongoose.Schema({
     // [BEGINNER] match: the value must fit this regular expression ("something@something.something").
     match: [/.+@.+\..+/, 'Please fill a valid email address.'],
     required: [true, 'Email is required.']
+  },
+  password: {
+    type: String,
+    required: [true, 'Password is required.'],
+    // [BEGINNER] minlength is a built-in rule for strings: at least 6 characters.
+    minlength: [6, 'Password must be at least 6 characters.']
   },
   updated: Date,
   created: {

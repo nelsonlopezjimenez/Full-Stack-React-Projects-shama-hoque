@@ -102,3 +102,11 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   400; a second instance on the same port exits with code 1 and `EADDRINUSE`.
 - **Surprise:** Mongoose reports validation errors in schema-path order of failure (email before
   name here), so the lesson table shows that order.
+
+## Stage 09 — password-plain (`teach/ch03-server-09-password-plain`)
+
+- **09a password field:** `password` (plain text, `required`, `minlength: 6`; the final code checks the
+  length in a `pre('validate')` hook because of the hashing virtual, stage 14). `api.http` sends
+  `{{password}}` (`secret1`, as in the final file), new request 18. Lesson 09 part a.
+  Verified: missing → 400 "Password is required."; `123` → 400 "...at least 6 characters.";
+  list hides it (`.select`); **read and patch return `"password":"secret1"`**, the leak part b fixes.
