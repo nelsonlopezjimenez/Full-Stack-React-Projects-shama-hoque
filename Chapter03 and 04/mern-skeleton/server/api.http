@@ -36,3 +36,20 @@ POST {{baseUrl}}/api/users
 Content-Type: application/json
 
 { "name": "Bob", "email": "bob@test.io" }
+
+### 7. List users and store the answer
+# [BEGINNER] "# @name list" saves this response, so the next requests can use the first user's id.
+# @name list
+GET {{baseUrl}}/api/users
+
+###
+@userId = {{list.response.body.$[0]._id}}
+
+### 8. Read one user → 200 and the user
+GET {{baseUrl}}/api/users/{{userId}}
+
+### 9. A valid id that belongs to nobody → 404 { "error": "User not found" }
+GET {{baseUrl}}/api/users/000000000000000000000000
+
+### 10. Something that is not an id at all → 500 HTML page (CastError; fixed in stage 08)
+GET {{baseUrl}}/api/users/not-an-id

@@ -41,3 +41,10 @@ script sent the stage's requests and compared status codes and bodies.
   handler prints the stack trace in the terminal, as the lesson says.
 - **Noticed:** `POST {"created": "2000-01-01"}` is accepted by `new User(req.body)`. The final code
   does the same for sign-up (only update has an allow-list); left as is, matches the target.
+
+## Stage 04 — read-one (`teach/ch03-server-04-read-one`)
+
+- **Changed:** `GET /api/users/:userId` with `findById` and a JSON 404. `api.http` 7–10 (stores the
+  first user's id with `# @name list`), lesson 04 (explains why "list all" comes first).
+- **Verified:** read → 200; valid unknown id → 404 `{ error: "User not found" }`; `not-an-id` → 500
+  HTML with CastError (fixed in 08).

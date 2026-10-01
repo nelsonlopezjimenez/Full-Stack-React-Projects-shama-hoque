@@ -87,6 +87,21 @@ app.post('/api/users', async (req, res) => {
   res.status(201).json({ message: 'Successfully signed up!' })
 })
 
+// Read one user
+// [BEGINNER] `:userId` is a route parameter: a placeholder for any value in that part of the URL.
+// For GET /api/users/66fb12...e1, Express puts '66fb12...e1' in req.params.userId.
+// REST: /api/users is the collection, /api/users/<id> is ONE item of it.
+app.get('/api/users/:userId', async (req, res) => {
+  const user = await User.findById(req.params.userId)
+  // [BEGINNER] findById answers null when no user has this id. `return` stops the function
+  // here, so we never send two answers to one request.
+  if (!user) {
+    // 404 Not Found: the id is well-formed but no such user exists
+    return res.status(404).json({ error: 'User not found' })
+  }
+  res.json(user)
+})
+
 // [BEGINNER] Top-level await: in an ES module you can `await` outside any function.
 // The server only starts listening AFTER the database is ready, so no request can arrive
 // while Mongoose is still connecting.
