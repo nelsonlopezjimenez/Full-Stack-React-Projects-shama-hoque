@@ -11,8 +11,8 @@ const router = express.Router()
 //   GET    /api/users            list users           (public)
 //   POST   /api/users            sign up              (public)
 //   GET    /api/users/:userId    read one user        (signed in)
-//   PATCH  /api/users/:userId    update a user        (signed in)
-//   DELETE /api/users/:userId    delete a user        (signed in)
+//   PATCH  /api/users/:userId    update own profile   (signed in + owner)
+//   DELETE /api/users/:userId    delete own account   (signed in + owner)
 //
 // [ADVANCED] GET /api/users is public: anyone can list every name and email. Kept public
 // because the "Users" page of the React client is public; add authCtrl.requireSignin in front
@@ -29,6 +29,7 @@ router.route('/api/users')
 // either answers or calls next() to hand the request to the next one:
 //   requireSignin     is the sign-in cookie there?     (no → 401)
 //   userByID          load the user into req.profile   (no such user → 404)
+//   hasAuthorization  is it YOUR profile?              (no → 403)
 //   read/update/remove
 //
 // [ADVANCED] The book used router.param('userId', userCtrl.userByID) instead of listing
@@ -37,7 +38,7 @@ router.route('/api/users')
 // Listing userByID after requireSignin makes the order visible and fixes both.
 router.route('/api/users/:userId')
   .get(authCtrl.requireSignin, userCtrl.userByID, userCtrl.read)
-  .patch(authCtrl.requireSignin, userCtrl.userByID, userCtrl.update)
-  .delete(authCtrl.requireSignin, userCtrl.userByID, userCtrl.remove)
+  .patch(authCtrl.requireSignin, userCtrl.userByID, authCtrl.hasAuthorization, userCtrl.update)
+  .delete(authCtrl.requireSignin, userCtrl.userByID, authCtrl.hasAuthorization, userCtrl.remove)
 
 export default router
