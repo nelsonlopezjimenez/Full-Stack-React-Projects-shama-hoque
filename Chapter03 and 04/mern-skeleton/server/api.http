@@ -144,3 +144,9 @@ Content-Type: application/json
 # @no-cookie-jar
 GET {{baseUrl}}/api/users/{{userId}}
 Authorization: Bearer {{token}}
+
+### 29. Change the password → 200 (the new one is hashed on save). Sign in with "secret2" afterwards,
+PATCH {{baseUrl}}/api/users/{{userId}}
+Content-Type: application/json
+
+{ "password": "secret2" }

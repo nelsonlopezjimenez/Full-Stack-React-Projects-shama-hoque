@@ -17,7 +17,7 @@ const signin = async (req, res) => {
 
   const user = await User.findOne({ email })
 
-  if (!user || user.password !== password) {
+  if (!user?.authenticate(password)) {
     return res.status(401).json({ error: "Email and password don't match." })
   }
 

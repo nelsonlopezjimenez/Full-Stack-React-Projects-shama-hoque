@@ -165,3 +165,16 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   `Authorization: Token …` → ignored (401); sign-out clears `t`; then 401.
 - **Noted:** when the cookie holds an invalid token, the header is not tried (the cookie wins).
   That is fine for this app (the React client sends both, and both hold the same token).
+
+## Stage 14 — password-hashed (`teach/ch03-server-14-password-hashed`)
+
+- **Changed:** `models/user.model.js` is now the final file, unchanged (scrypt + salt, `password` virtual,
+  `pre('validate')` length check, `authenticate`, `toJSON` hides hash and salt). `signin` uses
+  `user?.authenticate(password)`. Controller comments. `api.http` 29 (change the password). Lesson 14
+  (stolen database, hash ≠ encryption, salt, slow on purpose, delete the old plain-text users).
+- **Verified:** the stage 13 JWT script still passes; stored keys are
+  `_id,name,email,hashed_password,salt,created,__v` (128-hex hash, 32-hex salt, no `password`); the
+  same password gives two different hashes; sign-in/wrong password as before; read hides hash and salt;
+  PATCH password → old fails, new works; PATCH a 2-character password → 400; a leftover plain-text
+  document → 401 (no crash); **`PATCH {hashed_password, salt}` is accepted and locks the user out**,
+  the hole for stage 15.
