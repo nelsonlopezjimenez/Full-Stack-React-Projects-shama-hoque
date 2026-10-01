@@ -21,3 +21,10 @@ script sent the stage's requests and compared status codes and bodies.
   local files, not part of any commit, so they were left alone. Always `git add` specific paths.
 - **Lock files:** each stage's `package-lock.json` is built from the final lock
   (`npm install --package-lock-only`), so every stage uses the same versions as the final code.
+
+## Stage 02 — memory-users (`teach/ch03-server-02-memory-users`)
+
+- **Changed:** `server.js` gets `express.json()`, a `users` array, `GET /api/users`, `POST /api/users`
+  (201 `{ message }`, the same answer as the final code). `api.http` requests 2–4, lesson 02.
+- **Why:** HTTP methods, JSON bodies and status codes without having to learn a database at the same time.
+- **Verified:** empty list → `[]`; two POSTs → 201; list has both, the second one without name/email.

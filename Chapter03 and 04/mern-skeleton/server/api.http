@@ -7,3 +7,20 @@
 
 ### 1. Hello → 200 and a line of text
 GET {{baseUrl}}/
+
+### 2. List users → 200 and [] (an empty JSON array) after a restart
+GET {{baseUrl}}/api/users
+
+### 3. Create a user → 201
+# [BEGINNER] A POST has a body. The empty line after the headers is required: it separates the
+# headers from the body. Content-Type tells the server that the body is JSON.
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{ "name": "Ann", "email": "ann@test.io" }
+
+### 4. Create a user with NO data → 201 as well (nothing checks the data yet)
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{}
