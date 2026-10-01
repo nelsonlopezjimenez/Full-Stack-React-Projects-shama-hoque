@@ -186,3 +186,12 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
 - **Verified:** PATCH with `salt`, `hashed_password`, `created`, `_id` → 200, only the name changed,
   sign-in still works; email-only PATCH keeps the name; PATCH without a body → 200; the stage 14
   script with `STAGE=15` now shows the hash fields ignored and sign-in working afterwards.
+
+## Stage 16 — helmet (`teach/ch03-server-16-helmet`)
+
+- **Changed:** `helmet`, `compression`, `express.urlencoded({ extended: true })` in `express.js`
+  (final order and comments). `api.http` 31 (headers) and 32 (form body). Lesson 16 (header table).
+- **Verified:** response has `Content-Security-Policy`, `Strict-Transport-Security`,
+  `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: no-referrer`, and no
+  `X-Powered-By`; a URL-encoded sign-up → 201; a list of 31 users is sent gzipped; the stage 13 JWT
+  script still passes.
