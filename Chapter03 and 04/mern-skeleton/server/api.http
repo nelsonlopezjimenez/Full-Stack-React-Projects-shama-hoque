@@ -67,3 +67,15 @@ DELETE {{baseUrl}}/api/users/{{deleteId}}
 
 ### 13. Delete the same user again → 404 (it is gone)
 DELETE {{baseUrl}}/api/users/{{deleteId}}
+
+### 14. Change only the name → 200, the user with the new name and an "updated" date
+PATCH {{baseUrl}}/api/users/{{userId}}
+Content-Type: application/json
+
+{ "name": "Ann Updated" }
+
+### 15. An invalid email → 500 HTML (the schema refused it; fixed in stage 08)
+PATCH {{baseUrl}}/api/users/{{userId}}
+Content-Type: application/json
+
+{ "email": "not-an-email" }

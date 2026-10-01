@@ -54,3 +54,12 @@ script sent the stage's requests and compared status codes and bodies.
 - **Changed:** `DELETE /api/users/:userId` (`findById`, 404, `deleteOne()`, answers the deleted
   user like the final code). `api.http` 11–13 (the id is pasted by hand on purpose), lesson 05.
 - **Verified:** delete → 200 with the user; again → 404; read afterwards → 404.
+
+## Stage 06 — update (`teach/ch03-server-06-update`)
+
+- **Changed:** `PATCH /api/users/:userId` with a naive `Object.assign(user, req.body, { updated })`
+  and `save()`. `api.http` 14–15, lesson 06 with the full REST/CRUD table and a "look back" at the
+  158-line `server.js`.
+- **Verified:** PATCH name → 200 with `updated`; email unchanged; invalid email → 500 HTML;
+  `{ "created": "1990-01-01" }` → 200 and accepted (the mass-assignment hole, on purpose, for stage 15);
+  unknown id → 404.

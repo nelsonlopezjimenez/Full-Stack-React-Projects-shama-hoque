@@ -102,6 +102,26 @@ app.get('/api/users/:userId', async (req, res) => {
   res.json(user)
 })
 
+// Update one user
+// [BEGINNER] PATCH means "change SOME fields": the client sends only what changes, for example
+// { "name": "Ann B." }. PUT would mean "replace the whole user", so the client would have to
+// send every field, and a missing field would be erased.
+app.patch('/api/users/:userId', async (req, res) => {
+  const user = await User.findById(req.params.userId)
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' })
+  }
+  // [BEGINNER] Object.assign(target, a, b) copies every property of a and b onto target.
+  // Here: the fields from the body, then the date of this change.
+  // [ADVANCED] Copying EVERYTHING the client sends is dangerous ("mass assignment"): a client can
+  // also change fields it should never touch. Stage 15 shows the attack and fixes it.
+  Object.assign(user, req.body, { updated: Date.now() })
+  // [BEGINNER] save() runs the schema rules again, so an update cannot break them
+  // (an empty name or an invalid email is refused, just like on create).
+  await user.save()
+  res.json(user)
+})
+
 // Delete one user
 // [BEGINNER] Same URL as "read one", different method: the method is the verb.
 app.delete('/api/users/:userId', async (req, res) => {
