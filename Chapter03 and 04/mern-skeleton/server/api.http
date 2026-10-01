@@ -172,3 +172,12 @@ PATCH {{baseUrl}}/api/users/{{userId}}
 Content-Type: application/json
 
 { "name": "Ann Updated", "salt": "ignored", "hashed_password": "ignored", "created": "2000-01-01" }
+
+### 31. Look at the RESPONSE HEADERS (not the body): helmet's security headers, no X-Powered-By
+GET {{baseUrl}}/api/users
+
+### 32. Sign up with an HTML-form style body (URL-encoded instead of JSON) → 201
+POST {{baseUrl}}/api/users
+Content-Type: application/x-www-form-urlencoded
+
+name=Fay&email=fay%40test.io&password=secret1

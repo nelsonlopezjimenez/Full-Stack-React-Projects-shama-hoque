@@ -1,5 +1,7 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
+import compress from 'compression'
+import helmet from 'helmet'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
@@ -14,9 +16,23 @@ const app = express()
 // express.json() reads a JSON request body (Content-Type: application/json) and puts the
 // parsed object in req.body. Without it, req.body is undefined.
 app.use(express.json())
+// [BEGINNER] HTML forms send their data URL-encoded (name=Ann&email=a%40b.c) instead of as JSON;
+// this middleware reads that format into req.body too.
+// [ADVANCED] Express 5 changed the default to `extended: false` (Node's querystring
+// instead of the `qs` library). We pass `true` to keep the book's behaviour for nested
+// fields like a[b]=1. The React client only sends JSON, so this line could also be removed.
+app.use(express.urlencoded({ extended: true }))
 // [BEGINNER] cookie-parser reads the Cookie header of every request into the object req.cookies.
 // No secret any more: the JWT inside the cookie carries its own signature.
 app.use(cookieParser())
+// [BEGINNER] compression gzips large answers (Content-Encoding: gzip) when the client accepts it,
+// so less data travels over the network.
+app.use(compress())
+// secure apps by setting various HTTP headers
+// [ADVANCED] helmet 8 (the book had v3) sets a Content-Security-Policy by default, plus HSTS,
+// X-Content-Type-Options, a strict Referrer-Policy, and removes X-Powered-By. For a JSON API
+// the defaults are fine; they also work for the built Vite client if it is served from here.
+app.use(helmet())
 
 // mount routes
 // [BEGINNER] Every route for /api/users is defined in routes/user.routes.js, every route for
