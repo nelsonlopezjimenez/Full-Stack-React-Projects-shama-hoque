@@ -181,3 +181,13 @@ POST {{baseUrl}}/api/users
 Content-Type: application/x-www-form-urlencoded
 
 name=Fay&email=fay%40test.io&password=secret1
+
+### 33. CORS (only with CORS_ORIGIN=http://localhost:4173 in .env): a browser preflight from an allowed origin
+OPTIONS {{baseUrl}}/api/users
+Origin: http://localhost:4173
+Access-Control-Request-Method: POST
+
+### 34. Same, from an origin that is NOT allowed → no Access-Control-Allow-Origin header
+OPTIONS {{baseUrl}}/api/users
+Origin: http://evil.test
+Access-Control-Request-Method: POST

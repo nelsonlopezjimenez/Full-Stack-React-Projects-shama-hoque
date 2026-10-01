@@ -206,3 +206,14 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   (`POST /api/auth/sessions → 200 (27.4 ms)` …) plus the debug token; `NODE_ENV=production` with an
   empty `JWT_SECRET` stops with "JWT_SECRET must be set in production"; production with a secret
   starts, logs no request lines and no token, and the cookie gets `Secure`.
+
+## Stage 18 — client-ready (`teach/ch03-server-18-client-ready`)
+
+- **Changed:** `cors`; `config.corsOrigins` and `config.clientDist` (final code); `.env.example` lines;
+  `express.js` imports `config` again, CORS allow-list (off by default), `CLIENT_DIST` static files +
+  `/{*splat}` SPA fallback after the `/api` 404; `server.js` logs the client folder. `api.http` 33–34
+  (preflights). Lesson 18.
+- **Verified** (with `CORS_ORIGIN=http://localhost:4173` and a demo `CLIENT_DIST`): allowed preflight →
+  204 with allow-origin + allow-credentials; other origin → no allow-origin; `/` and `/users/123` →
+  index.html; `/assets/app.js` served; a missing asset → real 404; `/api/nope` still a JSON 404.
+  Without the variables, the stage 13 and 16 scripts still pass.
