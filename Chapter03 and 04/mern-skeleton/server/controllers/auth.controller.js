@@ -44,8 +44,19 @@ const requireSignin = (req, res, next) => {
   next()
 }
 
+const hasAuthorization = (req, res, next) => {
+  const authorized = req.profile && req.auth && req.profile._id.equals(req.auth._id)
+  if (!authorized) {
+    return res.status(403).json({
+      error: "User is not authorized"
+    })
+  }
+  next()
+}
+
 export default {
   signin,
   signout,
-  requireSignin
+  requireSignin,
+  hasAuthorization
 }

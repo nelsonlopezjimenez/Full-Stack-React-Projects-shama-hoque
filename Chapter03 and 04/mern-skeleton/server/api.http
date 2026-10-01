@@ -122,3 +122,18 @@ DELETE {{baseUrl}}/api/auth/sessions
 # @no-cookie-jar
 GET {{baseUrl}}/api/users/{{userId}}
 Cookie: userId={{userId}}
+
+### 26. Signed in as Ann, change BOB's account → 403 "User is not authorized"
+@bobId = {{list.response.body.$[1]._id}}
+PATCH {{baseUrl}}/api/users/{{bobId}}
+Content-Type: application/json
+
+{ "name": "Bob was here" }
+
+### 27. Still the weakness: a hand-made cookie with BOB's id can change Bob → 200 !
+# @no-cookie-jar
+PATCH {{baseUrl}}/api/users/{{bobId}}
+Cookie: userId={{bobId}}
+Content-Type: application/json
+
+{ "name": "Bob, hacked" }

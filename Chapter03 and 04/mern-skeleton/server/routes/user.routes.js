@@ -10,7 +10,7 @@ router.route('/api/users')
 
 router.route('/api/users/:userId')
   .get(authCtrl.requireSignin, userCtrl.userByID, userCtrl.read)
-  .patch(authCtrl.requireSignin, userCtrl.userByID, userCtrl.update)
-  .delete(authCtrl.requireSignin, userCtrl.userByID, userCtrl.remove)
+  .patch(authCtrl.requireSignin, userCtrl.userByID, authCtrl.hasAuthorization, userCtrl.update)
+  .delete(authCtrl.requireSignin, userCtrl.userByID, authCtrl.hasAuthorization, userCtrl.remove)
 
 export default router

@@ -129,3 +129,13 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   sign-in sets `userId=…; Max-Age=86400; HttpOnly; SameSite=Strict` (no `Secure` in development);
   read/patch with the cookie → 200; **patching Bob as Ann → 200** and a **hand-made cookie can read
   and delete Bob** (the holes for stages 11 and 12); sign-out clears the cookie (Expires 1970); then 401.
+
+## Stage 11 — authorization (`teach/ch03-server-11-authorization`)
+
+- **Changed:** `hasAuthorization` (the final function, comments adapted) on PATCH and DELETE after
+  `userByID`; route table says "signed in + owner". `api.http` 26 (Ann edits Bob → 403) and 27
+  (hand-made cookie with Bob's id → 200). Lesson 11 (401 vs 403, the chain as a checklist).
+- **Verified:** the stage 10 script with 403 expected for Ann → Bob: all pass; a hand-made cookie with
+  Bob's id still reads and deletes Bob (fixed in 12); cookie `userId=hello` → PATCH 403
+  (`ObjectId.equals('hello')` is false, no crash), GET 200 (read only needs *a* cookie: the exercise
+  of lesson 10).
