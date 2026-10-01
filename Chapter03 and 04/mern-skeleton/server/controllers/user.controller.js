@@ -50,7 +50,7 @@ const userByID = async (req, res, next) => {
 }
 
 const read = (req, res) => {
-  // the password is removed by the schema's toJSON transform (user.model.js)
+  // hashed_password and salt are removed by the schema's toJSON transform (user.model.js)
   return res.json(req.profile)
 }
 
@@ -65,6 +65,7 @@ const update = async (req, res) => {
   // Here: the fields from the body, then the date of this change.
   // [ADVANCED] Copying EVERYTHING the client sends is dangerous ("mass assignment"): a client can
   // also change fields it should never touch. Stage 15 shows the attack and fixes it.
+  // Assigning `password` goes through the schema's `password` virtual, which hashes it.
   const user = Object.assign(req.profile, req.body, { updated: Date.now() })
   // [BEGINNER] save() runs the schema rules again, so an update cannot break them
   // (an empty name or an invalid email is refused, just like on create).

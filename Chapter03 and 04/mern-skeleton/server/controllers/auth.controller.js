@@ -33,13 +33,13 @@ const signin = async (req, res) => {
   // error handler in express.js (a 500, instead of pretending it was a wrong password).
   const user = await User.findOne({ email })
 
-  // [BEGINNER] TEACHING VERSION: the stored password is plain text, so checking it is a
-  // simple comparison. (Stage 14 stores a hash and compares hashes instead.)
-  // `!user ||` comes first: when no user has this email there is nothing to compare.
-  // [ADVANCED] One message for "no such email" and "wrong password". Answering "User not found"
-  // for the first case would let anyone test which emails have an account
-  // (account enumeration).
-  if (!user || user.password !== password) {
+  // [ADVANCED] One message for "no such email" and "wrong password". The book answered
+  // "User not found" for the first case, which lets anyone test which emails have an account
+  // (account enumeration). `user?.authenticate(...)` is optional chaining: when user is null
+  // the call is skipped and the result is undefined (falsy).
+  // authenticate() (user.model.js) hashes the typed password with the user's salt and compares
+  // the result with the stored hash: the password itself is never stored or compared.
+  if (!user?.authenticate(password)) {
     // [BEGINNER] 401 Unauthorized: "I don't know who you are" (here: the proof was wrong).
     return res.status(401).json({ error: "Email and password don't match." })
   }
