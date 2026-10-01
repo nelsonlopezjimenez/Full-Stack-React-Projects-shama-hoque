@@ -84,3 +84,13 @@ Try: set `PORT=3001` in `.env`, restart, and change `@baseUrl` in `api.http`. Th
   lists the methods under it. The file reads like the REST table from stage 06.
 - **One job:** "which URL and method runs which function". Stages 10 and 11 add security checks
   here, between the URL and the handler.
+
+## e) Build the app in `express.js`, start it in `server.js`
+
+- `express.js` creates the app, adds middleware and routes, and **exports** it. It does not connect
+  or listen.
+- `server.js` imports the app, connects to MongoDB and calls `listen()`. That is all it does.
+- Why two files? A test (stage 19) can `import app from './express.js'` and send it requests without
+  starting the real server or touching the database.
+- The "Hello" route on `/` is gone: this server is a JSON API under `/api` (request 1 now answers 404).
+  In stage 18 the server can serve the built React app on `/` instead.
