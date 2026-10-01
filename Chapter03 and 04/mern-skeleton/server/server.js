@@ -19,4 +19,5 @@ app.listen(config.port, (err) => {
     process.exit(1)
   }
   logger.info('Server started on port %s.', config.port)
+  if (config.clientDist) logger.info('Serving client from %s', config.clientDist)
 })
