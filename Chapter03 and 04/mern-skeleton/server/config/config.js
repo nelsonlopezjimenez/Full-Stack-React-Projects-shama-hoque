@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 // [BEGINNER] Every setting that can differ between computers (your laptop, a classmate's, the
 // production server) is read here, in ONE place, from environment variables.
 // process.env is filled from the real environment and, in development, from the .env file:
@@ -26,6 +28,17 @@ const config = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
   // The cookie should expire together with the token (1 day in milliseconds by default).
   jwtCookieMaxAgeMs: Number(process.env.JWT_COOKIE_MAX_AGE_MS ?? 24 * 60 * 60 * 1000),
+  // Comma-separated list of browser origins allowed to call the API, e.g.
+  // CORS_ORIGIN=https://app.example.com,http://localhost:4173 — empty means CORS stays off.
+  corsOrigins: (process.env.CORS_ORIGIN ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean), // [BEGINNER] filter(Boolean) drops empty strings
+  // Folder of a built client to serve (e.g. ../client/dist), relative to the server folder.
+  // [BEGINNER] import.meta.dirname (Node 20.11+) is the ES-module replacement for __dirname.
+  clientDist: process.env.CLIENT_DIST
+    ? path.resolve(import.meta.dirname, '..', process.env.CLIENT_DIST)
+    : null,
   mongoUri: process.env.MONGODB_URI ||
     process.env.MONGO_HOST ||
     'mongodb://' + (process.env.IP || 'localhost') + ':' +

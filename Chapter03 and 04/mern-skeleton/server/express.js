@@ -1,10 +1,13 @@
+import path from 'node:path'
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import compress from 'compression'
+import cors from 'cors'
 import helmet from 'helmet'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
+import config from './config/config.js'
 import logger, { requestLogger } from './helpers/logger.js'
 
 // [BEGINNER] This file only *builds* the app and exports it. server.js is the file that
@@ -40,6 +43,17 @@ app.use(compress())
 // the defaults are fine; they also work for the built Vite client if it is served from here.
 app.use(helmet())
 
+// enable CORS - Cross Origin Resource Sharing
+// [BEGINNER] CORS is only needed when the browser page and the API are on DIFFERENT origins
+// (scheme + host + port). In development the Vite proxy makes them the same origin, and in a
+// single-process deploy Express serves both, so CORS stays off unless CORS_ORIGIN is set.
+// [ADVANCED] The book's cors() with no options allowed EVERY origin. An explicit allow-list is
+// required anyway once `credentials: true` (cookies) is used: browsers reject
+// Access-Control-Allow-Origin: * together with credentials. (See chat/ch02-cors-express-client.md.)
+if (config.corsOrigins.length > 0) {
+  app.use(cors({ origin: config.corsOrigins, credentials: true }))
+}
+
 // mount routes
 // [BEGINNER] Every route for /api/users is defined in routes/user.routes.js, every route for
 // /api/auth in routes/auth.routes.js. app.use() plugs each router into the app.
@@ -51,6 +65,28 @@ app.use('/', authRoutes)
 app.use('/api', (req, res) => {
   res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` })
 })
+
+// Optional: serve a built client
+// [BEGINNER] The React client is its own Vite project and the server imports NO client code, so
+// the two packages stay independent. For a single-process deploy, run `npm run build` in
+// ../client and start the server with CLIENT_DIST=../client/dist.
+// Without CLIENT_DIST the server is a pure JSON API (the client can live on a CDN).
+// [ADVANCED] The book rendered React on the server (renderToString + webpack devBundle + an
+// app.get('*') catch-all); that was removed in refactor/ch03-migration.
+if (config.clientDist) {
+  app.use(express.static(config.clientDist))
+
+  // [BEGINNER] SPA fallback: a page URL such as /users/123 exists only in React Router, not on
+  // the server, so every other GET returns index.html and React Router picks the page.
+  // [ADVANCED] Express 5 (path-to-regexp v8) no longer accepts a bare '*'. A wildcard needs a
+  // name: '/*splat' matches everything except '/', '/{*splat}' also matches '/'.
+  // (React Router still writes its catch-all as path="*": different library, different syntax.)
+  app.get('/{*splat}', (req, res, next) => {
+    // A missing file such as /assets/app-123.js should be a real 404, not index.html.
+    if (path.extname(req.path)) return next()
+    res.sendFile(path.join(config.clientDist, 'index.html'))
+  })
+}
 
 // Central error handler: every error from every route ends here.
 // [BEGINNER] Express recognises an error handler by its FOUR parameters (err, req, res, next).
