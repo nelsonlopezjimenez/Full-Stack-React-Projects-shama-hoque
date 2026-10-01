@@ -89,3 +89,16 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   note, which arrives in stage 10 together with `requireSignin`); routes list
   `userByID` before read/update/remove; the three copies are gone. README gets the layout.
   Verified: regression passes (404s now come from `userByID`).
+
+## Stage 08 — errors (`teach/ch03-server-08-errors`)
+
+- **Changed:** `express.js` gets the `/api` JSON 404 and the central error handler (the final one
+  without the `UnauthorizedError` branch, which comes with JWT in stage 13; `console.error` until the
+  logger in stage 17). `helpers/dbErrorHandler.js` copied from the final code. `server.js`: listen
+  error callback. Controller comments explain the missing try/catch. `api.http` 4/5/10/15 → 400,
+  new 16 (unknown route) and 17 (broken JSON). Lesson 08 starts with a before/after table.
+- **Verified:** `{}` → 400 "Email is required. Name is required."; duplicate → 400 "Email already
+  exists"; `not-an-id` → 400; invalid email on PATCH → 400; `/api/nope` → JSON 404; broken JSON → JSON
+  400; a second instance on the same port exits with code 1 and `EADDRINUSE`.
+- **Surprise:** Mongoose reports validation errors in schema-path order of failure (email before
+  name here), so the lesson table shows that order.
