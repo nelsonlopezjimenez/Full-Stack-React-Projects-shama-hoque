@@ -75,3 +75,5 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   **Deliberate difference from the migration:** the default database in `config.js` is
   `mernskeleton` (the migration's default was the book's `mernproject`, the Chapter 5 database,
   although its `.env.example` already said `mernskeleton`).
+- **07b model:** schema + model moved verbatim to `models/user.model.js` (`export default`).
+  Verified: regression passes.

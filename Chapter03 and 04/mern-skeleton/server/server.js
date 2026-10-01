@@ -6,39 +6,11 @@ import mongoose from 'mongoose'
 // [BEGINNER] Relative imports (our own files) need the full file name, including `.js`.
 // The port and the database address now come from config/config.js (and your .env file).
 import config from './config/config.js'
+// The schema and the model now live in their own file.
+import User from './models/user.model.js'
 
 // [BEGINNER] express() creates the application. Everything the server does is registered on `app`.
 const app = express()
-
-// [BEGINNER] A schema describes what a user looks like and which rules every user must follow.
-// MongoDB itself would store anything; Mongoose checks these rules before saving.
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true, // removes spaces at the start and the end
-    // [BEGINNER] [true, 'message'] is the documented form: "required, and if missing say this".
-    required: [true, 'Name is required.']
-  },
-  email: {
-    type: String,
-    trim: true,
-    // [ADVANCED] `unique` is NOT a validator: it only asks MongoDB to create a unique index.
-    // A common extra is `lowercase: true`, so 'A@x.io' and 'a@x.io' count as the same email.
-    unique: true,
-    // [BEGINNER] match: the value must fit this regular expression ("something@something.something").
-    match: [/.+@.+\..+/, 'Please fill a valid email address.'],
-    required: [true, 'Email is required.']
-  },
-  updated: Date,
-  created: {
-    type: Date,
-    default: Date.now
-  }
-})
-
-// [BEGINNER] A model is the schema + a collection in the database. 'User' → collection "users".
-// User.find(), new User(...).save() and friends all talk to that collection.
-const User = mongoose.model('User', UserSchema)
 
 // [BEGINNER] Middleware: a function that runs for EVERY request, before the routes.
 // express.json() reads a JSON request body (Content-Type: application/json) and puts the
