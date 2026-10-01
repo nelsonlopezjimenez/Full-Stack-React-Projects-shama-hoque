@@ -60,13 +60,25 @@ const list = async (req, res) => {
   res.json(users)
 }
 
+// [ADVANCED] Copying the whole request body onto the document ("mass assignment") let a user
+// also send hashed_password, salt or created. The book did the same with lodash's
+// `_.extend(user, req.body)`. Only the fields in this allow-list can be changed now.
+const UPDATABLE_FIELDS = ['name', 'email', 'password']
+
 const update = async (req, res) => {
-  // [BEGINNER] Object.assign(target, a, b) copies every property of a and b onto target.
-  // Here: the fields from the body, then the date of this change.
-  // [ADVANCED] Copying EVERYTHING the client sends is dangerous ("mass assignment"): a client can
-  // also change fields it should never touch. Stage 15 shows the attack and fixes it.
+  const body = req.body ?? {}
+  // [BEGINNER] Object.fromEntries turns [['name', 'Ann'], ['email', 'a@b.c']] into
+  // { name: 'Ann', email: 'a@b.c' }. Fields the client did not send are left out, so a PATCH
+  // with only a new name does not touch the email.
+  const changes = Object.fromEntries(
+    UPDATABLE_FIELDS
+      .filter((field) => body[field] !== undefined)
+      .map((field) => [field, body[field]])
+  )
+  // [BEGINNER] Object.assign(target, a, b) copies every property of a and b onto target:
+  // here the allowed changes, then the date of this change.
   // Assigning `password` goes through the schema's `password` virtual, which hashes it.
-  const user = Object.assign(req.profile, req.body, { updated: Date.now() })
+  const user = Object.assign(req.profile, changes, { updated: Date.now() })
   // [BEGINNER] save() runs the schema rules again, so an update cannot break them
   // (an empty name or an invalid email is refused, just like on create).
   await user.save()
