@@ -217,3 +217,19 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   204 with allow-origin + allow-credentials; other origin → no allow-origin; `/` and `/users/123` →
   index.html; `/assets/app.js` served; a missing asset → real 404; `/api/nope` still a JSON 404.
   Without the variables, the stage 13 and 16 scripts still pass.
+
+## Stage 19 — tests (`teach/ch03-server-19-tests`)
+
+- **Changed:** `tests/1–4` from the migration, plus one test in `4-api.test.js`: an expired token in the
+  cookie `t` → 401 "jwt expired" (proves the cookie is read). `package.json` = the migration's (test
+  scripts). README = the migration's server README + 19 tests + default DB `mernskeleton` + "Sign-in
+  token" + "Lessons" table. Lesson 19. Checklist "Final check" filled in.
+- **Verified:** `npm test` → 19/19 pass without a database; the new test **fails on the migration
+  server** (it only read the header) and passes here. Full regression on this stage: JWT script (13),
+  hashing (14, with the stage 15 expectations), mass assignment (15), headers/gzip/form body (16),
+  CORS + `CLIENT_DIST` (18), production start (17), sign-in (09c): all pass. (The stage 08 script
+  predates passwords, so its sign-ups fail validation now; that is expected, not a regression.)
+- **Final comparison** with `refactor/ch03-migration` (comments stripped): see the checklist. Only
+  `getToken`, its test, the default database name and one `.env.example` comment differ;
+  `package-lock.json` is identical.
+- Test database `mernskeleton_ladder` dropped at the end; ports 3210–3212 free.
