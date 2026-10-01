@@ -2,7 +2,6 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
-import config from './config/config.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
 
 // [BEGINNER] This file only *builds* the app and exports it. server.js is the file that
@@ -16,9 +15,8 @@ const app = express()
 // parsed object in req.body. Without it, req.body is undefined.
 app.use(express.json())
 // [BEGINNER] cookie-parser reads the Cookie header of every request into the object req.cookies.
-// With a secret it also checks SIGNED cookies: those with a valid signature end up in
-// req.signedCookies, a tampered one is set to false there, and an unsigned one stays in req.cookies.
-app.use(cookieParser(config.cookieSecret))
+// No secret any more: the JWT inside the cookie carries its own signature.
+app.use(cookieParser())
 
 // mount routes
 // [BEGINNER] Every route for /api/users is defined in routes/user.routes.js, every route for
@@ -42,8 +40,12 @@ app.use((err, req, res, next) => {
   // If part of the response was already sent, only Express's default handler can close it.
   if (res.headersSent) return next(err)
 
+  // Missing or invalid JWT (thrown by express-jwt in requireSignin)
+  if (err.name === 'UnauthorizedError') {
+    // [BEGINNER] `return` stops here, so only one answer is sent.
+    return res.status(401).json({ error: `${err.name}: ${err.message}` })
+  }
   // Mongoose schema validation, or a duplicate email (MongoDB error code 11000)
-  // [BEGINNER] `return` stops here, so only one answer is sent.
   if (err.name === 'ValidationError' || err.code === 11000) {
     return res.status(400).json({ error: dbErrorHandler.getErrorMessage(err) })
   }

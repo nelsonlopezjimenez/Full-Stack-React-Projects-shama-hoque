@@ -12,9 +12,13 @@ const config = {
   // [BEGINNER] `??` only falls back when the value is null/undefined; `||` also replaces '' and 0.
   // Environment variables are always strings, so Number() turns '3000' into 3000.
   port: Number(process.env.PORT ?? 3000),
-  // [BEGINNER] The secret that signs the sign-in cookie. Whoever knows it can make valid cookies,
-  // so the real value lives only in .env (never in git). The fallback is for development only.
-  cookieSecret: process.env.COOKIE_SECRET ?? 'dev-only-secret-do-not-use-in-production',
+  // [BEGINNER] The secret that signs the tokens. Whoever knows it can make valid tokens for any
+  // user, so the real value lives only in .env (never in git). The fallback is for development only.
+  jwtSecret: process.env.JWT_SECRET ?? 'dev-only-secret-do-not-use-in-production',
+  // Any format accepted by jsonwebtoken: '1d', '12h', '15m', or a number of seconds.
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
+  // The cookie should expire together with the token (1 day in milliseconds by default).
+  jwtCookieMaxAgeMs: Number(process.env.JWT_COOKIE_MAX_AGE_MS ?? 24 * 60 * 60 * 1000),
   mongoUri: process.env.MONGODB_URI ||
     process.env.MONGO_HOST ||
     'mongodb://' + (process.env.IP || 'localhost') + ':' +

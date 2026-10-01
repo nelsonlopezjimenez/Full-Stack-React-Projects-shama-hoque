@@ -149,3 +149,19 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
 - **Verified:** stage 10 script with stage-12 expectations (hand-made cookies → 401): all pass; the cookie
   looks like `userId=s%3A<id>.<signature>`; a genuine cookie → 200; the same cookie with one character
   of the id changed → 401.
+
+## Stage 13 — jwt-cookie (`teach/ch03-server-13-jwt-cookie`)
+
+- **Changed:** `jsonwebtoken` + `express-jwt`; config/`.env.example`: `JWT_SECRET`, `JWT_EXPIRES_IN`,
+  `JWT_COOKIE_MAX_AGE_MS` replace `COOKIE_SECRET`; `cookieParser()` without a secret (and `express.js`
+  drops the `config` import again until stage 18); `signin` signs a token and sets cookie `t`
+  + returns `{ token, user }`; **`getToken`: cookie `t` first, then `Authorization: Bearer` (D1)**;
+  `UnauthorizedError` → 401 in the error handler. `api.http`: 19 stores the token, 23/25/27 new 401
+  texts, 28 header-only. Lesson 13.
+- **Verified:** no token → 401 "No authorization token was found"; sign-in → cookie `t=ey…; Max-Age=86400;
+  HttpOnly; SameSite=Strict`, payload `{ _id, iat, exp }` with exp − iat = 86400; cookie → read/patch own
+  200, Bob 403; header only → 200; `t=<id>` → 401 "jwt malformed"; expired token in the cookie → 401
+  "jwt expired" (so the cookie really is read); token with another secret → 401 "invalid signature";
+  `Authorization: Token …` → ignored (401); sign-out clears `t`; then 401.
+- **Noted:** when the cookie holds an invalid token, the header is not tried (the cookie wins).
+  That is fine for this app (the React client sends both, and both hold the same token).
