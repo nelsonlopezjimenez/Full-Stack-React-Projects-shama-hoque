@@ -103,6 +103,21 @@ may show **only** these intended differences:
 - `README.md` — a "Lessons" section.
 - `lessons/` — new.
 
+**Result (2026-10-01):** with comments and blank lines removed, the code is identical to the
+migration except:
+
+| File | Difference | Why |
+|---|---|---|
+| `controllers/auth.controller.js` | `getToken` (cookie `t`, then Bearer) passed to `expressjwt` | D1 |
+| `tests/4-api.test.js` | +1 test: an expired token **in the cookie** → 401 "jwt expired" (fails on the migration, passes here) | D1 |
+| `config/config.js` | default database `mernskeleton` instead of `mernproject` (the Chapter 5 database) | found in 07a |
+| `.env.example` | a comment with a command that makes a random secret | lesson 12 |
+
+`server.js`, `express.js`, both routes, the model, both helpers, the user controller, tests 1–3,
+`package.json`, `package-lock.json` and `.gitignore` match exactly (the lock file built stage by stage is
+byte-for-byte the migration's). Comments differ where the ladder explains things in its own order;
+`README.md` and `api.http` are the ladder's own (README = migration README + "Sign-in token" + "Lessons").
+
 ## Fixing an earlier stage later
 
 Commit the fix on the stage where it belongs, then replay every later stage on top of it, from the last

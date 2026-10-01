@@ -9,7 +9,9 @@
   "main": "server.js",
   "scripts": {
     "dev": "node --watch --env-file-if-exists=.env server.js",
-    "start": "node --env-file-if-exists=.env server.js"
+    "start": "node --env-file-if-exists=.env server.js",
+    "test": "node --test",
+    "test:watch": "node --test --watch"
   },
   "engines": {
     "node": ">=22.9.0"
