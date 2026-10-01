@@ -110,3 +110,15 @@ POST {{baseUrl}}/api/auth/sessions
 Content-Type: application/json
 
 {}
+
+### 23. Read a user WITHOUT the cookie → 401 "Please sign in"
+# @no-cookie-jar
+GET {{baseUrl}}/api/users/{{userId}}
+
+### 24. Sign out → 200, cookie cleared. Request 8 now answers 401 until you sign in again.
+DELETE {{baseUrl}}/api/auth/sessions
+
+### 25. The weakness: a cookie made up by hand, without any sign-in → 200 !
+# @no-cookie-jar
+GET {{baseUrl}}/api/users/{{userId}}
+Cookie: userId={{userId}}

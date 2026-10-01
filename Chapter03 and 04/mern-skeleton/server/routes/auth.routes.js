@@ -5,5 +5,6 @@ const router = express.Router()
 
 router.route('/api/auth/sessions')
   .post(authCtrl.signin)
+  .delete(authCtrl.signout)
 
 export default router

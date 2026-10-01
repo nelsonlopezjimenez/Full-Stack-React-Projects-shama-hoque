@@ -1,4 +1,5 @@
 import express from 'express'
+import cookieParser from 'cookie-parser'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
@@ -6,6 +7,7 @@ import dbErrorHandler from './helpers/dbErrorHandler.js'
 const app = express()
 
 app.use(express.json())
+app.use(cookieParser())
 
 app.use('/', userRoutes)
 app.use('/', authRoutes)
