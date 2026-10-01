@@ -12,6 +12,10 @@ try {
   process.exit(1)
 }
 
-app.listen(config.port, () => {
+app.listen(config.port, (err) => {
+  if (err) {
+    console.error(err.message)
+    process.exit(1)
+  }
   console.log(`Server started on http://localhost:${config.port}`)
 })
