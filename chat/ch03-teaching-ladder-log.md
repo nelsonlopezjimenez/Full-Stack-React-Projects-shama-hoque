@@ -63,3 +63,15 @@ script sent the stage's requests and compared status codes and bodies.
 - **Verified:** PATCH name → 200 with `updated`; email unchanged; invalid email → 500 HTML;
   `{ "created": "1990-01-01" }` → 200 and accepted (the mass-assignment hole, on purpose, for stage 15);
   unknown id → 404.
+
+## Stage 07 — split (`teach/ch03-server-07-split`)
+
+Every step was checked with the same CRUD regression (hello, create, invalid create, list, read,
+read 404, patch, patch 404, delete, delete 404): the answers must not change while the code moves.
+
+- **07a config:** `config/config.js` (`port`, `mongoUri`), `.env.example`, npm scripts with
+  `--env-file-if-exists=.env`; `server.js` uses `config`. Lesson 07 (why split + step a).
+  Verified: regression passes; a `.env` with `PORT=3211` is picked up by `--env-file-if-exists`.
+  **Deliberate difference from the migration:** the default database in `config.js` is
+  `mernskeleton` (the migration's default was the book's `mernproject`, the Chapter 5 database,
+  although its `.env.example` already said `mernskeleton`).
