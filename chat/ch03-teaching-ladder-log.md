@@ -48,3 +48,9 @@ script sent the stage's requests and compared status codes and bodies.
   first user's id with `# @name list`), lesson 04 (explains why "list all" comes first).
 - **Verified:** read → 200; valid unknown id → 404 `{ error: "User not found" }`; `not-an-id` → 500
   HTML with CastError (fixed in 08).
+
+## Stage 05 — delete (`teach/ch03-server-05-delete`)
+
+- **Changed:** `DELETE /api/users/:userId` (`findById`, 404, `deleteOne()`, answers the deleted
+  user like the final code). `api.http` 11–13 (the id is pasted by hand on purpose), lesson 05.
+- **Verified:** delete → 200 with the user; again → 404; read afterwards → 404.

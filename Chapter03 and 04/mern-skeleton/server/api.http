@@ -53,3 +53,17 @@ GET {{baseUrl}}/api/users/000000000000000000000000
 
 ### 10. Something that is not an id at all → 500 HTML page (CastError; fixed in stage 08)
 GET {{baseUrl}}/api/users/not-an-id
+
+### 11. A user to delete → 201
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{ "name": "Dan", "email": "dan@test.io" }
+
+### 12. Delete a user → 200 and the deleted user
+# [BEGINNER] Send request 2, copy Dan's "_id" and paste it after `@deleteId =` below.
+@deleteId = paste-an-id-here
+DELETE {{baseUrl}}/api/users/{{deleteId}}
+
+### 13. Delete the same user again → 404 (it is gone)
+DELETE {{baseUrl}}/api/users/{{deleteId}}

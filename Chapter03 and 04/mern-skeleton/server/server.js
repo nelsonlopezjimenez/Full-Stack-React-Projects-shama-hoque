@@ -102,6 +102,19 @@ app.get('/api/users/:userId', async (req, res) => {
   res.json(user)
 })
 
+// Delete one user
+// [BEGINNER] Same URL as "read one", different method: the method is the verb.
+app.delete('/api/users/:userId', async (req, res) => {
+  const user = await User.findById(req.params.userId)
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' })
+  }
+  // [BEGINNER] deleteOne() removes this document from the collection.
+  await user.deleteOne()
+  // We answer with the user that was deleted, so the client can show "Bob was deleted".
+  res.json(user)
+})
+
 // [BEGINNER] Top-level await: in an ES module you can `await` outside any function.
 // The server only starts listening AFTER the database is ready, so no request can arrive
 // while Mongoose is still connecting.
