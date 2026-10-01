@@ -2,3 +2,18 @@
 
 ### 1. Hello → 200 and a line of text
 GET {{baseUrl}}/
+
+### 2. List users → 200 and [] (an empty JSON array) after a restart
+GET {{baseUrl}}/api/users
+
+### 3. Create a user → 201
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{ "name": "Ann", "email": "ann@test.io" }
+
+### 4. Create a user with NO data → 201 as well (nothing checks the data yet)
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{}
