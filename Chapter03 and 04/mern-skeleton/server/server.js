@@ -26,6 +26,12 @@ try {
 
 // [BEGINNER] listen() starts the server. The callback runs once it is ready for requests.
 // `...` between backticks is a template literal: ${config.port} is replaced by the value.
-app.listen(config.port, () => {
+// [ADVANCED] Express 5 calls this callback with an error when listen fails
+// (for example EADDRINUSE when the port is taken), so the check below works.
+app.listen(config.port, (err) => {
+  if (err) {
+    console.error(err.message)
+    process.exit(1)
+  }
   console.log(`Server started on http://localhost:${config.port}`)
 })

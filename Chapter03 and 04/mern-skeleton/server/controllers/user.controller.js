@@ -7,13 +7,19 @@ import User from '../models/user.model.js'
 // [BEGINNER] Talking to a database takes time, so Mongoose returns a Promise ("I will have the
 // answer later"). An `async` function can `await` it: the next line runs once the answer is there,
 // and the server keeps serving other requests in the meantime.
+//
+// [ADVANCED] There is no try/catch here on purpose. Express 5 notices when an async handler's
+// Promise rejects and calls next(err) for us, so every error (validation, duplicate key,
+// invalid id, database down) ends up in ONE error handler at the bottom of express.js.
+// With Express 4 you needed try/catch + next(err) in every handler, or a wrapper such as
+// express-async-handler.
 
 const create = async (req, res) => {
   // [BEGINNER] new User(...) builds a document from the body; fields that are not in the
   // schema are dropped. save() checks the schema rules and writes it to MongoDB.
   const user = new User(req.body)
   // [BEGINNER] If a rule fails (no name, bad email, email already used) save() throws an error.
-  // Nothing catches it yet, so Express answers with an ugly 500 page. Stage 08 fixes that.
+  // It goes to the error handler in express.js, which answers 400 with a readable message.
   await user.save()
   // [BEGINNER] 201 Created is the status for "a new item was created" (200 just means OK).
   return res.status(201).json({
@@ -29,6 +35,7 @@ const create = async (req, res) => {
 // It either ANSWERS (404) or calls next() to pass the request on to the next function in the route.
 // `req.params.userId` is the `:userId` part of the route path.
 const userByID = async (req, res, next) => {
+  // An id that is not a valid ObjectId throws a CastError → 400 in the error handler.
   const user = await User.findById(req.params.userId)
   // [BEGINNER] findById answers null when no user has this id. `return` stops the function
   // here, so we never send two answers to one request.
