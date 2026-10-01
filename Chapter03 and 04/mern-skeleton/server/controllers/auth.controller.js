@@ -1,4 +1,20 @@
 import User from '../models/user.model.js'
+import config from '../config/config.js'
+
+// [BEGINNER] A cookie is a small named value the server asks the browser to store. The browser
+// then sends it back automatically with every request to this server, so the server can
+// recognise who is asking without a new sign-in each time.
+// [ADVANCED] httpOnly: JavaScript in the page cannot read the cookie (limits XSS damage).
+// sameSite 'strict': the browser does not send it on requests started by other sites (CSRF).
+// secure: only sent over HTTPS — turned on in production only, because localhost is plain HTTP.
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: 'strict',
+  secure: config.env === 'production'
+}
+
+// [BEGINNER] How long the browser keeps the cookie, in milliseconds: 1 day.
+const ONE_DAY_MS = 24 * 60 * 60 * 1000
 
 const signin = async (req, res) => {
   // [BEGINNER] Destructuring pulls two properties out of an object in one line.
@@ -26,13 +42,38 @@ const signin = async (req, res) => {
     return res.status(401).json({ error: "Email and password don't match." })
   }
 
-  // [BEGINNER] Only the public fields go back. The server does not remember the sign-in yet:
-  // the next request is anonymous again. Stage 10 fixes that with a cookie.
+  // [BEGINNER] TEACHING VERSION: the cookie simply contains the user's id. Every later request
+  // carries it, and requireSignin (below) believes it. Believes it a bit too much:
+  // see the lesson, and stage 12.
+  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS })
+
   return res.json({
     user: { _id: user._id, name: user.name, email: user.email }
   })
 }
 
+const signout = (req, res) => {
+  // [BEGINNER] A cookie is only removed when the same options (path, sameSite, secure) are given.
+  res.clearCookie('userId', cookieOptions)
+  return res.status(200).json({
+    message: "signed out"
+  })
+}
+
+// [BEGINNER] requireSignin is middleware: it lets the request continue only if it carries the
+// sign-in cookie, and records WHO is asking in req.auth for the functions after it.
+// cookie-parser (express.js) has already turned the Cookie header into the object req.cookies.
+const requireSignin = (req, res, next) => {
+  const userId = req.cookies.userId
+  if (!userId) {
+    return res.status(401).json({ error: 'Please sign in' })
+  }
+  req.auth = { _id: userId }
+  next()
+}
+
 export default {
-  signin
+  signin,
+  signout,
+  requireSignin
 }

@@ -1,4 +1,5 @@
 import express from 'express'
+import cookieParser from 'cookie-parser'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
@@ -13,6 +14,8 @@ const app = express()
 // express.json() reads a JSON request body (Content-Type: application/json) and puts the
 // parsed object in req.body. Without it, req.body is undefined.
 app.use(express.json())
+// [BEGINNER] cookie-parser reads the Cookie header of every request into the object req.cookies.
+app.use(cookieParser())
 
 // mount routes
 // [BEGINNER] Every route for /api/users is defined in routes/user.routes.js, every route for

@@ -6,6 +6,10 @@
 @baseUrl = http://localhost:3000
 @password = secret1
 
+# [BEGINNER] From stage 10 on, reading, changing and deleting a user needs a sign-in.
+# Send request 19 (sign in) first: REST Client stores the cookie from the answer and sends it
+# with every later request, just like a browser. "# @no-cookie-jar" turns that off for one request.
+
 ### 1. The root URL → 404 "Cannot GET /" (since stage 07e the server only answers under /api)
 GET {{baseUrl}}/
 
@@ -119,3 +123,16 @@ POST {{baseUrl}}/api/auth/sessions
 Content-Type: application/json
 
 {}
+
+### 23. Read a user WITHOUT the cookie → 401 "Please sign in"
+# @no-cookie-jar
+GET {{baseUrl}}/api/users/{{userId}}
+
+### 24. Sign out → 200, cookie cleared. Request 8 now answers 401 until you sign in again.
+DELETE {{baseUrl}}/api/auth/sessions
+
+### 25. The weakness: a cookie made up by hand, without any sign-in → 200 !
+# [BEGINNER] The server only checks that a userId cookie EXISTS. Anyone can type one.
+# @no-cookie-jar
+GET {{baseUrl}}/api/users/{{userId}}
+Cookie: userId={{userId}}

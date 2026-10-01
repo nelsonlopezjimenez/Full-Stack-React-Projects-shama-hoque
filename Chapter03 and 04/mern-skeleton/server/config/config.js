@@ -3,7 +3,12 @@
 // process.env is filled from the real environment and, in development, from the .env file:
 // the npm scripts start Node with --env-file-if-exists=.env (Node 22.9+), so the `dotenv`
 // package is not needed.
+// [BEGINNER] NODE_ENV says where the code runs: 'development' on your computer, 'production'
+// on the real server. Some settings depend on it (e.g. secure cookies need HTTPS).
+const env = process.env.NODE_ENV || 'development'
+
 const config = {
+  env,
   // [BEGINNER] `??` only falls back when the value is null/undefined; `||` also replaces '' and 0.
   // Environment variables are always strings, so Number() turns '3000' into 3000.
   port: Number(process.env.PORT ?? 3000),

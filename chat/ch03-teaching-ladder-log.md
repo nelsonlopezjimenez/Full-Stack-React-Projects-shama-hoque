@@ -117,3 +117,15 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   mounted in `express.js`. `api.http` 19–22. Lesson 09 part c ends with "HTTP is stateless".
   Verified: sign-in → 200 `{ user }` without the password; wrong password and unknown email → the
   same 401; `{}` and no body → 400; `GET /api/auth/sessions` → JSON 404.
+
+## Stage 10 — cookie-session (`teach/ch03-server-10-cookie-session`)
+
+- **Changed:** `cookie-parser`; `config.env` (as in the final config); `signin` sets the cookie
+  `userId` (httpOnly, sameSite strict, secure in production, 1 day); `signout` on
+  `DELETE /api/auth/sessions`; hand-written `requireSignin` (cookie present → `req.auth`, else 401)
+  in front of `userByID` for read/update/delete, with the final `router.param` note. `api.http`:
+  a note on REST Client's cookie jar, requests 23–25 (25 = hand-made cookie). Lesson 10.
+- **Verified:** no cookie → 401 (also for an unknown id: 401, not 404, so ids cannot be probed);
+  sign-in sets `userId=…; Max-Age=86400; HttpOnly; SameSite=Strict` (no `Secure` in development);
+  read/patch with the cookie → 200; **patching Bob as Ann → 200** and a **hand-made cookie can read
+  and delete Bob** (the holes for stages 11 and 12); sign-out clears the cookie (Expires 1970); then 401.
