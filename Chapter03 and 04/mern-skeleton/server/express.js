@@ -2,12 +2,13 @@ import express from 'express'
 import cookieParser from 'cookie-parser'
 import userRoutes from './routes/user.routes.js'
 import authRoutes from './routes/auth.routes.js'
+import config from './config/config.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
 
 const app = express()
 
 app.use(express.json())
-app.use(cookieParser())
+app.use(cookieParser(config.cookieSecret))
 
 app.use('/', userRoutes)
 app.use('/', authRoutes)

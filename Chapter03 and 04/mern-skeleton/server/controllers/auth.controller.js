@@ -21,7 +21,7 @@ const signin = async (req, res) => {
     return res.status(401).json({ error: "Email and password don't match." })
   }
 
-  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS })
+  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS, signed: true })
 
   return res.json({
     user: { _id: user._id, name: user.name, email: user.email }
@@ -36,7 +36,7 @@ const signout = (req, res) => {
 }
 
 const requireSignin = (req, res, next) => {
-  const userId = req.cookies.userId
+  const userId = req.signedCookies.userId
   if (!userId) {
     return res.status(401).json({ error: 'Please sign in' })
   }
