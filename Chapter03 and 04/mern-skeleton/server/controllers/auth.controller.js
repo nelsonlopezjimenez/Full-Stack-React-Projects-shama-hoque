@@ -1,20 +1,22 @@
 import User from '../models/user.model.js'
+import jwt from 'jsonwebtoken'
+// [BEGINNER] Named import (curly braces): express-jwt v7+ exports `expressjwt` by name,
+// the book's default import `import expressJwt from 'express-jwt'` no longer exists.
+import { expressjwt } from 'express-jwt'
 import config from '../config/config.js'
 
 // [BEGINNER] A cookie is a small named value the server asks the browser to store. The browser
-// then sends it back automatically with every request to this server, so the server can
-// recognise who is asking without a new sign-in each time.
+// then sends it back automatically with every request to this server.
 // [ADVANCED] httpOnly: JavaScript in the page cannot read the cookie (limits XSS damage).
 // sameSite 'strict': the browser does not send it on requests started by other sites (CSRF).
 // secure: only sent over HTTPS — turned on in production only, because localhost is plain HTTP.
+// The book passed { expire: new Date() + 9999 }: `expire` is not a cookie option (so it was
+// ignored) and Date + number concatenates to a string. maxAge is in milliseconds.
 const cookieOptions = {
   httpOnly: true,
   sameSite: 'strict',
   secure: config.env === 'production'
 }
-
-// [BEGINNER] How long the browser keeps the cookie, in milliseconds: 1 day.
-const ONE_DAY_MS = 24 * 60 * 60 * 1000
 
 const signin = async (req, res) => {
   // [BEGINNER] Destructuring pulls two properties out of an object in one line.
@@ -42,43 +44,65 @@ const signin = async (req, res) => {
     return res.status(401).json({ error: "Email and password don't match." })
   }
 
-  // [BEGINNER] signed: true adds a signature computed from the value and config.cookieSecret:
-  // the browser stores "s:<id>.<signature>". The id is still READABLE, but it cannot be CHANGED
-  // without the secret: a different id needs a different signature.
-  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS, signed: true })
+  // [BEGINNER] The token only contains the user id (never the password), signed with the
+  // server's secret. Paste a token at https://jwt.io to see that the payload is readable,
+  // only tamper-proof — so never put secrets in it.
+  const token = jwt.sign({ _id: user._id }, config.jwtSecret, {
+    algorithm: 'HS256',
+    expiresIn: config.jwtExpiresIn // the book's tokens never expired
+  })
 
+  res.cookie('t', token, { ...cookieOptions, maxAge: config.jwtCookieMaxAgeMs })
+
+  // [ADVANCED] The token is sent twice: in the httpOnly cookie and in the body. A browser app
+  // needs only the cookie (requireSignin reads it first). The body copy is for clients that
+  // cannot use cookies, such as a mobile app or another server: they send it back as
+  // "Authorization: Bearer <token>". (The React client of refactor/ch03-migration does that.)
   return res.json({
+    token,
     user: { _id: user._id, name: user.name, email: user.email }
   })
 }
 
 const signout = (req, res) => {
   // [BEGINNER] A cookie is only removed when the same options (path, sameSite, secure) are given.
-  res.clearCookie('userId', cookieOptions)
+  res.clearCookie('t', cookieOptions)
   return res.status(200).json({
     message: "signed out"
   })
 }
 
-// [BEGINNER] requireSignin is middleware: it lets the request continue only if it carries a
-// correctly SIGNED sign-in cookie, and records WHO is asking in req.auth for the functions after it.
-// cookie-parser (express.js) has already checked the signature: req.signedCookies.userId is the id
-// for a genuine cookie, false for a tampered one, and undefined for a missing or unsigned one.
-const requireSignin = (req, res, next) => {
-  const userId = req.signedCookies.userId
-  if (!userId) {
-    return res.status(401).json({ error: 'Please sign in' })
-  }
-  req.auth = { _id: userId }
-  next()
+// [BEGINNER] Where requireSignin looks for the token: the httpOnly cookie "t" first, then an
+// "Authorization: Bearer <token>" header. Returning undefined means "no token".
+// `?.` (optional chaining) stops at a missing value instead of throwing: if there is no
+// Authorization header, req.headers.authorization?.split(' ') is undefined.
+const getToken = (req) => {
+  if (req.cookies?.t) return req.cookies.t
+  const [scheme, token] = req.headers.authorization?.split(' ') ?? []
+  if (scheme === 'Bearer') return token
 }
+
+// [BEGINNER] requireSignin is middleware: it finds the token (getToken), verifies the signature
+// and the expiry, and puts the decoded payload in req.auth. If the token is missing or
+// invalid it calls next(err) with an UnauthorizedError (→ 401 in express.js).
+// [ADVANCED] `algorithms` is required since express-jwt v6: without an allow-list an attacker
+// could send a token signed with a different algorithm (the "alg: none" family of attacks).
+// `requestProperty` replaced the book's `userProperty` (its default is already 'auth').
+// The book (and refactor/ch03-migration) read only the Authorization header and set the cookie
+// without ever using it.
+const requireSignin = expressjwt({
+  secret: config.jwtSecret,
+  algorithms: ['HS256'],
+  requestProperty: 'auth',
+  getToken
+})
 
 // [BEGINNER] Authentication = WHO are you (requireSignin). Authorization = are you ALLOWED to do
 // this (hasAuthorization). Being signed in as Ann does not allow changing Bob's account.
 const hasAuthorization = (req, res, next) => {
-  // [BEGINNER] req.profile._id is an ObjectId and req.auth._id is a string. Comparing them with
-  // `===` would always be false (different types). .equals() compares ObjectIds explicitly
-  // and also accepts a hex string.
+  // [BEGINNER] req.profile._id is an ObjectId and req.auth._id is a string (from the JWT).
+  // Comparing them with `===` would always be false (different types). .equals() compares
+  // ObjectIds explicitly and also accepts a hex string.
   const authorized = req.profile && req.auth && req.profile._id.equals(req.auth._id)
   if (!authorized) {
     // [BEGINNER] 403 Forbidden: "I know who you are, and the answer is no".

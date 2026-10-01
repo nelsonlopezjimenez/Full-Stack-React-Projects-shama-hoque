@@ -27,7 +27,7 @@ router.route('/api/users')
 
 // [BEGINNER] A route can list SEVERAL functions. Express runs them left to right; each one
 // either answers or calls next() to hand the request to the next one:
-//   requireSignin     is the sign-in cookie there?     (no → 401)
+//   requireSignin     is there a valid token?          (no → 401)
 //   userByID          load the user into req.profile   (no such user → 404)
 //   hasAuthorization  is it YOUR profile?              (no → 403)
 //   read/update/remove
