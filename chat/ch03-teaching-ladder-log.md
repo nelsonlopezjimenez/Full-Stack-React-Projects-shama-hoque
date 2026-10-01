@@ -63,3 +63,29 @@ script sent the stage's requests and compared status codes and bodies.
 - **Verified:** PATCH name → 200 with `updated`; email unchanged; invalid email → 500 HTML;
   `{ "created": "1990-01-01" }` → 200 and accepted (the mass-assignment hole, on purpose, for stage 15);
   unknown id → 404.
+
+## Stage 07 — split (`teach/ch03-server-07-split`)
+
+Every step was checked with the same CRUD regression (hello, create, invalid create, list, read,
+read 404, patch, patch 404, delete, delete 404): the answers must not change while the code moves.
+
+- **07a config:** `config/config.js` (`port`, `mongoUri`), `.env.example`, npm scripts with
+  `--env-file-if-exists=.env`; `server.js` uses `config`. Lesson 07 (why split + step a).
+  Verified: regression passes; a `.env` with `PORT=3211` is picked up by `--env-file-if-exists`.
+  **Deliberate difference from the migration:** the default database in `config.js` is
+  `mernskeleton` (the migration's default was the book's `mernproject`, the Chapter 5 database,
+  although its `.env.example` already said `mernskeleton`).
+- **07b model:** schema + model moved verbatim to `models/user.model.js` (`export default`).
+  Verified: regression passes.
+- **07c controllers:** handlers named and moved to `controllers/user.controller.js` (order and
+  export as in the final file); the 404 lookup is still copied in read/update/remove on purpose.
+  `server.js` down to 66 lines. Verified: regression passes.
+- **07d routes:** `routes/user.routes.js` with `express.Router()` + `router.route()`, mounted with
+  `app.use('/', userRoutes)` (as in the final `express.js`). Verified: regression passes.
+- **07e express.js / server.js:** `express.js` builds and exports the app (json + routes);
+  `server.js` only connects and listens. The hello route on `/` is removed (the final code has none);
+  `api.http` request 1 now expects 404. Verified: regression passes, `GET /` → 404.
+- **07f userByID:** middleware in the controller (final form, without the `router.param`
+  note, which arrives in stage 10 together with `requireSignin`); routes list
+  `userByID` before read/update/remove; the three copies are gone. README gets the layout.
+  Verified: regression passes (404s now come from `userByID`).
