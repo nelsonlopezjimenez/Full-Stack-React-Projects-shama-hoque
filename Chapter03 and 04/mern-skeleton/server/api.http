@@ -1,0 +1,9 @@
+# Requests to try against the running server, one block at a time.
+# [BEGINNER] Open this file in VS Code with the "REST Client" extension (humao.rest-client)
+# and click "Send Request" above a block. `npm run dev` must be running.
+# (JetBrains IDEs run .http files natively.) Blocks are separated by lines starting with ###.
+
+@baseUrl = http://localhost:3000
+
+### 1. Hello → 200 and a line of text
+GET {{baseUrl}}/
