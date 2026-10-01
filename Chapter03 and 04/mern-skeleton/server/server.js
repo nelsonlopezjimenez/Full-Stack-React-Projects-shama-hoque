@@ -46,6 +46,14 @@ app.post('/api/users', async (req, res) => {
   res.status(201).json({ message: 'Successfully signed up!' })
 })
 
+app.get('/api/users/:userId', async (req, res) => {
+  const user = await User.findById(req.params.userId)
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' })
+  }
+  res.json(user)
+})
+
 try {
   await mongoose.connect(mongoUri)
   await User.init()
