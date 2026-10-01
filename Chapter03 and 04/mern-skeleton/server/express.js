@@ -1,5 +1,6 @@
 import express from 'express'
 import userRoutes from './routes/user.routes.js'
+import authRoutes from './routes/auth.routes.js'
 import dbErrorHandler from './helpers/dbErrorHandler.js'
 
 const app = express()
@@ -7,6 +8,7 @@ const app = express()
 app.use(express.json())
 
 app.use('/', userRoutes)
+app.use('/', authRoutes)
 
 app.use('/api', (req, res) => {
   res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` })

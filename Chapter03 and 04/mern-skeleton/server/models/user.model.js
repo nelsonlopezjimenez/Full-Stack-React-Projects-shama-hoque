@@ -13,10 +13,22 @@ const UserSchema = new mongoose.Schema({
     match: [/.+@.+\..+/, 'Please fill a valid email address.'],
     required: [true, 'Email is required.']
   },
+  password: {
+    type: String,
+    required: [true, 'Password is required.'],
+    minlength: [6, 'Password must be at least 6 characters.']
+  },
   updated: Date,
   created: {
     type: Date,
     default: Date.now
+  }
+}, {
+  toJSON: {
+    transform: (doc, ret) => {
+      delete ret.password
+      return ret
+    }
   }
 })
 
