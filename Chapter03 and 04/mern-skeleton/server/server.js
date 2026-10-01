@@ -54,6 +54,16 @@ app.get('/api/users/:userId', async (req, res) => {
   res.json(user)
 })
 
+app.patch('/api/users/:userId', async (req, res) => {
+  const user = await User.findById(req.params.userId)
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' })
+  }
+  Object.assign(user, req.body, { updated: Date.now() })
+  await user.save()
+  res.json(user)
+})
+
 app.delete('/api/users/:userId', async (req, res) => {
   const user = await User.findById(req.params.userId)
   if (!user) {
