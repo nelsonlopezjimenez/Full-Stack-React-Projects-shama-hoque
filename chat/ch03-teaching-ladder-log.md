@@ -110,3 +110,5 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   `{{password}}` (`secret1`, as in the final file), new request 18. Lesson 09 part a.
   Verified: missing → 400 "Password is required."; `123` → 400 "...at least 6 characters.";
   list hides it (`.select`); **read and patch return `"password":"secret1"`**, the leak part b fixes.
+- **09b toJSON:** schema `toJSON.transform` deletes `password`; controller comments updated.
+  Verified: read and patch no longer contain the password.

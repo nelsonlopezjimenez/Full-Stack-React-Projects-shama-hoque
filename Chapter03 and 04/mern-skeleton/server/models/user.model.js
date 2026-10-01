@@ -35,6 +35,18 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  // [BEGINNER] res.json(user) calls user.toJSON() behind the scenes. Removing the password
+  // here means NO route can leak it by accident, including routes written later by someone
+  // who forgot about it.
+  // [ADVANCED] The alternative is `select: false` on the field; then sign-in must ask for it
+  // with .select('+password'). toJSON keeps the queries unchanged.
+  toJSON: {
+    transform: (doc, ret) => {
+      delete ret.password
+      return ret
+    }
+  }
 })
 
 // [BEGINNER] A model is the schema + a collection in the database. 'User' → collection "users".

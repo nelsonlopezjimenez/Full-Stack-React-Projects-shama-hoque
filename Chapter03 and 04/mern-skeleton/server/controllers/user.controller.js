@@ -50,11 +50,12 @@ const userByID = async (req, res, next) => {
 }
 
 const read = (req, res) => {
+  // the password is removed by the schema's toJSON transform (user.model.js)
   return res.json(req.profile)
 }
 
 const list = async (req, res) => {
-  // [BEGINNER] .select() limits the fields returned: only these four (and _id) are sent.
+  // [BEGINNER] .select() limits the fields returned, so passwords never leave the database here.
   const users = await User.find().select('name email updated created')
   res.json(users)
 }
