@@ -4,6 +4,7 @@ import config from './config/config.js'
 import app from './express.js'
 import mongoose from 'mongoose'
 import User from './models/user.model.js'
+import logger from './helpers/logger.js'
 
 // [BEGINNER] This file only STARTS the server: connect to the database, then listen.
 // What the server does (middleware, routes) is built in express.js.
@@ -17,21 +18,20 @@ try {
   // background after connecting. Without this line, two signups with the same email right after
   // a fresh start can both succeed. Model.init() resolves once the indexes exist.
   await User.init()
-  console.log(`Connected to MongoDB: ${config.mongoUri}`)
+  logger.info('Connected to MongoDB: %s', config.mongoUri)
 } catch (err) {
-  console.error(`Unable to connect to database ${config.mongoUri}: ${err.message}`)
+  logger.error('Unable to connect to database %s: %s', config.mongoUri, err.message)
   // [BEGINNER] A non-zero exit code tells the shell (or Docker) that startup failed.
   process.exit(1)
 }
 
 // [BEGINNER] listen() starts the server. The callback runs once it is ready for requests.
-// `...` between backticks is a template literal: ${config.port} is replaced by the value.
 // [ADVANCED] Express 5 calls this callback with an error when listen fails
 // (for example EADDRINUSE when the port is taken), so the check below works.
 app.listen(config.port, (err) => {
   if (err) {
-    console.error(err.message)
+    logger.error(err.message)
     process.exit(1)
   }
-  console.log(`Server started on http://localhost:${config.port}`)
+  logger.info('Server started on port %s.', config.port)
 })

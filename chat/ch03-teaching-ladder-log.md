@@ -195,3 +195,14 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: no-referrer`, and no
   `X-Powered-By`; a URL-encoded sign-up → 201; a list of 31 users is sent gzipped; the stage 13 JWT
   script still passes.
+
+## Stage 17 — logging (`teach/ch03-server-17-logging`)
+
+- **Changed:** `helpers/logger.js` (the final file, unchanged); `requestLogger` first in
+  `express.js`, `logger.error` for 500s; `server.js` uses `logger.info/error`; `logger.debug` prints
+  the JWT on sign-in (development only); `config.js` throws in production without `JWT_SECRET`.
+  Lesson 17 (what never goes into a log, fail fast).
+- **Verified:** the stage 13 JWT script passes and the terminal shows one line per request
+  (`POST /api/auth/sessions → 200 (27.4 ms)` …) plus the debug token; `NODE_ENV=production` with an
+  empty `JWT_SECRET` stops with "JWT_SECRET must be set in production"; production with a secret
+  starts, logs no request lines and no token, and the cookie gets `Secure`.

@@ -8,6 +8,13 @@
 // `||`, not `??`: an empty `NODE_ENV=` in .env falls back to 'development' as well.
 const env = process.env.NODE_ENV || 'development'
 
+// [ADVANCED] Fail fast: in production the server refuses to start without a real secret.
+// With the fallback below, a server deployed without JWT_SECRET would sign tokens with a
+// secret that is published on GitHub, so anyone could forge a login for any user.
+if (env === 'production' && !process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET must be set in production')
+}
+
 const config = {
   env,
   // [BEGINNER] `??` only falls back when the value is null/undefined; `||` also replaces '' and 0.
