@@ -1,0 +1,4 @@
+@baseUrl = http://localhost:3000
+
+### 1. Hello → 200 and a line of text
+GET {{baseUrl}}/

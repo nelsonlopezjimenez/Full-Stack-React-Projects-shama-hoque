@@ -1,0 +1,20 @@
+{
+  "name": "mern-skeleton-server",
+  "version": "2.0.0",
+  "description": "Express + MongoDB API for the MERN skeleton (Chapter 3)",
+  "author": "Shama Hoque",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.9.0"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

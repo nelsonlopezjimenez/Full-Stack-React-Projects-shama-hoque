@@ -1,16 +1,21 @@
-# MERN Skeleton
+# MERN Skeleton — built step by step
 
-### [Live Demo](http://skeleton.mernbook.com/ "MERN Skeleton")
+The skeleton app from chapters 3 (backend) and 4 (frontend) of *Full-Stack React Projects*,
+rebuilt **from an empty folder**, one idea at a time.
 
-#### What you need to run this code
-1. Node (8.11.1)
-2. NPM (5.8.0)
-3. MongoDB (3.6.3)
+Every stage is a git branch that starts from the stage before it:
 
-####  How to run this code
-1. Clone this repository
-2. Open command line in the cloned folder, 
-   - To install dependencies, run ```  npm install  ```
-   - To run the application for development, run ```  npm run development  ```
-4. Open [localhost:3000](http://localhost:3000/) in the browser
- 
+```bash
+git switch teach/ch03-server-01-hello      # check out a stage and run it
+git diff teach/ch03-server-01-hello teach/ch03-server-02-memory-users -- server   # one lesson
+```
+
+Each stage explains itself in `server/lessons/NN-name.md`.
+The plan for all stages is in [`chat/ch03-teaching-ladder-checklist.md`](../../chat/ch03-teaching-ladder-checklist.md).
+
+The book's original code (Node 8, Express 4, React 16, webpack 4) is still on `main` until the ladder
+is finished, and always in the history:
+
+```bash
+git show main:"Chapter03 and 04/mern-skeleton/server/server.js"
+```
