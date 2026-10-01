@@ -3,7 +3,7 @@
 ### 1. Hello → 200 and a line of text
 GET {{baseUrl}}/
 
-### 2. List users → 200 and [] (an empty JSON array) after a restart
+### 2. List users → 200 and a JSON array (the users survive a restart now)
 GET {{baseUrl}}/api/users
 
 ### 3. Create a user → 201
@@ -12,8 +12,20 @@ Content-Type: application/json
 
 { "name": "Ann", "email": "ann@test.io" }
 
-### 4. Create a user with NO data → 201 as well (nothing checks the data yet)
+### 4. Create a user with NO data → 500 and an HTML error page (the schema said no; fixed in stage 08)
 POST {{baseUrl}}/api/users
 Content-Type: application/json
 
 {}
+
+### 5. Create Ann AGAIN → 500 as well (duplicate email; fixed in stage 08)
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{ "name": "Ann", "email": "ann@test.io" }
+
+### 6. A second user, for the next stages → 201
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{ "name": "Bob", "email": "bob@test.io" }

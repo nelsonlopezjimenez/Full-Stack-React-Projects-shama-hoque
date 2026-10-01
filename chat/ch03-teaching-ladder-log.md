@@ -28,3 +28,16 @@ script sent the stage's requests and compared status codes and bodies.
   (201 `{ message }`, the same answer as the final code). `api.http` requests 2–4, lesson 02.
 - **Why:** HTTP methods, JSON bodies and status codes without having to learn a database at the same time.
 - **Verified:** empty list → `[]`; two POSTs → 201; list has both, the second one without name/email.
+
+## Stage 03 — mongodb (`teach/ch03-server-03-mongodb`)
+
+- **Changed:** `mongoose` dependency; `server.js` connects with top-level `await` + `User.init()`,
+  defines `UserSchema` (the final schema without password fields) and the `User` model; both routes
+  use `async`/`await`. `api.http` requests 4–6, lesson 03.
+- **Why:** persistence and schema rules. No error handling yet on purpose: the HTML 500s are the
+  reason for stage 08.
+- **Verified:** create → 201; `{}` → 500 HTML containing "Name is required."; duplicate → 500
+  HTML containing "E11000"; list → 2 users, no `__v` (thanks to `.select`). Express 5's default
+  handler prints the stack trace in the terminal, as the lesson says.
+- **Noticed:** `POST {"created": "2000-01-01"}` is accepted by `new User(req.body)`. The final code
+  does the same for sign-up (only update has an allow-list); left as is, matches the target.
