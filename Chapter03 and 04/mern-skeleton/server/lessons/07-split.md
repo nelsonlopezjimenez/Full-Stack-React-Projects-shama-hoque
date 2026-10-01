@@ -94,3 +94,32 @@ Try: set `PORT=3001` in `.env`, restart, and change `@baseUrl` in `api.http`. Th
   starting the real server or touching the database.
 - The "Hello" route on `/` is gone: this server is a JSON API under `/api` (request 1 now answers 404).
   In stage 18 the server can serve the built React app on `/` instead.
+
+## f) Remove the copy: the `userByID` middleware
+
+- **Middleware** is any function `(req, res, next)`. It either answers, or calls `next()` to pass
+  the request to the next function.
+- `userByID` finds the user from the URL. If there is none it answers 404; otherwise it stores the user
+  in `req.profile` and calls `next()`.
+- A route can list several functions, which run left to right:
+  `.get(userCtrl.userByID, userCtrl.read)`.
+- `read`, `update` and `remove` lost their four copied lines and just use `req.profile`. A fix to the
+  lookup (stage 08 makes bad ids answer 400) now happens in **one** place.
+
+## The result
+
+| Before (stage 06) | After (stage 07) |
+|---|---|
+| `server.js`, 158 lines, 5 jobs | `server.js` ~30 lines (start), `express.js` ~20 (build), `config/` (settings), `models/` (data), `controllers/` (logic), `routes/` (URLs) |
+| lookup + 404 written three times | written once, in `userByID` |
+| port and database address in the code | in `.env` |
+
+Run `api.http` from top to bottom: every answer is the same as in stage 06 (except request 1).
+Nothing a client can see has changed; only the code is easier to work with. That is what a
+**refactor** is.
+
+## Exercise
+
+Add a route `GET /api/users/:userId/name` that answers only `{ "name": ... }`. Which files do you
+touch? (Answer: the controller for a new `readName` handler, the routes file for the URL, and
+`userByID` is reused as it is.)

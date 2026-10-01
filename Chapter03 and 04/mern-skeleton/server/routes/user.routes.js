@@ -20,9 +20,13 @@ router.route('/api/users')
   .get(userCtrl.list)
   .post(userCtrl.create)
 
+// [BEGINNER] A route can list SEVERAL functions. Express runs them left to right; each one
+// either answers or calls next() to hand the request to the next one:
+//   userByID   load the user into req.profile   (no such user → 404, and the chain stops)
+//   read/update/remove
 router.route('/api/users/:userId')
-  .get(userCtrl.read)
-  .patch(userCtrl.update)
-  .delete(userCtrl.remove)
+  .get(userCtrl.userByID, userCtrl.read)
+  .patch(userCtrl.userByID, userCtrl.update)
+  .delete(userCtrl.userByID, userCtrl.remove)
 
 export default router

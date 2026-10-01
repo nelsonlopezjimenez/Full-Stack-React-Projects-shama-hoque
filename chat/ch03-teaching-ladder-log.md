@@ -85,3 +85,7 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
 - **07e express.js / server.js:** `express.js` builds and exports the app (json + routes);
   `server.js` only connects and listens. The hello route on `/` is removed (the final code has none);
   `api.http` request 1 now expects 404. Verified: regression passes, `GET /` → 404.
+- **07f userByID:** middleware in the controller (final form, without the `router.param`
+  note, which arrives in stage 10 together with `requireSignin`); routes list
+  `userByID` before read/update/remove; the three copies are gone. README gets the layout.
+  Verified: regression passes (404s now come from `userByID`).

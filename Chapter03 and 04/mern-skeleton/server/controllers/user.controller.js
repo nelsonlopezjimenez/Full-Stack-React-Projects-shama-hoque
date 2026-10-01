@@ -21,16 +21,29 @@ const create = async (req, res) => {
   })
 }
 
-const read = async (req, res) => {
-  // [BEGINNER] req.params.userId is the `:userId` part of the route path.
+/**
+ * Load user and append to req.
+ */
+// [BEGINNER] Middleware (req, res, next): it loads the user named in the URL into req.profile,
+// so the handlers after it (read, update, remove) do not repeat the query.
+// It either ANSWERS (404) or calls next() to pass the request on to the next function in the route.
+// `req.params.userId` is the `:userId` part of the route path.
+const userByID = async (req, res, next) => {
   const user = await User.findById(req.params.userId)
   // [BEGINNER] findById answers null when no user has this id. `return` stops the function
   // here, so we never send two answers to one request.
   if (!user) {
-    // 404 Not Found: the id is well-formed but no such user exists
+    // [BEGINNER] 404 Not Found: the id is well-formed but no such user exists
     return res.status(404).json({ error: "User not found" })
   }
-  return res.json(user)
+  // [BEGINNER] req is one object that travels through every function of the route, so
+  // anything stored on it here (req.profile) is visible to read/update/remove.
+  req.profile = user
+  next()
+}
+
+const read = (req, res) => {
+  return res.json(req.profile)
 }
 
 const list = async (req, res) => {
@@ -40,15 +53,11 @@ const list = async (req, res) => {
 }
 
 const update = async (req, res) => {
-  const user = await User.findById(req.params.userId)
-  if (!user) {
-    return res.status(404).json({ error: "User not found" })
-  }
   // [BEGINNER] Object.assign(target, a, b) copies every property of a and b onto target.
   // Here: the fields from the body, then the date of this change.
   // [ADVANCED] Copying EVERYTHING the client sends is dangerous ("mass assignment"): a client can
   // also change fields it should never touch. Stage 15 shows the attack and fixes it.
-  Object.assign(user, req.body, { updated: Date.now() })
+  const user = Object.assign(req.profile, req.body, { updated: Date.now() })
   // [BEGINNER] save() runs the schema rules again, so an update cannot break them
   // (an empty name or an invalid email is refused, just like on create).
   await user.save()
@@ -56,10 +65,7 @@ const update = async (req, res) => {
 }
 
 const remove = async (req, res) => {
-  const user = await User.findById(req.params.userId)
-  if (!user) {
-    return res.status(404).json({ error: "User not found" })
-  }
+  const user = req.profile
   // [BEGINNER] deleteOne() removes this document from the collection.
   await user.deleteOne()
   // We answer with the user that was deleted, so the client can show "Bob was deleted".
@@ -70,6 +76,7 @@ const remove = async (req, res) => {
 // `remove`, not `delete`: `delete` is a reserved word in JavaScript.
 export default {
   create,
+  userByID,
   read,
   list,
   remove,
