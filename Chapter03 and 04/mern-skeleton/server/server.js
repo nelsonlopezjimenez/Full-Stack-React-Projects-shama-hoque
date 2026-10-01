@@ -8,7 +8,7 @@ import mongoose from 'mongoose'
 import config from './config/config.js'
 // The schema and the model now live in their own file.
 import User from './models/user.model.js'
-import userCtrl from './controllers/user.controller.js'
+import userRoutes from './routes/user.routes.js'
 
 // [BEGINNER] express() creates the application. Everything the server does is registered on `app`.
 const app = express()
@@ -26,22 +26,10 @@ app.get('/', (req, res) => {
   res.send('Hello from the MERN skeleton server!')
 })
 
-// [BEGINNER] REST: the URL names a collection of things (/api/users) and the HTTP method says
-// what to do with it:   GET = read it,   POST = add a new item to it.
-// The /api prefix keeps the data URLs apart from the pages a browser app will show later.
-
-// [BEGINNER] The handler functions now live in controllers/user.controller.js. A route only says
-// "this method + this path → that function". Note: userCtrl.list, NOT userCtrl.list().
-// We hand Express the function itself; Express calls it later, once per request.
-app.get('/api/users', userCtrl.list)
-app.post('/api/users', userCtrl.create)
-
-// [BEGINNER] `:userId` is a route parameter: a placeholder for any value in that part of the URL.
-// REST: /api/users is the collection, /api/users/<id> is ONE item of it.
-// PATCH means "change SOME fields"; PUT would mean "replace the whole user".
-app.get('/api/users/:userId', userCtrl.read)
-app.patch('/api/users/:userId', userCtrl.update)
-app.delete('/api/users/:userId', userCtrl.remove)
+// mount routes
+// [BEGINNER] Every route for /api/users is defined in routes/user.routes.js. app.use() plugs the
+// whole router into the app. To find "what happens on PATCH /api/users/:id", open the routes file.
+app.use('/', userRoutes)
 
 // [BEGINNER] Top-level await: in an ES module you can `await` outside any function.
 // The server only starts listening AFTER the database is ready, so no request can arrive
