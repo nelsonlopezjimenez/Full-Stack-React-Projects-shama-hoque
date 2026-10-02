@@ -1,0 +1,16 @@
+# Applies to the whole repository: every chapter, every subfolder.
+# A folder can still have its own .gitignore for rules that only make sense there
+# (e.g. dist/ in a Vite client); both files apply.
+
+# Dependencies (recreated with npm install)
+node_modules/
+
+# Secrets: never commit them. .env.example is committed on purpose.
+.env
+.env.*
+!.env.example
+
+# Logs and OS clutter
+*.log
+.DS_Store
+Thumbs.db
