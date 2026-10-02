@@ -57,7 +57,8 @@ git push gitea "refs/remotes/github/teach/ch03-client-*:refs/heads/teach/ch03-cl
 ```
 
 Avoid `refs/remotes/github/*:refs/heads/*`. It also matches `github/HEAD`, which would create a branch
-called `HEAD` on Gitea.
+called `HEAD` on Gitea. To copy **all** branches at once (and make Gitea an exact copy of GitHub), use the
+procedure in [gitea-force-sync-from-github.md](gitea-force-sync-from-github.md), which removes `github/HEAD` first.
 
 ## Check that both servers agree
 
