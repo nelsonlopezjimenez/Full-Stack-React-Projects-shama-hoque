@@ -1,0 +1,17 @@
+# Applies to this folder and every subfolder (client/, server/).
+# A stray node_modules/ can appear here if Vite is started from this folder
+# instead of client/ — it only holds a cache and is safe to delete.
+node_modules/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+
+# Logs and OS clutter
+*.log
+.DS_Store
+Thumbs.db
