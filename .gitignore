@@ -14,3 +14,7 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+
+# Local DB dumps produced by db-export.mjs (tools/db-recovery branch)
+dump-json/
+dump/
