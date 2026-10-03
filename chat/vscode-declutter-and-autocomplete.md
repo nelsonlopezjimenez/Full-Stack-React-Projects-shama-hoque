@@ -4,6 +4,9 @@ Notes from a chat on 2026-10-02. All settings go in the user `settings.json`
 (`Ctrl+Shift+P` → **Preferences: Open User Settings (JSON)**), located at
 `%APPDATA%\Code\User\settings.json`.
 
+Git settings to apply on every machine (push behaviour, upstream tracking) are in
+[git-config-and-push.md](git-config-and-push.md).
+
 ---
 
 ## 1. Autocomplete "eats" the dot (current pain point)
