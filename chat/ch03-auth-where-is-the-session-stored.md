@@ -138,3 +138,134 @@ You might expect a 404 for a URL that was never defined. Instead, at stage 09, `
 ```
 
 Lesson for students: **a route parameter (`:userId`) matches any text.** That is why auth lives under its own prefix, `/api/auth/...`. Any extra word placed under `/api/users/` would be taken for a user id, unless its route is declared *before* the `:userId` route (Express tries routes in the order they are registered).
+
+## 7. Stage 10 (`teach/ch03-server-10-cookie-session`): where is the cookie?
+
+### In the code
+
+| Step | File | What happens |
+|---|---|---|
+| 1. Created | `controllers/auth.controller.js`, `signin` | `res.cookie('userId', user._id.toString(), { httpOnly: true, sameSite: 'strict', secure: <production only>, maxAge: 1 day })` → response header `Set-Cookie: userId=66fb…; Max-Age=86400; Path=/; HttpOnly; SameSite=Strict` |
+| 2. Parsed | `express.js` | `app.use(cookieParser())` turns the request header `Cookie: userId=66fb…` into `req.cookies` |
+| 3. Read | `auth.controller.js`, `requireSignin` | `req.cookies.userId`: missing → 401 "Please sign in"; present → `req.auth = { _id: userId }`, `next()` |
+| 4. Removed | `auth.controller.js`, `signout` (`DELETE /api/auth/sessions`) | `res.clearCookie('userId', cookieOptions)`: a `Set-Cookie` that has already expired |
+
+`requireSignin` guards `GET`, `PATCH` and `DELETE /api/users/:userId` (`routes/user.routes.js`).
+
+### Where it is stored: on the client, never on the server
+
+| Client | Where the cookie lives | How to see it |
+|---|---|---|
+| Browser | its cookie storage for the site (here `localhost`) | DevTools → Application → Cookies. `document.cookie` does **not** show it, because it is `httpOnly`, but the browser still sends it |
+| VS Code REST Client (`api.http`) | the extension remembers cookies between requests | the `Set-Cookie` header in the response to request 19; request 8 then works automatically |
+| curl | nowhere, unless told | `curl -c jar.txt …` saves it, `curl -b jar.txt …` sends it back |
+| **Server** | **nothing stored** | it reads whatever cookie arrives with each request |
+
+The cookie can be sent by any client, and the server cannot tell who created it. Request 25 sends a hand-typed `Cookie: userId=…` and is accepted. That is the weakness of stage 10, fixed in stage 12 (signed cookie: the server keeps only `COOKIE_SECRET`).
+
+> Comparison with the book and the migration branch: there the cookie is named `t` and holds a **JWT**, not a bare user id (see sections 2–3).
+
+## 8. Is `req.auth` a built-in method?
+
+**No.** `req.auth = { _id: userId }` (in `requireSignin`, `controllers/auth.controller.js`) **creates a new property** on the request object. `req` is an ordinary JavaScript object that Express creates once per request, and assigning to a property that does not exist yet simply adds it. The name could be anything.
+
+Every middleware later in the same request receives **the same `req` object**, which is how they pass information along:
+
+```
+requireSignin    → sets   req.auth    = { _id }        (who is calling)
+userByID         → sets   req.profile = <user doc>     (which user the URL names)
+hasAuthorization → reads  both and compares them       (stage 11)
+read / update    → read   req.profile
+```
+
+| Property | Created by |
+|---|---|
+| `req.method`, `req.url`, `req.headers` | Node's HTTP server |
+| `req.params`, `req.query`, `req.path`, `req.originalUrl` | Express |
+| `req.body` | `express.json()` (middleware, not built in; `undefined` in Express 5 when no parser ran) |
+| `req.cookies` | `cookieParser()` (middleware) |
+| `req.auth`, `req.profile` | our own middleware (`requireSignin`, `userByID`) |
+
+**Why `auth`:** in stage 13 the hand-written `requireSignin` is replaced by **express-jwt**, which puts the decoded token in `req.auth` by default (option `requestProperty`). Using the same name from stage 10 on means `hasAuthorization` and the user routes never change when the cookie becomes a JWT.
+
+[ADVANCED] Express's documented place for per-request data is `res.locals`. Adding properties to `req` is still the common convention (express-jwt → `req.auth`, Passport → `req.user`). Choose distinctive names to avoid clashing with a library. In TypeScript the extra property must be declared (declaration merging on `Express.Request`).
+
+## 9. Where is `req.auth` visible?
+
+**Only inside the request that set it, and only to the code that runs after `requireSignin` in that request.** It is a property on that request's `req` object, not a variable in a file, so it goes wherever that object goes.
+
+**Visible:**
+
+- middleware and handlers that come **after** `requireSignin` in the same route chain, in any file, because they receive the same `req`:
+
+  ```js
+  router.route('/api/users/:userId')
+    .get(authCtrl.requireSignin, userCtrl.userByID, userCtrl.read)
+    //   sets req.auth ───────▶  can read it ──▶  can read it
+  ```
+
+  `hasAuthorization` (stage 11) is the code that actually reads `req.auth._id`;
+- the error handler in `express.js`, if a later step of that request fails.
+
+**Not visible:**
+
+| Where | Why |
+|---|---|
+| middleware that runs **before** it (`express.json()`, `cookieParser()`) | not set yet |
+| routes **without** `requireSignin` (`GET /api/users`, `POST /api/users`, `POST /api/auth/sessions`) | never set → `undefined` |
+| **another request**, even the next one from the same user | every request gets a new `req`; the cookie is what lets `requireSignin` rebuild `req.auth` each time |
+| **the client** | it lives only in server memory and is never sent unless a handler puts it in a response |
+| after the response | the `req` object is discarded |
+
+**Try it (stage 10):** add `console.log('req.auth =', req.auth)` at the top of `read` in `user.controller.js`. Request 8 after signing in prints the id. After signing out you get a 401, and `read` never runs. Or set a breakpoint in `read` (VS Code: JavaScript Debug Terminal → `npm run dev`) and hover over `req.auth`.
+
+## 10. Signing in twice with the same data: any side effect?
+
+Nothing breaks. Sign-in only **reads** the database (`User.findOne`); no stage writes anything at login (there is no "last login" field). What differs is the answer:
+
+| Stage | Second sign-in, same data | Side effect |
+|---|---|---|
+| 09 (no session) | same 200 answer | none |
+| 10–11 (cookie `userId`) | same `Set-Cookie: userId=…` | the browser replaces the cookie (same name and path), so the **expiry restarts** from the second login |
+| 12 (signed cookie) | identical value **and** signature: the same HMAC input always gives the same output | only the expiry restarts |
+| 13+ and `refactor/ch03-migration` (JWT) | a **new, different token**, because `iat`/`exp` hold the current time (identical only within the same second) | it replaces cookie `t`, **but the old token stays valid until its own `exp`** |
+
+**The real side effect (JWT stages): tokens pile up.** Every successful login mints another valid token, and the server keeps no list (§2), so it cannot cancel earlier ones. Signing out clears only this browser's cookie. A token in another tab's `sessionStorage` (migration branch) or pasted into `api.http`/Postman keeps working until it expires. That is also what lets one user be signed in on several devices, and it is why `expiresIn` matters.
+
+**Where repeated logins would matter:**
+
+- **Server-side sessions** (express-session, not in the ladder): each login creates a new store entry, and old ones stay until they expire. Best practice: `req.session.regenerate()` at login (new session id, prevents *session fixation*).
+- **Cost:** from stage 14 on, each login runs scrypt (~22 ms CPU, deliberately slow). Mass logins, correct or not, load the server, and wrong ones are brute-force attempts. Both are what **rate limiting** guards against (migration checklist 6.9, `later`).
+- **HTTP semantics:** POST is not idempotent by definition. In the JWT stages, signing in twice really does "create a session" twice (two tokens). It is harmless because the user's data is untouched.
+
+## 11. curl vs REST Client: do I need to sign in to list users?
+
+**Separate clients, separate "sessions".** Each client keeps its own cookies. REST Client remembers the cookie from request 19 (sign in); **curl remembers nothing** between commands unless told to. Signing in from one does not sign in the other, and the server cannot tell they are the same person.
+
+**But listing users needs no sign-in.** In every ladder stage (10 → 19) and in the migration branch:
+
+```js
+router.route('/api/users')
+  .get(userCtrl.list)      // public: no requireSignin
+  .post(userCtrl.create)   // sign up: public
+```
+
+`curl http://localhost:3000/api/users` always works. Only the one-user routes `GET`/`PATCH`/`DELETE /api/users/:userId` need a sign-in. (The Ch05 review flagged the public list: anyone can read every name and email.)
+
+**Signing in with curl for the protected routes:**
+
+```bash
+# stages 10–12 (cookie), and 13+ (cookie t): save the cookie with -c, send it back with -b
+curl -c jar.txt -X POST http://localhost:3000/api/auth/sessions \
+     -H "Content-Type: application/json" \
+     -d '{"email":"ann@test.io","password":"secret1"}'
+curl -b jar.txt http://localhost:3000/api/users/<id>      # 200
+curl http://localhost:3000/api/users/<id>                 # 401: no cookie sent
+
+# stage 13+: or send the token from the sign-in answer as a header
+curl -H "Authorization: Bearer <token>" http://localhost:3000/api/users/<id>
+```
+
+Branch difference: in stage 13+ `getToken` checks the cookie first, then the header. In `refactor/ch03-migration` only the header works.
+
+**Windows:** in PowerShell, `curl` can be an alias for `Invoke-WebRequest`, so use `curl.exe`. The single-quoted JSON works in Git Bash; in PowerShell or cmd, put the JSON in a file and use `-d @login.json`.
