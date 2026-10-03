@@ -114,3 +114,27 @@ Each of these is checked in a different place:
 | Absent at **sign-up** | the schema: `required: [true, 'Password is required.']` | 400 "Password is required." |
 
 The length rule exists only at sign-up (and update). Sign-in just compares, so a 3-character password simply "does not match".
+
+## 6. "So at stage 09 the sessions route exists but does nothing?"
+
+**It authenticates, but it does not remember.** At stage 09, `POST /api/auth/sessions`:
+
+| Request | Answer |
+|---|---|
+| no email or no password | 400 "Email and password are required" |
+| unknown email or wrong password | 401 "Email and password don't match." |
+| correct email + password | 200 `{ user: { _id, name, email } }` |
+
+Checking who you are is **authentication**, and that part works. What is missing is **state**: no cookie and no token, so the next request is anonymous again. The URL already names a "session" that only exists from stage 10 on (cookie → signed cookie in stage 12 → JWT in stage 13). The name comes first on purpose, so the URL never has to change.
+
+### Side note for students: a route parameter matches any text
+
+This came up from a typo in the question: `/api/users/session` instead of `/api/auth/sessions`. **That URL is not in the code** (no route, test or `api.http` request uses it). It is still a good classroom experiment.
+
+You might expect a 404 for a URL that was never defined. Instead, at stage 09, `GET /api/users/session` matches **`/api/users/:userId`** with `userId = "session"`. It runs `User.findById("session")`, Mongoose cannot convert `"session"` into an ObjectId (a CastError), and the error handler answers:
+
+```
+400 {"error":"Invalid _id: session"}
+```
+
+Lesson for students: **a route parameter (`:userId`) matches any text.** That is why auth lives under its own prefix, `/api/auth/...`. Any extra word placed under `/api/users/` would be taken for a user id, unless its route is declared *before* the `:userId` route (Express tries routes in the order they are registered).
