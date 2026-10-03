@@ -269,3 +269,40 @@ curl -H "Authorization: Bearer <token>" http://localhost:3000/api/users/<id>
 Branch difference: in stage 13+ `getToken` checks the cookie first, then the header. In `refactor/ch03-migration` only the header works.
 
 **Windows:** in PowerShell, `curl` can be an alias for `Invoke-WebRequest`, so use `curl.exe`. The single-quoted JSON works in Git Bash; in PowerShell or cmd, put the JSON in a file and use `-d @login.json`.
+
+## 12. What is a "cookie made by hand"?
+
+A cookie the **client invents and sends**, instead of one the server created with `Set-Cookie`.
+
+**Why it is possible:** sending a cookie is nothing more than a request header,
+
+```
+Cookie: userId=66fb1c…e1
+```
+
+and HTTP does not record who wrote that text. Any client can produce it:
+
+| Client | How |
+|---|---|
+| REST Client | type the header `Cookie: userId=…` (`api.http` requests 25 and 27; `# @no-cookie-jar` keeps the real cookie out) |
+| curl | `curl -b "userId=66fb…" http://localhost:3000/api/users/66fb…` |
+| browser | DevTools → Application → Cookies → edit the value. `httpOnly` only blocks **page JavaScript**, not the user |
+
+A real id is easy to find, because `GET /api/users` is public and lists every `_id`.
+
+**Effect, stage by stage:**
+
+- **Stage 10.** `requireSignin` only checks that the cookie **exists** (`req.cookies.userId`) and copies it into `req.auth`. Request 25 (Ann's id, no sign-in) → **200**: the server believes it is Ann.
+- **Stage 11.** `hasAuthorization` requires `req.profile._id` to equal `req.auth._id`. Ann changing Bob → 403 (request 26). But request 27 forges `Cookie: userId=<Bob's id>`, so `req.auth._id` *is* Bob, the check passes, and Bob is changed (**200**). Authorization is worthless when authentication can be faked.
+- **Stage 12.** The cookie is **signed**: `userId=s:66fb…e1.<HMAC(value, COOKIE_SECRET)>`. `cookieParser(secret)` recomputes the HMAC:
+
+  | Cookie that arrives | `req.signedCookies.userId` | Result |
+  |---|---|---|
+  | the real one from sign-in | `"66fb…e1"` | allowed |
+  | hand-made, unsigned | absent (it stays in `req.cookies`) | **401** (requests 25, 27) |
+  | real cookie with the id edited | `false` (signature mismatch) | **401** |
+
+  Forging a valid one needs `COOKIE_SECRET`, which never leaves the server. Signed ≠ encrypted: the id is still readable, just not changeable.
+- **Stage 13+ (JWT):** same principle. The payload is readable, but any change breaks the signature → 401.
+
+**General rule:** never trust anything the client sends (cookies, headers, body, URL) unless the server can verify it, here with a signature only the server can produce.
