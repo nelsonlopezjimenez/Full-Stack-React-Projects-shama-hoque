@@ -684,3 +684,42 @@ P=$(echo "$TOKEN" | cut -d. -f2 | tr '_-' '/+'); while [ $(( ${#P} % 4 )) -ne 0 
 ```
 
 **Others (not tried here):** the browser DevTools console, `JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))`; VS Code marketplace "JWT" decoder extensions; smallstep's `step crypto jwt inspect --insecure` (needs to be installed).
+
+## 24. How secure is two-factor authentication (a code app)?
+
+**It depends on who has the secret, not on the phone.**
+
+**How a code app (TOTP, RFC 6238) works:**
+
+1. At setup the site creates a random **secret** and shows it as a QR code. The app stores it, and **the site keeps a copy**.
+2. Every 30 s both sides compute `HMAC-SHA1(secret, floor(time / 30))` and shorten it to 6 digits ("dynamic truncation").
+3. At sign-in you type the code; the server computes its own and compares.
+
+The algorithm is public. Ten lines of Node (`crypto.createHmac`) reproduce the RFC's test codes exactly (`94287082` at t=59, `07081804` at t=1111111109, secret `12345678901234567890`), and with the same secret a "phone" and a "laptop" produce the same code. **Whoever has the secret can generate valid codes on any device.**
+
+- "Only my phone has it" holds only if the secret really exists only there. Cloud backup or sync in authenticator apps (Google Authenticator sync, Authy, password managers) and screenshots of the QR code copy it elsewhere.
+- On another computer, security depends on who can use that computer.
+
+**How attacks get around 2FA in practice:**
+
+| Attack | How | Stopped by a code app? |
+|---|---|---|
+| real-time phishing (most common) | a fake login page takes password + current code and forwards both within the 30 s | **no** |
+| stolen session cookie / token | after sign-in, malware or XSS copies the cookie or JWT, so the attacker is "already signed in" | **no**: 2FA is checked only at sign-in (§10, §14, §17) |
+| SIM swap | the carrier moves your number to the attacker's SIM | affects **SMS** codes only |
+| push "approve?" fatigue | repeated prompts until one is approved by mistake | reduced by number matching |
+| recovery codes | backup codes found | no: store them like a password |
+| server breach | TOTP is a **shared** secret: a hacked site loses everyone's secrets | no |
+
+**Ranking of second factors:**
+
+| Factor | Strength | Why |
+|---|---|---|
+| SMS code | weakest | SIM swap, interception; still far better than nothing |
+| code app (TOTP) | good | stops password leaks and mass guessing; not phishing-proof |
+| push with number matching | good | same phishing weakness, less typing |
+| **passkey / security key** (FIDO2/WebAuthn) | **strongest** | public-key: the private key **never leaves the device** (secure chip), the server stores only a public key, and the browser ties it to the **real domain**, so a fake site gets nothing usable |
+
+**Link to Git:** GitHub's 2FA protects **web sign-in** only. `git push` over SSH or HTTPS uses an already-proven credential (SSH key, stored token), much like a session cookie, and asks for no second factor. A copied key file without a passphrase bypasses 2FA (see `git-config-and-push.md` §4).
+
+**Summary:** a code app is a big step up from a password alone and stops most automated attacks. It is not near 100%, because the common attacks go *around* it (phishing, session theft), not *through* it. Passkeys or security keys close the phishing gap.
