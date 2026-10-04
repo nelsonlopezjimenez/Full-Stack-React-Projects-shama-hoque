@@ -629,3 +629,58 @@ Invoke-RestMethod -Uri http://localhost:3000/api/users/$($r.user._id) -Headers @
 | 400 "Email and password are required" | missing field **or** missing `Content-Type` header |
 | 401 "Email and password don't match." | unknown email or wrong password |
 | 200 without `token` | stage 10–12 (cookie only) |
+
+## 22. Does `iat` change every second?
+
+**Not inside a token.** `iat` is written once, when the token is signed, and frozen by the signature. What changes every second is the clock, so a **new** token signed a second later gets a different `iat`.
+
+Tested with `jsonwebtoken` 9:
+
+| Situation | `iat` | Token |
+|---|---|---|
+| two sign-ins in the same second | same (1791084308) | **identical**, character for character |
+| a sign-in 1.1 s later | 1791084309 | different |
+| the first token, decoded again later | still 1791084308 | unchanged |
+
+- **An existing token is frozen.** `iat`/`exp` are part of the signed text (changing them breaks the signature, §16). Nothing "updates" a token; it only gets older compared to the clock, until `exp` is passed.
+- **Resolution is whole seconds:** `iat = Math.floor(Date.now() / 1000)`. Same payload + same `iat`/`exp` + same secret = the same HMAC, so the same token (hence "different tokens, except within the same second" in §10).
+- **The server never rewrites `iat`.** A fresh `iat` (and a later `exp`) means signing in again, or a refresh token in apps that have one.
+
+## 23. Offline alternatives to jwt.io
+
+Offline is also **safer**: pasting a real, still-valid token into a website hands it to a third party. All three commands below were tested on a stage-13-style token.
+
+**1. Decode with Node (nothing to install, decode only, like jwt.io's default view):**
+
+```bash
+node -e "
+const [h, p] = process.argv[1].split('.')
+const dec = (s) => JSON.parse(Buffer.from(s, 'base64url'))
+const payload = dec(p)
+console.log('header :', dec(h))
+console.log('payload:', payload)
+for (const k of ['iat', 'exp', 'nbf']) if (payload[k]) console.log(k.padEnd(7), new Date(payload[k] * 1000).toISOString())
+" "$TOKEN"
+```
+
+Prints the header, the payload, and `iat`/`exp` as dates.
+
+**2. Verify the signature** (in the ladder's `server/`, stage 13+, where `jsonwebtoken` is installed and `.env` holds `JWT_SECRET`):
+
+```bash
+node --env-file=.env -e "
+const jwt = require('jsonwebtoken')
+try { console.log('valid ->', jwt.verify(process.argv[1], process.env.JWT_SECRET, { algorithms: ['HS256'] })) }
+catch (e) { console.log('INVALID ->', e.name + ':', e.message) }
+" "$TOKEN"
+```
+
+Right secret → `valid -> { _id, iat, exp }`; wrong secret → `JsonWebTokenError: invalid signature`; expired → `TokenExpiredError: jwt expired`. Doing this online would mean giving your secret to a website: never do that.
+
+**3. Git Bash only (no Node):** base64url → base64 (swap `_-` → `/+`, add `=` padding):
+
+```bash
+P=$(echo "$TOKEN" | cut -d. -f2 | tr '_-' '/+'); while [ $(( ${#P} % 4 )) -ne 0 ]; do P="$P="; done; echo "$P" | base64 -d
+```
+
+**Others (not tried here):** the browser DevTools console, `JSON.parse(atob(token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))`; VS Code marketplace "JWT" decoder extensions; smallstep's `step crypto jwt inspect --insecure` (needs to be installed).
