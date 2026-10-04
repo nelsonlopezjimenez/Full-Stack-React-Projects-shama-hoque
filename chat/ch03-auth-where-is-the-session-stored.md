@@ -522,3 +522,40 @@ Wording: a **cookie** is a way to carry data; a **JWT** is a data format. In sta
 | code | `cookieParser(secret)`, `req.signedCookies`, a hand-written 401 | `jsonwebtoken` + `express-jwt` (`UnauthorizedError` → 401) |
 
 **In one sentence:** for one Express server and a browser they behave almost the same, and server-checked expiry is the practical gain. JWT pays off when **other clients or services** must use or verify the token (a mobile app, a second backend, another language). That is why lesson 13 can swap them with almost no change to the routes.
+
+## 20. Unsigned vs signed cookie
+
+The difference is **who can produce a valid value**: anyone (unsigned) or only the server, which alone knows the secret (signed). Forging is covered in §12 and the signature's structure in §15.
+
+**The code change from stage 11 to stage 12 is four lines:**
+
+```diff
+ // config/config.js
++  cookieSecret: process.env.COOKIE_SECRET ?? 'dev-only-secret-do-not-use-in-production',
+ // express.js
+-app.use(cookieParser())
++app.use(cookieParser(config.cookieSecret))
+ // auth.controller.js, signin
+-  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS })
++  res.cookie('userId', user._id.toString(), { ...cookieOptions, maxAge: ONE_DAY_MS, signed: true })
+ // auth.controller.js, requireSignin
+-  const userId = req.cookies.userId
++  const userId = req.signedCookies.userId
+```
+
+| | Unsigned (stages 10–11) | Signed (stage 12) |
+|---|---|---|
+| value | `userId=66fb…e1` | `userId=s:66fb…e1.<HMAC>` |
+| read from | `req.cookies.userId` | `req.signedCookies.userId` |
+| client reads it | yes | yes (signed ≠ encrypted) |
+| client edits it | accepted | signature mismatch → `false` → 401 |
+| client invents one | accepted (requests 25/27 → 200) | needs `COOKIE_SECRET` → 401 |
+| stolen copy reused | works | **still works**: a signature proves origin, not who sends it |
+| expiry checked by the server | no | no (only the JWT's `exp`, §16) |
+| server keeps | nothing | only the secret |
+
+**How `cookie-parser(secret)` sorts incoming cookies:** no `s:` prefix → `req.cookies`; `s:` + valid signature → `req.signedCookies` (the value); `s:` + invalid signature → `req.signedCookies` = `false`.
+
+**What signing does not do:** hide the value (use encryption); stop theft or reuse (`httpOnly`, HTTPS/`secure`, short lifetimes); expire on the server (needs a time inside the signed data, i.e. a JWT `exp`); survive a leaked secret. Whoever has `COOKIE_SECRET` can sign anything, so rotate it if it leaks: all cookies become invalid, which is also the emergency "sign out everyone".
+
+**When unsigned is fine:** values where a fake does no harm (theme, language, a dismissed banner, cookie consent). If the server **makes a decision** from the value (identity, permissions, prices, role), it must be signed, encrypted, or a random id pointing to data on the server.
