@@ -306,3 +306,187 @@ A real id is easy to find, because `GET /api/users` is public and lists every `_
 - **Stage 13+ (JWT):** same principle. The payload is readable, but any change breaks the signature → 401.
 
 **General rule:** never trust anything the client sends (cookies, headers, body, URL) unless the server can verify it, here with a signature only the server can produce.
+
+## 13. `req.profile && req.auth && req.profile._id.equals(req.auth._id)`
+
+The core of `hasAuthorization` (stage 11 on, and the migration branch). It answers: **is the user named in the URL the same person who is signed in?**
+
+| Value | Set by | Type | Meaning |
+|---|---|---|---|
+| `req.profile._id` | `userByID` (from MongoDB) | ObjectId | the account in the URL `/api/users/:userId` |
+| `req.auth._id` | `requireSignin` (from the cookie or JWT) | string | the person making the request |
+
+Ann changing Ann → `true` → `next()`. Ann changing Bob → `false` → **403** "User is not authorized".
+
+**`&&` as a chain of guards.** It evaluates left to right and stops at the first falsy value, returning it. With no `req.profile` or no `req.auth`, the result is `undefined` and `.equals()` is never called. Without these guards, `req.profile._id` on a missing profile would throw a TypeError (a 500). In the normal order (`requireSignin → userByID → hasAuthorization`) both are always set, so the guards are **defensive**: a future route that forgets `userByID` or reorders middleware fails safely with a 403. `authorized` can be `undefined`/`false`/`true`; `if (!authorized)` treats the first two alike.
+
+**Why `.equals()`.** Checked with `bson` 6.10:
+
+| Comparison | Result | Why |
+|---|---|---|
+| `id === '66fb…'` | false, always | different types (object vs string) |
+| `id === new ObjectId('66fb…')` | false | objects are `===` only when they are the same object |
+| `id == '66fb…'` | true | only because `==` converts the ObjectId to a string: implicit, fragile (the book used this) |
+| `id.equals('66fb…')` | true | explicit value comparison; accepts an ObjectId or a hex string |
+| `id.equals(undefined)`, `id.equals('hello')` | false | no throw |
+
+**Modern equivalent (optional):** `const authorized = req.profile?._id.equals(req.auth?._id) ?? false`. `?.` replaces the guards, `.equals(undefined)` is `false`, and `?? false` gives a real boolean. Same behaviour; the ladder keeps the `&&` form because it is easier for beginners to read.
+
+## 14. Where does REST Client keep the cookie?
+
+**On disk, in a plain JSON file.** It is not in localStorage: REST Client is not a browser and has no localStorage.
+
+```
+%USERPROFILE%\.rest-client\cookie.json
+```
+
+Checked on this machine (extension `humao.rest-client` 0.25.1): the code builds the path as `<home>/.rest-client/cookie.json` and saves to it with a file-based cookie store. The setting `rest-client.rememberCookiesForSubsequentRequests` is `true` by default. The same folder holds `history.json`, `environment.json` and `responses/`.
+
+What follows from that:
+
+- **It survives VS Code restarts.** The cookie stays until it expires (`maxAge`) or the server clears it. Request 24 (`DELETE /api/auth/sessions`) sends an expired `Set-Cookie`, and REST Client drops the entry.
+- **It is shared** by every `.http` file and project on that machine, per domain (`localhost:3000` is one cookie jar for all projects).
+- **`httpOnly` does not apply.** It only hides a cookie from a web page's JavaScript. REST Client reads and sends it normally, and the value sits in the file as **plain text**.
+- **The file is sensitive.** Whoever can read it can reuse a valid cookie until it expires, even a signed cookie or a JWT. A signature prevents *forging*, not *reuse of a stolen value*; expiry limits the damage.
+- **Opting out:** `# @no-cookie-jar` on one request (requests 25, 27), or set `rest-client.rememberCookiesForSubsequentRequests` to `false`. Emptying `cookie.json` signs REST Client out everywhere.
+
+| Client | Where cookies are kept |
+|---|---|
+| REST Client | `~/.rest-client/cookie.json` (plain JSON) |
+| Browser | a database file in the browser profile (encrypted on Windows). **Not** localStorage or sessionStorage, which are separate stores for page JavaScript (the migration client keeps its JWT copy in sessionStorage) |
+| curl | nowhere, unless `-c jar.txt` (save) / `-b jar.txt` (send) |
+| Server | nowhere |
+
+## 15. Reading a real signed cookie (stage 12): `s:<id>.<signature>`
+
+The same cookie, as seen in REST Client's `cookie.json` and in a curl `jar.txt` after signing in on stage 12:
+
+```
+REST Client:  "value":"s%3A6ac0fe25a6f690631f02cc47.f2Ve8HyO%2Fkvsqjm5C9Ut0iw2bxNSKY4ugTQW2TCCwek"
+curl jar:     #HttpOnly_localhost  FALSE  /  FALSE  1791165196  userId  s%3A6ac0fe25…TCCwek
+```
+
+URL-decoded (`%3A` = `:`, `%2F` = `/`):
+
+```
+s:6ac0fe25a6f690631f02cc47.f2Ve8HyO/kvsqjm5C9Ut0iw2bxNSKY4ugTQW2TCCwek
+│ └──────── value ────────┘ └────────────── signature ──────────────┘
+└ "signed" marker            "." separates them
+```
+
+| Part | Meaning |
+|---|---|
+| `s:` | marks a **signed** cookie; `cookie-parser` checks these and puts them in `req.signedCookies` |
+| `6ac0fe25a6f690631f02cc47` | the value set at sign-in: the user's `_id` (24 hex characters = an ObjectId) |
+| `f2Ve8HyO…TCCwek` | **HMAC-SHA256(value, `COOKIE_SECRET`)**, base64 without the trailing `=`: 43 characters = 32 bytes (the size of a SHA-256 result) |
+
+This is the `cookie-signature` library (used by `cookie-parser`): `createHmac('sha256', secret).update(value).digest('base64').replace(/=+$/, '')`. On the way back it cuts at the last `.`, recomputes, and compares. Match → `req.signedCookies.userId = '6ac0…'`; no match → `false` → 401.
+
+**Why curl and REST Client hold the identical value:** an HMAC is deterministic. Same id + same secret = same signature. Only the expiry differs: curl `1791165196` = 2026-10-05 01:53:16, REST Client 01:58:15, because each sign-in restarts `maxAge` (§10). In the curl jar, `#HttpOnly_` marks an httpOnly cookie, and the two `FALSE` columns mean "not for subdomains" and "not secure-only".
+
+**Check it yourself** (in `server/`, reads `COOKIE_SECRET` from `.env`):
+
+```bash
+node --env-file=.env -e "const c=require('crypto'); console.log(c.createHmac('sha256', process.env.COOKIE_SECRET).update('6ac0fe25a6f690631f02cc47').digest('base64').replace(/=+$/,''))"
+```
+
+It prints the same signature. Change one character of the id and the result is completely different, which is why an edited cookie is rejected.
+
+**What this shows about stage 12:** the signed text contains **only the id, no time**. Every sign-in gives the same cookie, and expiry exists only in the client's cookie jar. The server cannot tell an old cookie from a new one, so a copied value keeps working (until `COOKIE_SECRET` changes). Stage 13's JWT puts `iat`/`exp` **inside the signed part**: every sign-in gives a different token, and the server itself rejects expired ones.
+
+## 16. `iat` and `exp` in a JWT
+
+Two standard fields ("registered claims", RFC 7519) in the payload. They give the token a **lifetime that the server checks itself**, which the stage 12 signed cookie did not have (§15).
+
+A real token from `jsonwebtoken` 9 with stage 13's options (`expiresIn: '1d'`):
+
+```js
+{ _id: '6ac0fe25a6f690631f02cc47', iat: 1791079733, exp: 1791166133 }
+```
+
+| Claim | Name | Value | Date (UTC) |
+|---|---|---|---|
+| `iat` | issued at | 1791079733 | 2026-10-04 02:08:53 |
+| `exp` | expiration time | 1791166133 | 2026-10-05 02:08:53 (`exp - iat` = 86400 s = 1 day) |
+
+**Units: seconds since 1970-01-01 UTC**, not milliseconds:
+
+```
+Date.now()                    → 1791079733475  (ms)
+Math.floor(Date.now() / 1000) → 1791079733     (s, JWT format)
+new Date(payload.exp * 1000)  → back to a JS Date
+```
+
+Watch for this in the code: the cookie's `maxAge` is in **ms** (`JWT_COOKIE_MAX_AGE_MS=86400000`) while `JWT_EXPIRES_IN=1d` ends up as seconds in `exp` (keep them equal). The migration client's `isExpired()` compares `payload.exp * 1000 < Date.now()`.
+
+**Who sets them:** `jwt.sign(payload, secret, { expiresIn: '1d' })` adds `iat` (now) automatically and sets `exp = iat + 1d`. That is why each sign-in gives a different token (§10).
+
+**Who checks them:** `requireSignin` (express-jwt → `jsonwebtoken.verify`), against the server clock. Tested:
+
+| Situation | Result |
+|---|---|
+| expired a minute ago | `TokenExpiredError: jwt expired` (+ `expiredAt`) → 401 |
+| `exp` edited to a year later | `JsonWebTokenError: invalid signature` → 401: `exp` is inside the signed part |
+| small clock difference between servers | `clockTolerance: <s>` option (120 s accepted a token 60 s past `exp`) |
+| "no token older than 1 h", whatever its `exp` | `maxAge: '1h'` option of `verify` (uses `iat`) |
+
+**Compared with stage 12:** there the expiry lived only in the client's cookie jar. Now the server rejects an expired token itself, even a copied one. The cookie's `maxAge` matches `exp`, so the browser drops the cookie when the server would start refusing the token anyway.
+
+**Limits:** `exp` cannot be extended (changing it breaks the signature), so staying signed in means a new token; real apps add a long-lived *refresh token*. A token also cannot be revoked before `exp` (§10) without a `jti` (token id) plus a server-side blocklist.
+
+Other registered claims: `nbf` (not before), `sub` (subject, often used instead of `_id`), `iss` (issuer), `aud` (audience), `jti` (token id).
+
+## 17. The cookie carries `_id`: the only option? Who decides?
+
+**The developer decides, in the sign-in code.** Clients (browser, curl, REST Client) store and resend whatever text the server sends; HTTP does not care what is inside.
+
+| Stage | The deciding line | Cookie name / content |
+|---|---|---|
+| 10–11 | `res.cookie('userId', user._id.toString(), …)` | `userId` = the id |
+| 12 | same with `signed: true` | `userId` = `s:<id>.<signature>` |
+| 13+ | `jwt.sign({ _id: user._id }, secret, …)` → `res.cookie('t', token, …)` | `t` = JWT with payload `{ _id, iat, exp }` |
+
+The **name** and the **content** are both choices made in `signin`. Libraries only add their own defaults where they are involved: `jwt.sign` adds `iat`/`exp`; express-session would name its cookie `connect.sid` and put a random id in it.
+
+**Options:**
+
+| Content | Pros | Cons |
+|---|---|---|
+| signed user id (stages 10–12) | tiny, simple | readable; no time inside, so the server cannot expire a copy (§15) |
+| JWT with claims (13+) | no lookup to know who is calling; expiry inside | readable; not revocable before `exp`; extra claims can go stale |
+| random session id (express-session) | reveals nothing; revocable at once | session store + a lookup per request |
+| encrypted data (JWE, `iron-session`) | contents hidden | more complex; still not revocable before expiry |
+
+**Rules for choosing what goes inside:**
+
+1. **No secrets** (password, hash, private data). Signed ≠ encrypted.
+2. **A stable identifier:** `_id` never changes; an email can (users can edit it), so it is a poor identity key.
+3. **Minimal:** a browser cookie holds about **4 KB** at most and travels with every request.
+4. **Beware of changing data:** `role: 'admin'` in a JWT stays "admin" until `exp`, even after a demotion. Use short lifetimes or re-check the database.
+5. **Unsigned values must be unguessable:** an ObjectId is predictable (it starts with a timestamp), and `GET /api/users` lists them all anyway, hence the stage 10 forgery (§12). A random session id has ~128 bits of randomness.
+
+**Why `_id` here:** the code needs exactly that value. `requireSignin` → `req.auth._id`, and `hasAuthorization` compares it with `req.profile._id` (loaded by `userByID` from the URL id). Convention alternative: name it `sub` in the JWT (`{ sub: '66fb…' }`) and read `req.auth.sub`. That is purely a naming choice; the ladder keeps `_id` to match MongoDB.
+
+## 18. Is a unique id unavoidable? Realistic alternatives
+
+**Some identifier on every request is unavoidable; the database `_id` itself is not.** HTTP is stateless (§4), so each request must carry either **the credentials again** or **a stand-in** the server issued earlier that leads back to a user. Every realistic design is one of these two; the choice is what the stand-in contains.
+
+| Option | Travels with each request | Server finds the user by | Seen in |
+|---|---|---|---|
+| DB id, signed (the ladder) | `_id` in a signed cookie or a JWT (`sub`) | reading it | most JWT APIs |
+| random session id | opaque random string (`connect.sid`) | session store lookup → user id | express-session, Django, Rails, PHP |
+| random token, stored hashed | opaque random string | hash it, look the hash up in the DB | API keys, GitHub personal access tokens, "remember me" |
+| public id instead of `_id` | a UUID/random handle in the JWT | a lookup by that field | apps that hide internal ids |
+| encrypted cookie | the id, encrypted | decrypting it | `iron-session`, framework session cookies |
+| external identity (OpenID Connect) | afterwards, usually your own session or JWT | the provider's `sub` mapped to a local user | "Sign in with Google/Microsoft/GitHub" |
+| credentials every time (HTTP Basic) | `Authorization: Basic base64(email:password)` | checking the password on every request | old internal tools; avoided: the password travels constantly, a slow hash on every request, no real sign-out |
+
+Passkeys/WebAuthn and client certificates change **how you prove who you are at sign-in**; afterwards the app still issues a session id or a token.
+
+**For this app:**
+
+- **signed id / JWT** (the ladder): fine and very common, especially for APIs used by mobile apps or other servers. The id is readable, but `GET /api/users` exposes every id anyway;
+- **random session id**: the other mainstream choice, better when you need instant sign-out or "sign out all devices". The cookie carries no user information;
+- **public UUID**: when ids should reveal nothing (an ObjectId starts with its creation time).
+
+The rest work but are niche (encrypted cookies, client certificates) or outdated (Basic Auth).
