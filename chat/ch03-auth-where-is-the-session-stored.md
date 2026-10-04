@@ -490,3 +490,35 @@ Passkeys/WebAuthn and client certificates change **how you prove who you are at 
 - **public UUID**: when ids should reveal nothing (an ObjectId starts with its creation time).
 
 The rest work but are niche (encrypted cookies, client certificates) or outdated (Basic Auth).
+
+## 19. Signed cookie vs JWT: is `iat`/`exp` the only difference?
+
+**Mostly yes, for stage 12 vs stage 13.** Both are HMAC-SHA256 over a payload with a server-only secret. Server-checked expiry is the biggest difference, but not the only one.
+
+Wording: a **cookie** is a way to carry data; a **JWT** is a data format. In stage 13 the JWT travels *inside* a cookie (`t`). The real comparison is *signed cookie value* vs *JWT*.
+
+**The same:**
+
+| | Stage 12 signed cookie | Stage 13 JWT |
+|---|---|---|
+| protection | HMAC-SHA256(data, secret) | HMAC-SHA256(header.payload, secret) |
+| readable | yes | yes |
+| server storage | none (`COOKIE_SECRET` only) | none (`JWT_SECRET` only) |
+| early revocation | no | no |
+| cookie flags | same (`httpOnly`, `sameSite`, `secure`) | same |
+| what routes see | `req.auth = { _id }` | `req.auth = { _id, iat, exp }`, `hasAuthorization` unchanged |
+
+**Different:**
+
+| | Signed cookie | JWT |
+|---|---|---|
+| expiry enforced by the server | no (client cookie jar only, §15) | **yes** (`exp` is signed, §16) |
+| format | Express convention `s:<value>.<sig>`, one value | open standard (RFC 7519), JSON with any claims |
+| who can verify | Express's `cookie-signature` (Node apps in practice) | libraries in every language |
+| transport | a cookie | cookie **or** `Authorization: Bearer` (stage 13 `getToken` accepts both) |
+| algorithms | shared-secret HMAC only | HMAC or public-key (RS256/ES256): other services verify with a public key and cannot issue tokens |
+| pitfalls | few | must pin `algorithms: ['HS256']` (`alg: none` attacks) |
+| size | ~70 characters | ~150+ characters |
+| code | `cookieParser(secret)`, `req.signedCookies`, a hand-written 401 | `jsonwebtoken` + `express-jwt` (`UnauthorizedError` → 401) |
+
+**In one sentence:** for one Express server and a browser they behave almost the same, and server-checked expiry is the practical gain. JWT pays off when **other clients or services** must use or verify the token (a mobile app, a second backend, another language). That is why lesson 13 can swap them with almost no change to the routes.
