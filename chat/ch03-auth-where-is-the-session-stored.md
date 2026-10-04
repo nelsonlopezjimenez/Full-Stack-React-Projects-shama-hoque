@@ -559,3 +559,73 @@ The difference is **who can produce a valid value**: anyone (unsigned) or only t
 **What signing does not do:** hide the value (use encryption); stop theft or reuse (`httpOnly`, HTTPS/`secure`, short lifetimes); expire on the server (needs a time inside the signed data, i.e. a JWT `exp`); survive a leaked secret. Whoever has `COOKIE_SECRET` can sign anything, so rotate it if it leaks: all cookies become invalid, which is also the emergency "sign out everyone".
 
 **When unsigned is fine:** values where a fake does no harm (theme, language, a dismissed banner, cookie consent). If the server **makes a decision** from the value (identity, permissions, prices, role), it must be signed, encrypted, or a random id pointing to data on the server.
+
+## 21. curl: sign in and get the token
+
+Applies to **stage 13+** and `refactor/ch03-migration`: `POST /api/auth/sessions` answers `{ token, user: { _id, name, email } }` and sets the cookie `t`. Stages 10–12 return no token (the cookie is everything).
+
+**Git Bash:**
+
+```bash
+curl -X POST http://localhost:3000/api/auth/sessions \
+     -H "Content-Type: application/json" \
+     -d '{"email":"ann@test.io","password":"secret1"}'
+```
+
+| Option | Meaning |
+|---|---|
+| `-X POST` | method (`-d` already implies POST; explicit is clearer) |
+| `-H "Content-Type: application/json"` | without it `express.json()` does not parse the body → 400 "Email and password are required" |
+| `-d '…'` | request body |
+| `-i` | show response headers (`Set-Cookie: t=…; HttpOnly; SameSite=Strict`) |
+| `-c jar.txt` | save the cookie (reuse with `-b jar.txt`) |
+| `-s` | silent (no progress meter), useful when capturing output |
+
+**Keep the token in a variable** (`sed` is built into Git Bash):
+
+```bash
+TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/sessions \
+  -H "Content-Type: application/json" \
+  -d '{"email":"ann@test.io","password":"secret1"}' \
+  | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')
+echo "$TOKEN"
+curl -H "Authorization: Bearer $TOKEN" http://localhost:3000/api/users/<id>
+```
+
+Alternatives: `| jq -r .token` (if jq is installed), or `| node.exe -e "process.stdin.on('data', d => console.log(JSON.parse(d).token))"`. Write `node.exe`, not `node` (see below).
+
+**How the capture works:**
+
+```
+TOKEN=$(  curl …  |  sed/node (picks the token)  )
+          └─┬──┘     └──────────┬─────────────┘
+            │ stdout = whole JSON  │ stdout = just the token
+            └──────► stdin of next └──────► captured into TOKEN
+```
+
+The pipe `|` sends curl's output (the whole JSON) to the **stdin** of the next command, not into the variable. `$( … )` (command substitution) captures the **stdout of the last command**, i.e. only the token, and strips the trailing newline. **stderr is not captured**: error messages (such as `stdin is not a tty`) still appear on screen, and the variable stays empty. Check with `echo "[$TOKEN]"` (`[]` = empty).
+
+**Troubleshooting (Git Bash):**
+
+- **`stdin is not a tty`:** in Git for Windows' terminal (mintty), `node` is often an alias for `winpty node.exe`, and winpty refuses piped input. Check with `type node`. Fix: call `node.exe` directly, or use `sed`.
+- **Line continuation:** `\` must be the **last character** of the line it continues (no space after it). A `\` alone on the next line, or a missing one, ends the command early, and `| …` becomes a separate, broken command. When in doubt, write the command on one line.
+- **`echo "$TOKEN"` is empty:** run the curl part alone and look at the raw answer (400/401, or no `token` field on stages 10–12).
+
+**PowerShell:** use `curl.exe` (plain `curl` may be `Invoke-WebRequest`) with the JSON in a file, or let PowerShell parse the answer:
+
+```powershell
+'{"email":"ann@test.io","password":"secret1"}' | Out-File -Encoding ascii login.json
+curl.exe -s -X POST http://localhost:3000/api/auth/sessions -H "Content-Type: application/json" -d "@login.json"
+
+$r = Invoke-RestMethod -Method Post -Uri http://localhost:3000/api/auth/sessions `
+     -ContentType 'application/json' -Body '{"email":"ann@test.io","password":"secret1"}'
+$r.token
+Invoke-RestMethod -Uri http://localhost:3000/api/users/$($r.user._id) -Headers @{ Authorization = "Bearer $($r.token)" }
+```
+
+| Answer | Cause |
+|---|---|
+| 200 + `token` | correct |
+| 400 "Email and password are required" | missing field **or** missing `Content-Type` header |
+| 401 "Email and password don't match." | unknown email or wrong password |
+| 200 without `token` | stage 10–12 (cookie only) |
