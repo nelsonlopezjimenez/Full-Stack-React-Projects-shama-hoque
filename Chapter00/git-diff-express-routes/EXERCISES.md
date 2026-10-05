@@ -77,6 +77,7 @@ Diff questions:
 ## Exercise 4. The classic assignment
 
 The original version of this assignment, with animals. Same skills, no Reddit.
+([Screenshot of the original assignment](../images/week06lab6.PNG).)
 
 ```text
 Visiting "/"                  should print  "Hi there, welcome to my assignment!"
