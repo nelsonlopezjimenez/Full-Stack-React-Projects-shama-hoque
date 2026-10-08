@@ -1,0 +1,23 @@
+# Chapter 03 teaching ladder (client) — log
+
+Plan: [ch03-client-ladder-checklist.md](ch03-client-ladder-checklist.md)
+
+How each stage was checked: the server of stage 19 ran from a scratch copy on port **3210** with its own
+database **`mernskeleton_ladder`** (the real `mernskeleton` data and the server on 3100 were not touched).
+For each client stage a script ran `vite build` (into a scratch folder, not `client/dist`) and started
+the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210. Then headless Edge
+(Playwright) opened the pages, filled the forms, and failed on any page error or React warning in the console.
+`node_modules` came from the final client, so every stage ran with the final package versions.
+
+---
+
+## Stage 01 — hello (`teach/ch03-client-01-hello`)
+
+- **Changed:** `client/` with `package.json` (react, react-dom, vite, @vitejs/plugin-react; scripts
+  `dev` / `build`), `.gitignore` (the migration's), `index.html`, `vite.config.js`, `src/main.jsx`,
+  `src/App.jsx`, `README.md`, `lessons/01-hello.md`. The ladder README lists both series.
+- **Why:** the smallest React app, so that later files each have a reason to appear.
+- **Verified:** build ok; the page shows "MERN Skeleton" and "Hello from React."; no console errors
+  (the only 404 is the browser asking for `/favicon.ico`).
+- **Lock files:** as in the server series, each stage's `package-lock.json` is the final client lock
+  pruned with `npm install --package-lock-only`. Stage 01 lock has 44 packages.
