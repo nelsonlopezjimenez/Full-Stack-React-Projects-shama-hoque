@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useActionState } from 'react'
 import { Link } from 'react-router'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
@@ -14,66 +14,47 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { create } from './api-user.js'
 import FormError from '../core/FormError.jsx'
 
-// [BEGINNER] Style objects outside the component: they never change, so they are created once.
 const cardSx = { maxWidth: 600, mx: 'auto', mt: 5, pb: 2, textAlign: 'center' }
 const fieldSx = { mx: 1, width: 300 }
 
-const emptyForm = { name: '', email: '', password: '' }
+const initialState = { error: '', open: false, values: { name: '', email: '' } }
 
+// Same React 19 form-action pattern as Signin.jsx (see the comments there).
 const Signup = () => {
-  // [BEGINNER] "Controlled inputs": React state holds every field value, and each input shows
-  // that value and reports changes with onChange. One state object for the whole form.
-  const [values, setValues] = useState(emptyForm)
-  const [error, setError] = useState('')
-  const [open, setOpen] = useState(false)
-
-  // [BEGINNER] A function that returns a function ("currying", same as the book): each input
-  // gets its own handler, e.g. onChange={handleChange('email')}.
-  // [name] is a computed property key: the object key comes from the variable.
-  // The spread (...v) copies the old values, so only one field changes. React state must be
-  // replaced, never mutated in place.
-  const handleChange = (name) => (event) => {
-    setValues((v) => ({ ...v, [name]: event.target.value }))
-  }
-
-  // [BEGINNER] async/await, as on the server: `await` waits for the Promise without .then().
-  const handleSubmit = async (event) => {
-    // Stop the browser from reloading the page, which is what a <form> does by default.
-    event.preventDefault()
-    setError('')
-    const data = await create(values)
-    // The server sends every validation problem at once in `error` (server stage 08), and
-    // request() puts "Cannot reach the server" in the same place.
+  const [state, formAction, isPending] = useActionState(async (previousState, formData) => {
+    // [BEGINNER] Object.fromEntries(formData) turns all named fields into one object:
+    // { name: '...', email: '...', password: '...' }
+    const user = Object.fromEntries(formData)
+    const data = await create(user)
     if (data.error) {
-      setError(data.error)
-      return
+      // The server sends every validation problem at once (dbErrorHandler, server stage 08).
+      // Keep name and email in the fields; the password is cleared on purpose.
+      return { error: data.error, open: false, values: { name: user.name, email: user.email } }
     }
-    setValues(emptyForm)
-    setOpen(true)
-  }
+    return { ...initialState, open: true }
+  }, initialState)
 
   return (
     <>
-      {/* [BEGINNER] A real <form> (Card rendered as component="form"): onSubmit runs for the
-          button AND for Enter in a field. The book only listened to the button's onClick. */}
-      <Card component="form" onSubmit={handleSubmit} sx={cardSx}>
+      <Card component="form" action={formAction} sx={cardSx}>
         <CardContent>
           <Typography variant="h6" component="h2" sx={{ mt: 2, color: (theme) => theme.palette.openTitle }}>
             Sign Up
           </Typography>
-          {/* [BEGINNER] TextField = label + input + helper text in one component. The `id` links
-              the label to the input, so clicking the label focuses the field. */}
-          <TextField id="name" label="Name" value={values.name} onChange={handleChange('name')}
+          <TextField id="name" name="name" label="Name" defaultValue={state.values.name}
             autoComplete="name" sx={fieldSx} margin="normal" /><br />
-          <TextField id="email" type="email" label="Email" value={values.email} onChange={handleChange('email')}
+          <TextField id="email" name="email" type="email" label="Email" defaultValue={state.values.email}
             autoComplete="email" sx={fieldSx} margin="normal" /><br />
-          <TextField id="password" type="password" label="Password" value={values.password}
-            onChange={handleChange('password')} autoComplete="new-password" sx={fieldSx} margin="normal" />
-          <FormError message={error} />
+          <TextField id="password" name="password" type="password" label="Password"
+            autoComplete="new-password" sx={fieldSx} margin="normal" />
+          {/* [ADVANCED] No `required` attributes here on purpose: an empty form reaches the
+              server, which answers with all its validation messages (good for class demos).
+              Signin uses `required` to show the browser-side check instead. */}
+          <FormError message={state.error} />
         </CardContent>
         <CardActions>
-          {/* [BEGINNER] variant "contained" is the old "raised". type="submit" submits the form. */}
-          <Button type="submit" color="primary" variant="contained" sx={{ mx: 'auto', mb: 2 }}>
+          <Button type="submit" color="primary" variant="contained" disabled={isPending}
+            sx={{ mx: 'auto', mb: 2 }}>
             Submit
           </Button>
         </CardActions>
@@ -81,7 +62,7 @@ const Signup = () => {
 
       {/* [BEGINNER] Without an onClose prop, clicking outside or pressing Escape does not close
           the dialog; the book needed disableBackdropClick (removed from MUI) for that. */}
-      <Dialog open={open}>
+      <Dialog open={state.open}>
         <DialogTitle>New Account</DialogTitle>
         <DialogContent>
           <DialogContentText>
