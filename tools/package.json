@@ -2,8 +2,13 @@
   "name": "ladder-tools",
   "private": true,
   "type": "module",
-  "description": "Helper scripts for the teaching ladders (see make-nc-ladder.mjs)",
+  "description": "Helper scripts for the teaching ladders: make-nc-ladder.mjs and the end-to-end checks in ladder-e2e/",
+  "scripts": {
+    "nc-ladder": "node make-nc-ladder.mjs",
+    "e2e": "node ladder-e2e/run.mjs"
+  },
   "dependencies": {
-    "@babel/parser": "^7.29.0"
+    "@babel/parser": "^7.29.0",
+    "playwright-core": "^1.64.0"
   }
 }
