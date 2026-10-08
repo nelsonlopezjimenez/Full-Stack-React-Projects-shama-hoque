@@ -218,3 +218,18 @@ teach/ch03-client-16-tests -- server` is empty).
 
 Comments that differ on purpose: they explain things in the ladder's order, refer to server *stages* instead
 of migration checklist steps, and `auth-helper.js` no longer says the server ignores the cookie (server D1).
+
+---
+
+## Change after the build — pointer to the student instructions (2026-10-08)
+
+- **Changed:** one new commit on stage 01: client `lessons/01-hello.md` and `README.md` link to
+  `instructions/working-with-the-lesson-stages.md` on `main`. Stages 02–16 were replayed on top with
+  `git rebase --update-refs` (no conflicts), and `tools/make-nc-ladder.mjs` rebuilt the 16 `teach-nc/ch03-client-*` branches.
+- **Why:** one copy of the instructions, on `main`. A second copy on the ladder would drift apart and conflict
+  when the ladder is merged.
+- **Verified:** every stage has both pointers; old vs new stage 16 differ only in those two files (+9 lines); every
+  lesson diff is otherwise unchanged, so the earlier test results still apply.
+- **Surprise:** `--update-refs` also moved the backup branch that pointed at the old stage 16; it was reset from
+  the reflog. Tags are never moved, so a tag is the better backup.
+- Question, analysis and rebase/clone/fork notes: `chat/ch03-instructions-on-main-and-rebasing.md` (on `main`).
