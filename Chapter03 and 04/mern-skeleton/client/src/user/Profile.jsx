@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useLocation, useParams } from 'react-router'
+import { Link, Navigate, useLocation, useParams } from 'react-router'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import Avatar from '@mui/material/Avatar'
+import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
+import Edit from '@mui/icons-material/Edit'
 import Person from '@mui/icons-material/Person'
 import auth from '../auth/auth-helper.js'
 import { read } from './api-user.js'
@@ -24,7 +26,7 @@ const Profile = () => {
   const jwt = auth.isAuthenticated()
 
   // [BEGINNER] [userId] is the dependency list: the effect runs again whenever userId changes,
-  // e.g. going from one profile to another. The book needed a second lifecycle method for
+  // e.g. going from someone else's profile to "My Profile". The book needed a second lifecycle method for
   // this, componentWillReceiveProps, which React has since deprecated.
   useEffect(() => {
     const controller = new AbortController()
@@ -50,6 +52,10 @@ const Profile = () => {
     return <Navigate to="/signin" replace state={{ from: location }} />
   }
 
+  // Only the owner sees the edit button. This is only for the looks: the server checks the
+  // same thing on every PATCH and answers 403 (server stage 11).
+  const isOwnProfile = user && jwt.user._id === user._id
+
   return (
     <Paper elevation={4} sx={{ maxWidth: 600, mx: 'auto', mt: 5, p: 3 }}>
       <Typography variant="h6" component="h2" sx={{ mt: 1, mb: 2, color: (theme) => theme.palette.protectedTitle }}>
@@ -60,7 +66,14 @@ const Profile = () => {
           data arrived. Rendering nothing until `user` exists avoids that flash. */}
       {user && (
         <List dense>
-          <ListItem>
+          {/* [ADVANCED] `secondaryAction` replaces MUI's deprecated <ListItemSecondaryAction>. */}
+          <ListItem
+            secondaryAction={isOwnProfile && (
+              <IconButton component={Link} to={`/users/${user._id}/edit`} aria-label="Edit" color="primary">
+                <Edit />
+              </IconButton>
+            )}
+          >
             <ListItemAvatar>
               <Avatar>
                 <Person />

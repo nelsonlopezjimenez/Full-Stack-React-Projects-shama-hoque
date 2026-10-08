@@ -17,3 +17,7 @@ export const list = (signal) =>
 // [BEGINNER] A template literal (`...${userId}`) builds the URL /api/users/<id>.
 export const read = (userId, token, signal) =>
   request(`/api/users/${userId}`, { token, signal })
+
+// PATCH, not the book's PUT: only the changed fields are sent (server stage 06)
+export const update = (userId, token, user) =>
+  request(`/api/users/${userId}`, { method: 'PATCH', token, body: user })

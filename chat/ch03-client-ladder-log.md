@@ -128,3 +128,13 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Verified:** signed out, list → profile → `/signin` → sign in → back on that profile; Back → `/users`
   (the sign-in page is not in history); an expired token in sessionStorage → `/signin` without a request;
   a token with a bad signature and no cookie → the server's 401 → `/signin`.
+
+## Stage 11 — edit-profile (`teach/ch03-client-11-edit-profile`)
+
+- **Changed:** `user/EditProfile.jsx` (the final file; its first comment is adjusted until stage 13), `update()`
+  with PATCH, Profile shows the Edit button only on the own profile (`secondaryAction`), route
+  `/users/:userId/edit` inside `PrivateRoute`, MainRouter comments mention the book's edit URL, lesson 11.
+- **Why:** the full create / read / update cycle of the REST table, and 403 seen from the browser.
+- **Verified:** the form is prefilled; the PATCH body is `{"name": …, "email": …}` without `password`; the
+  profile shows the new name; no Edit link on someone else's profile; typing their `/edit` URL and
+  submitting → "User is not authorized" (403).

@@ -7,6 +7,7 @@ import PrivateRoute from './auth/PrivateRoute.jsx'
 import Users from './user/Users.jsx'
 import Signup from './user/Signup.jsx'
 import Profile from './user/Profile.jsx'
+import EditProfile from './user/EditProfile.jsx'
 
 // [BEGINNER] The book's MainRouter was a class whose componentDidMount removed the CSS that
 // server-side rendering had injected (#jss-server-side). No SSR now → a plain function.
@@ -14,12 +15,13 @@ import Profile from './user/Profile.jsx'
 // [BEGINNER] React Router v6+ (this is v8): <Routes> replaces <Switch>, and each <Route> gets
 // an `element` (<Home />) instead of `component={Home}`. `exact` is gone: paths match exactly
 // unless they end in `/*`.
-// [ADVANCED] <Switch> rendered the FIRST route that matched, so the order mattered. <Routes>
-// ranks all routes and picks the most specific one, so the order no longer changes the result.
+// [ADVANCED] <Switch> rendered the FIRST route that matched, so the order mattered (the book
+// had to put /user/edit/:userId before /user/:userId). <Routes> ranks all routes and picks the
+// most specific one, so the order no longer changes the result.
 //
 // Page URLs vs API URLs: these paths are React pages, the /api/... paths are the server.
 // They use the same plural nouns (/users/:userId ↔ /api/users/:userId) so they are easy to
-// connect. The book used /user/:userId.
+// connect. The book used /user/:userId and /user/edit/:userId.
 const MainRouter = () => (
   <>
     {/* [BEGINNER] <>...</> is a Fragment: it groups elements without adding a <div> to the page. */}
@@ -38,6 +40,7 @@ const MainRouter = () => (
       <Route element={<PrivateRoute />}>
         {/* [BEGINNER] `:userId` is a URL parameter: /users/abc123 shows Profile with userId "abc123". */}
         <Route path="/users/:userId" element={<Profile />} />
+        <Route path="/users/:userId/edit" element={<EditProfile />} />
       </Route>
 
       {/* [ADVANCED] React Router's catch-all is still path="*". The Express 5 server writes
