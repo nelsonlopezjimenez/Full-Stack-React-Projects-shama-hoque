@@ -119,3 +119,12 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Comment changed from the migration:** `auth-helper.js` said "switching the API to read that cookie … is the
   more secure design". The ladder's server already reads the cookie first (server D1), so the comment now
   points to "ask the server who am I?" (idea L1) instead.
+
+## Stage 10 — private-route (`teach/ch03-client-10-private-route`)
+
+- **Changed:** `auth/PrivateRoute.jsx` (the final file), the profile route moves inside the layout route,
+  Signin goes back to `from` with `replace`, Profile redirects on 401 and uses `jwt.token`, lesson 10.
+- **Why:** the friendly side of protection; the server is still the real one.
+- **Verified:** signed out, list → profile → `/signin` → sign in → back on that profile; Back → `/users`
+  (the sign-in page is not in history); an expired token in sessionStorage → `/signin` without a request;
+  a token with a bad signature and no cookie → the server's 401 → `/signin`.

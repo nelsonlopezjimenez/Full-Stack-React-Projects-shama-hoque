@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
@@ -15,6 +15,8 @@ const fieldSx = { mx: 1, width: 300 }
 
 const Signin = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from?.pathname ?? '/'
   const [values, setValues] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
 
@@ -29,7 +31,7 @@ const Signin = () => {
       setError(data.error)
       return
     }
-    auth.authenticate(data, () => navigate('/'))
+    auth.authenticate(data, () => navigate(from, { replace: true }))
   }
 
   return (

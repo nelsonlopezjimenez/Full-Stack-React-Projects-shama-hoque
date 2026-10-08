@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { Navigate, useLocation, useParams } from 'react-router'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -15,20 +15,27 @@ import FormError from '../core/FormError.jsx'
 
 const Profile = () => {
   const { userId } = useParams()
+  const location = useLocation()
   const [user, setUser] = useState(null)
   const [error, setError] = useState('')
+  const [redirectToSignin, setRedirectToSignin] = useState(false)
   const jwt = auth.isAuthenticated()
 
   useEffect(() => {
     const controller = new AbortController()
     setError('')
-    read(userId, jwt?.token, controller.signal).then((data) => {
+    read(userId, jwt.token, controller.signal).then((data) => {
       if (controller.signal.aborted) return
-      if (data.error) setError(data.error)
+      if (data.status === 401) setRedirectToSignin(true)
+      else if (data.error) setError(data.error)
       else setUser(data)
     })
     return () => controller.abort()
   }, [userId])
+
+  if (redirectToSignin) {
+    return <Navigate to="/signin" replace state={{ from: location }} />
+  }
 
   return (
     <Paper elevation={4} sx={{ maxWidth: 600, mx: 'auto', mt: 5, p: 3 }}>
