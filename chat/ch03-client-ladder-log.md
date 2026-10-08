@@ -81,3 +81,12 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Verified:** menu → `/signup`, create a user; menu → `/users` shows it; only "Users" has the class
   `active`; Back returns to `/signup`; reloading `/users` works; `/nope/really` → "Page not found"
   with the path, and "Go home" → `/`.
+
+## Stage 07 — profile (`teach/ch03-client-07-profile`)
+
+- **Changed:** `Users.jsx` rows are `ListItemButton component={Link}` with an arrow (now the final
+  markup), `api-user.js` gets `read(userId, signal)`, new `user/Profile.jsx` (useParams, effect on
+  `[userId]`, abort check), route `/users/:userId`, lesson 07.
+- **Why:** the first page the server refuses, which is the reason for signing in.
+- **Verified:** clicking a user opens `/users/<24 hex>`; the page shows
+  "UnauthorizedError: No authorization token was found" (401).
