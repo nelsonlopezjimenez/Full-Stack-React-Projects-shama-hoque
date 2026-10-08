@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // [BEGINNER] Vite replaces the book's three webpack configs, Babel, webpack-dev-middleware and
@@ -7,13 +7,19 @@ import react from '@vitejs/plugin-react'
 //
 // dev: Vite serves the React app on 5173 and forwards /api/* to the Express server, so
 //      the browser only ever talks to ONE origin (no CORS needed in development).
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173,
-    proxy: {
-      // Every API route of the server starts with /api, so one proxy rule is enough.
-      '/api': 'http://localhost:3000'
+export default defineConfig(({ mode }) => {
+  // [ADVANCED] loadEnv reads .env files for vite.config itself. The '' prefix loads every
+  // variable (not only VITE_*), so API_PROXY_TARGET stays out of the browser bundle.
+  const env = loadEnv(mode, import.meta.dirname, '')
+
+  return {
+    plugins: [react()],
+    server: {
+      port: 5173,
+      proxy: {
+        // Every API route of the server starts with /api, so one proxy rule is enough.
+        '/api': env.API_PROXY_TARGET || 'http://localhost:3000'
+      }
     }
   }
 })

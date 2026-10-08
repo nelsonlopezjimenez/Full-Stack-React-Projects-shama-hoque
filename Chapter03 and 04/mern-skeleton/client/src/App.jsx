@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import Users from './Users.jsx'
-import Signup from './Signup.jsx'
+import Users from './user/Users.jsx'
+import Signup from './user/Signup.jsx'
 
 // [BEGINNER] A React component is a function whose name starts with a capital letter and
 // that returns what to show. The HTML-like syntax is JSX: Vite turns it into plain
