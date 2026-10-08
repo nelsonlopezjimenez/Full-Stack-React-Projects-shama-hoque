@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Edit from '@mui/icons-material/Edit'
 import Person from '@mui/icons-material/Person'
+import DeleteUser from './DeleteUser.jsx'
 import auth from '../auth/auth-helper.js'
 import { read } from './api-user.js'
 import FormError from '../core/FormError.jsx'
@@ -51,9 +52,12 @@ const Profile = () => {
         <List dense>
           <ListItem
             secondaryAction={isOwnProfile && (
-              <IconButton component={Link} to={`/users/${user._id}/edit`} aria-label="Edit" color="primary">
-                <Edit />
-              </IconButton>
+              <>
+                <IconButton component={Link} to={`/users/${user._id}/edit`} aria-label="Edit" color="primary">
+                  <Edit />
+                </IconButton>
+                <DeleteUser userId={user._id} />
+              </>
             )}
           >
             <ListItemAvatar>
