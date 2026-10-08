@@ -24,7 +24,7 @@ This is the React 19 single-page app, built with Vite 8. It uses React Router 8 
 |---|---|---|
 | `/` | Home | — |
 | `/users` | All users | — |
-| `/signup`, `/signin` | Forms (controlled inputs) | — |
+| `/signup`, `/signin` | Forms (React 19 `useActionState`) | — |
 | `/users/:userId` | Profile | yes |
 | `/users/:userId/edit` | Edit profile (controlled inputs) | yes |
 | anything else | Not found | — |

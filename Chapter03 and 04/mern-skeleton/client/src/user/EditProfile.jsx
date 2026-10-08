@@ -13,9 +13,10 @@ import FormError from '../core/FormError.jsx'
 const cardSx = { maxWidth: 600, mx: 'auto', mt: 5, pb: 2, textAlign: 'center' }
 const fieldSx = { mx: 1, width: 300 }
 
-// [BEGINNER] "Controlled inputs" again, as in Signup and Signin: React state holds every field
-// value (value + onChange). Here they are also the natural fit, because the fields are filled
-// from the server after the page loads.
+// [ADVANCED] This page keeps the CLASSIC pattern on purpose: "controlled inputs", where React
+// state holds every field value (value + onChange). Signin/Signup use React 19 form actions
+// instead. Controlled inputs fit here because the fields are filled from the server after the
+// page loads, and they allow live validation while typing. Compare the two approaches.
 const EditProfile = () => {
   const { userId } = useParams()
   const navigate = useNavigate()

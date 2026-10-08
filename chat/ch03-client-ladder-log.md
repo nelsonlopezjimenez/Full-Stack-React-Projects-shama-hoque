@@ -147,3 +147,15 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Verified:** the dialog opens and Cancel closes it; Confirm sends `DELETE /api/users/<id>`, lands on `/`
   signed out ("Sign In" visible, no "My Profile"); the user is missing from the page list and from
   `GET /api/users`.
+
+## Stage 13 — form-actions (`teach/ch03-client-13-form-actions`)
+
+- **Changed:** `Signin.jsx` and `Signup.jsx` become the final files (`useActionState`, `FormData`,
+  `defaultValue`, `isPending`; one Signup comment points to "server stage 08" instead of the migration
+  checklist step), EditProfile's comment becomes the final one, lesson 13.
+- **Why:** decision C5. The same forms in both styles let students compare them.
+- **Verified:** empty signup → all messages; a duplicate email keeps name + email and clears the password;
+  a wrong sign-in keeps the email; signup → dialog → wrong, then right password → home and signed in; the
+  whole stage-10 scenario (redirect, `from`, Back, expired and forged tokens) passes with the new form.
+- **Surprises:** the stage-08 test could not be reused here. It expects sign-in to land on the profile,
+  but since stage 09 sign-in goes to `from` (or `/`). The test was changed, not the app.
