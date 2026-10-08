@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { create } from './api-user.js'
 
 const emptyForm = { name: '', email: '', password: '' }
 
@@ -26,18 +27,10 @@ const Signup = ({ onCreated }) => {
     event.preventDefault()
     setError('')
     setMessage('')
-    // [ADVANCED] If the server is down, `await fetch` throws and the error only reaches the console.
-    // Stage 04 moves all fetch code into one helper that handles that case once for every request.
-    const response = await fetch('/api/users', {
-      method: 'POST',
-      // The server's express.json() only reads bodies that say they are JSON.
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values)
-    })
-    const data = await response.json()
-    // [BEGINNER] fetch does NOT fail on 400 or 500: response.ok is false instead. The server
-    // sends every validation problem at once in `error` (server stage 08).
-    if (!response.ok) {
+    const data = await create(values)
+    // The server sends every validation problem at once in `error` (server stage 08), and
+    // request() puts "Cannot reach the server" in the same place.
+    if (data.error) {
       setError(data.error)
       return
     }

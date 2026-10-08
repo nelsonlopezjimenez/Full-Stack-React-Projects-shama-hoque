@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { list } from './api-user.js'
 
 const Users = () => {
   // [BEGINNER] useState replaces this.state / this.setState of the book's class component.
@@ -12,15 +13,13 @@ const Users = () => {
   // page, and it happens again on every state change (that would be an endless loop).
   useEffect(() => {
     const controller = new AbortController()
-    // [BEGINNER] A relative URL: the request goes to the same server that sent the page (Vite, on
-    // port 5173), and Vite forwards everything under /api to Express (see vite.config.js).
-    fetch('/api/users', { signal: controller.signal })
-      .then((response) => response.json())
-      .then((data) => setUsers(data))
-      .catch((err) => {
-        // An aborted request (see the cleanup below) is not an error worth showing.
-        if (err.name !== 'AbortError') setError('Cannot reach the server')
-      })
+    list(controller.signal).then((data) => {
+      // request() never throws, so there is no .catch(). An aborted request (see the cleanup
+      // below) answers { error: 'Request cancelled' }, which is not worth showing.
+      if (controller.signal.aborted) return
+      if (data.error) setError(data.error) // the book only did console.log(data.error)
+      else setUsers(data)
+    })
     // [BEGINNER] The function returned by an effect is its cleanup: it runs when the page is
     // left, so a late answer is ignored instead of updating a page that is gone.
     // [ADVANCED] In development, StrictMode runs every effect twice on purpose (mount, cleanup,
