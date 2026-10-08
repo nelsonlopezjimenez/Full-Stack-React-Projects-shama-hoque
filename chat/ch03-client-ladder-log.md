@@ -185,3 +185,16 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
      reach the server" (the browser blocks the answer).
   The dev-server scenario of stage 09 also still passes.
 - **Changes to the plan:** `VITE_API_URL` and `credentials: 'include'` arrive here instead of stage 04 (see stage 04).
+
+## Stage 16 — tests (`teach/ch03-client-16-tests`)
+
+- **Changed:** `package.json` and `package-lock.json` (both now byte-for-byte the migration's), the
+  `test` block in `vite.config.js`, `src/test/` (the migration's six files), README = the migration README +
+  "Deploying" + "Lessons", lesson 16.
+- **Why:** the same four levels as the server tests.
+- **Verified:** `npx vitest run` → 4 files, 13 tests passed. The lock built from the final `package.json` with
+  `npm install --package-lock-only` is identical to the migration lock. The browser scenarios of stages 13 and
+  14 (forms, redirects, forged and expired tokens, lazy chunks, edit, 403, delete) pass on this stage.
+- **Surprises:** the first browser run failed because the scratch server on 3210 had been stopped by the
+  30-minute limit for background commands. It was restarted with a longer limit and the run passed.
+  The app was not at fault.
