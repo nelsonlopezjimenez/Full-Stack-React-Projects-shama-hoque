@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
+import Paper from '@mui/material/Paper'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import ListItemText from '@mui/material/ListItemText'
+import Avatar from '@mui/material/Avatar'
+import Typography from '@mui/material/Typography'
+import Person from '@mui/icons-material/Person'
 import { list } from './api-user.js'
+import FormError from '../core/FormError.jsx'
 
 const Users = () => {
   // [BEGINNER] useState replaces this.state / this.setState of the book's class component.
@@ -28,18 +37,30 @@ const Users = () => {
   }, [])
 
   return (
-    <section>
-      <h2>All Users</h2>
-      {/* [BEGINNER] `condition && <p>...</p>`: show the paragraph only when there is an error. */}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <ul>
+    // [BEGINNER] MUI components replace the plain <section>, <h2>, <ul> and <li>. `sx` is MUI's
+    // style prop: p: 1 → padding theme.spacing(1) = 8px, m: 5 → margin 40px.
+    <Paper elevation={4} sx={{ p: 1, m: 5 }}>
+      {/* [BEGINNER] `variant` sets the look, `component` the HTML tag (h2 for screen readers).
+          The color is a function of the theme: the custom openTitle color from App.jsx. */}
+      <Typography variant="h6" component="h2" sx={{ mt: 4, mb: 2, mx: 2, color: (theme) => theme.palette.openTitle }}>
+        All Users
+      </Typography>
+      <FormError message={error} />
+      <List dense>
         {users.map((item) => (
           // [BEGINNER] key must be stable and unique: the database id. The book used the array
           // index (key={i}), which confuses React when items are added or removed.
-          <li key={item._id}>{item.name}</li>
+          <ListItem key={item._id}>
+            <ListItemAvatar>
+              <Avatar>
+                <Person />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText primary={item.name} />
+          </ListItem>
         ))}
-      </ul>
-    </section>
+      </List>
+    </Paper>
   )
 }
 

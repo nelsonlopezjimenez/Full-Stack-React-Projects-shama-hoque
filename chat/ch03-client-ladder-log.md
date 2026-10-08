@@ -59,3 +59,15 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Surprises:** when Express is down, Vite 8's proxy answers **502 with an empty body**, not a network
   error. So the page shows "Request failed (502)". "Cannot reach the server" only appears when Vite
   itself is gone (or the request is blocked). Lesson 04 shows both.
+
+## Stage 05 — mui (`teach/ch03-client-05-mui`)
+
+- **Changed:** MUI, Emotion and Roboto in `package.json` (lock: 126 packages), Roboto imports in
+  `main.jsx`, the theme + `CssBaseline` in `App.jsx`, `core/Home.jsx` and `core/FormError.jsx` (identical to
+  the final files), the seashell image, `Users.jsx` and `Signup.jsx` restyled, lesson 05.
+- **Why:** plain React first (stages 01–04, decision C4), then the library. The diff of this stage is
+  only presentation.
+- **Verified:** the home card shows the seashell (the CSS background URL points to the imported file),
+  the body font is Roboto, and the full stage-04 scenario (validation, create, duplicate, failed request) passes.
+- **Note:** the `<h1>MERN Skeleton</h1>` heading is gone; the title comes back in the app bar in stage 06.
+  Signup still shows its success message as text; the dialog with "Sign In" comes with the sign-in page (08).
