@@ -17,6 +17,10 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': env.API_PROXY_TARGET || 'http://localhost:3000'
       }
+    },
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./src/test/setup.js']
     }
   }
 })

@@ -185,3 +185,51 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
      reach the server" (the browser blocks the answer).
   The dev-server scenario of stage 09 also still passes.
 - **Changes to the plan:** `VITE_API_URL` and `credentials: 'include'` arrive here instead of stage 04 (see stage 04).
+
+## Stage 16 — tests (`teach/ch03-client-16-tests`)
+
+- **Changed:** `package.json` and `package-lock.json` (both now byte-for-byte the migration's), the
+  `test` block in `vite.config.js`, `src/test/` (the migration's six files), README = the migration README +
+  "Deploying" + "Lessons", lesson 16.
+- **Why:** the same four levels as the server tests.
+- **Verified:** `npx vitest run` → 4 files, 13 tests passed. The lock built from the final `package.json` with
+  `npm install --package-lock-only` is identical to the migration lock. The browser scenarios of stages 13 and
+  14 (forms, redirects, forged and expired tokens, lazy chunks, edit, 403, delete) pass on this stage.
+- **Surprises:** the first browser run failed because the scratch server on 3210 had been stopped by the
+  30-minute limit for background commands. It was restarted with a longer limit and the run passed.
+  The app was not at fault.
+
+---
+
+## Final check (after stage 16)
+
+Every file of `client/` on `teach/ch03-client-16-tests` compared with `refactor/ch03-migration`, comments
+removed from both with `tools/make-nc-ladder.mjs` (on `main`):
+
+| Result | Files |
+|---|---|
+| byte-for-byte identical | `.env.example`, `.gitignore`, `index.html`, `package.json`, `package-lock.json`, the seashell image, `PrivateRoute.jsx`, `Signin.jsx`, `FormError.jsx`, `Home.jsx`, `Menu.jsx`, `NotFound.jsx`, `DeleteUser.jsx`, `EditProfile.jsx`, all six files in `src/test/` |
+| the same code, different comments | `App.jsx`, `MainRouter.jsx`, `main.jsx`, `api-auth.js`, `auth-helper.js`, `request.js`, `Profile.jsx`, `Signup.jsx`, `Users.jsx`, `api-user.js`, `vite.config.js` |
+| documentation | `README.md` = migration README + "Deploying" + "Lessons"; `lessons/` is new |
+| different code | **none** |
+
+The client series does not change any file in `server/` (`git diff teach/ch03-server-19-tests
+teach/ch03-client-16-tests -- server` is empty).
+
+Comments that differ on purpose: they explain things in the ladder's order, refer to server *stages* instead
+of migration checklist steps, and `auth-helper.js` no longer says the server ignores the cookie (server D1).
+
+---
+
+## Change after the build — pointer to the student instructions (2026-10-08)
+
+- **Changed:** one new commit on stage 01: client `lessons/01-hello.md` and `README.md` link to
+  `instructions/working-with-the-lesson-stages.md` on `main`. Stages 02–16 were replayed on top with
+  `git rebase --update-refs` (no conflicts), and `tools/make-nc-ladder.mjs` rebuilt the 16 `teach-nc/ch03-client-*` branches.
+- **Why:** one copy of the instructions, on `main`. A second copy on the ladder would drift apart and conflict
+  when the ladder is merged.
+- **Verified:** every stage has both pointers; old vs new stage 16 differ only in those two files (+9 lines); every
+  lesson diff is otherwise unchanged, so the earlier test results still apply.
+- **Surprise:** `--update-refs` also moved the backup branch that pointed at the old stage 16; it was reset from
+  the reflog. Tags are never moved, so a tag is the better backup.
+- Question, analysis and rebase/clone/fork notes: `chat/ch03-instructions-on-main-and-rebasing.md` (on `main`).
