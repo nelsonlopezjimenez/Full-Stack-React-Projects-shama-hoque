@@ -52,6 +52,7 @@ Two things learned the hard way, already handled by the scripts:
 - **Short Windows paths.** Node may report the temp folder as `C:\Users\ABCDEF~1\…` (an 8.3 short name). A Vite
   dev server started there answers 404 for `/@vite/client` as soon as it pre-bundles dependencies (stage 05, MUI),
   and the page stays blank. `config.mjs` therefore always uses the long real path of the temp folder.
+  Background and other systems: `chat/paths-short-long-and-real.md`.
 - **The first page load is slow** in a fresh install, while Vite pre-bundles the dependencies. `check-stage.mjs`
   opens the page once and waits up to two minutes for React to render before the scenario starts.
 
