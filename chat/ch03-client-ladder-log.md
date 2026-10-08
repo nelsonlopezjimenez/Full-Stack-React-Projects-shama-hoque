@@ -71,3 +71,13 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
   the body font is Roboto, and the full stage-04 scenario (validation, create, duplicate, failed request) passes.
 - **Note:** the `<h1>MERN Skeleton</h1>` heading is gone; the title comes back in the app bar in stage 06.
   Signup still shows its success message as text; the dialog with "Sign In" comes with the sign-in page (08).
+
+## Stage 06 — router (`teach/ch03-client-06-router`)
+
+- **Changed:** `react-router` (lock: 129 packages), `App.jsx` gets `BrowserRouter` + `<MainRouter />`,
+  new `MainRouter.jsx` (no lazy loading yet), `core/Menu.jsx` (Home, Users, Sign up), `core/NotFound.jsx`
+  (identical to the final file), `Signup.jsx` loses the `onCreated` prop, lesson 06.
+- **Why:** the next stages need URLs (`/users/:userId`, `/signin`, `/users/:userId/edit`).
+- **Verified:** menu → `/signup`, create a user; menu → `/users` shows it; only "Users" has the class
+  `active`; Back returns to `/signup`; reloading `/users` works; `/nope/really` → "Page not found"
+  with the path, and "Go home" → `/`.

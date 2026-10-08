@@ -14,9 +14,7 @@ const fieldSx = { mx: 1, width: 300 }
 
 const emptyForm = { name: '', email: '', password: '' }
 
-// [BEGINNER] Props arrive as the function's first argument; `{ onCreated }` destructures the
-// one we need. App passes a function here, so Signup can tell App "a user was created".
-const Signup = ({ onCreated }) => {
+const Signup = () => {
   // [BEGINNER] "Controlled inputs": React state holds every field value, and each input shows
   // that value and reports changes with onChange. One state object for the whole form.
   const [values, setValues] = useState(emptyForm)
@@ -47,7 +45,6 @@ const Signup = ({ onCreated }) => {
     }
     setValues(emptyForm)
     setMessage(data.message)
-    onCreated()
   }
 
   return (
