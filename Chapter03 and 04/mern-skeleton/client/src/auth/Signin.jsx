@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
@@ -18,6 +18,10 @@ const Signin = () => {
   // [BEGINNER] useNavigate() gives a function that changes the page from code, e.g. after a
   // successful request. <Link> is for clicks, navigate() is for "when this is done, go there".
   const navigate = useNavigate()
+  const location = useLocation()
+  // [BEGINNER] Optional chaining + nullish coalescing: "the page PrivateRoute sent us away from,
+  // or the home page". Replaces the book's `this.props.location.state || { from: ... }`.
+  const from = location.state?.from?.pathname ?? '/'
   const [values, setValues] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
 
@@ -36,7 +40,8 @@ const Signin = () => {
     // [ADVANCED] The answer is { token, user }, and the response ALSO set the httpOnly cookie
     // "t" (server stage 13). JavaScript cannot read that cookie, so the page keeps its own copy
     // of { token, user } to know who is signed in (the menu, "is this my profile?").
-    auth.authenticate(data, () => navigate('/'))
+    // replace: true → the sign-in page is not kept in history ("Back" skips it).
+    auth.authenticate(data, () => navigate(from, { replace: true }))
   }
 
   return (

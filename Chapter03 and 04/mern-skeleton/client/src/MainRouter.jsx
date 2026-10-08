@@ -3,6 +3,7 @@ import Home from './core/Home.jsx'
 import Menu from './core/Menu.jsx'
 import NotFound from './core/NotFound.jsx'
 import Signin from './auth/Signin.jsx'
+import PrivateRoute from './auth/PrivateRoute.jsx'
 import Users from './user/Users.jsx'
 import Signup from './user/Signup.jsx'
 import Profile from './user/Profile.jsx'
@@ -29,8 +30,15 @@ const MainRouter = () => (
       <Route path="/users" element={<Users />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/signin" element={<Signin />} />
-      {/* [BEGINNER] `:userId` is a URL parameter: /users/abc123 shows Profile with userId "abc123". */}
-      <Route path="/users/:userId" element={<Profile />} />
+
+      {/* Protected pages: everything inside this route needs a signed-in user.
+          [ADVANCED] The book only protected the edit page. A profile needs a token anyway
+          (GET /api/users/:userId requires sign-in), so it is protected here too instead of
+          loading, failing with 401 and then redirecting. */}
+      <Route element={<PrivateRoute />}>
+        {/* [BEGINNER] `:userId` is a URL parameter: /users/abc123 shows Profile with userId "abc123". */}
+        <Route path="/users/:userId" element={<Profile />} />
+      </Route>
 
       {/* [ADVANCED] React Router's catch-all is still path="*". The Express 5 server writes
           its catch-all as '/{*splat}' (path-to-regexp v8): same idea, different library. */}
