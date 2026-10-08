@@ -21,3 +21,14 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
   (the only 404 is the browser asking for `/favicon.ico`).
 - **Lock files:** as in the server series, each stage's `package-lock.json` is the final client lock
   pruned with `npm install --package-lock-only`. Stage 01 lock has 44 packages.
+
+## Stage 02 — users-list (`teach/ch03-client-02-users-list`)
+
+- **Changed:** `src/Users.jsx` (useState, useEffect, fetch, AbortController cleanup, list with `key`),
+  `App.jsx` uses it, `vite.config.js` proxies `/api` to port 3000, lesson 02.
+- **Why:** state and effects are the two ideas every later page uses. The list is a GET without
+  sign-in, so nothing else is needed yet.
+- **Verified:** a user created through the API appears in the list; with `/api/users` blocked in
+  the browser the page shows "Cannot reach the server"; no React warnings.
+- **Note:** no loading state on purpose. The final `Users.jsx` has none, and adding one only to remove
+  it later would make a lesson diff go backwards.

@@ -1,7 +1,9 @@
+import Users from './Users.jsx'
+
 const App = () => (
   <main>
     <h1>MERN Skeleton</h1>
-    <p>Hello from React.</p>
+    <Users />
   </main>
 )
 
