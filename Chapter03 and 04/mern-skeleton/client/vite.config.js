@@ -11,6 +11,12 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': env.API_PROXY_TARGET || 'http://localhost:3000'
       }
+    },
+    preview: {
+      port: 4173,
+      proxy: {
+        '/api': env.API_PROXY_TARGET || 'http://localhost:3000'
+      }
     }
   }
 })

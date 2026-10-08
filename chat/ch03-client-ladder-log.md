@@ -168,3 +168,20 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Verified:** build with no warning; JS files 1 → 17; largest 510 kB → 256 kB. In the browser `Signin.jsx`
   is not requested on `/` and is requested when the sign-in page opens. The stage-11 and stage-12
   scenarios (edit, 403, delete) pass with lazy pages.
+
+## Stage 15 — production (`teach/ch03-client-15-production`)
+
+- **Changed:** script `preview`, a `preview` block in `vite.config.js`, `request.js` becomes the final file
+  (`VITE_API_URL`, `credentials: 'include'`; one comment still points to `Users.jsx`), `.env.example` becomes
+  the final file, README with preview / environment / a "Deploying" table, lesson 15.
+- **Why:** server stage 18 prepared two ways of deploying; this stage uses both.
+- **Verified** (extra script, three more server processes on 3211–3213, all stopped afterwards):
+  1. `vite preview` of the build shows the users list through the proxy;
+  2. the server with `CLIENT_DIST` serves the build: a profile deep link → SPA fallback → `/signin` → sign
+     in → the profile; `/api/nope` is still a JSON 404;
+  3. a build with `VITE_API_URL=http://localhost:3212`, served from another origin (4211), signs in and
+     opens the profile against a server with `CORS_ORIGIN=http://localhost:4211`, and all API requests went
+     to `localhost:3212`. The same kind of build against a server *without* `CORS_ORIGIN` shows "Cannot
+     reach the server" (the browser blocks the answer).
+  The dev-server scenario of stage 09 also still passes.
+- **Changes to the plan:** `VITE_API_URL` and `credentials: 'include'` arrive here instead of stage 04 (see stage 04).
