@@ -8,9 +8,12 @@
  * [BEGINNER] `= {}` gives the second parameter a default, and destructuring it in the
  * parameter list gives each option its own default (`method = 'GET'`).
  */
-export async function request(path, { method = 'GET', body, signal } = {}) {
+export async function request(path, { method = 'GET', body, token, signal } = {}) {
   const headers = { Accept: 'application/json' }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
+  // [ADVANCED] The browser also sends the cookie "t" by itself. The server reads the cookie
+  // first and this header second (server stage 13), so either one is enough.
+  if (token) headers.Authorization = `Bearer ${token}`
 
   try {
     // [BEGINNER] `path` is relative (/api/users): the request goes to the server that sent the page

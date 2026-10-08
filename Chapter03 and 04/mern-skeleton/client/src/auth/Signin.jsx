@@ -6,6 +6,7 @@ import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import auth from './auth-helper.js'
 import { signin } from './api-auth.js'
 import FormError from '../core/FormError.jsx'
 
@@ -33,10 +34,9 @@ const Signin = () => {
       return
     }
     // [ADVANCED] The answer is { token, user }, and the response ALSO set the httpOnly cookie
-    // "t" (server stage 13). The browser stores that cookie and sends it with every later
-    // request to this origin by itself, so the profile below loads. This page ignores the
-    // token for now; stage 09 explains why the client still needs { user }.
-    navigate(`/users/${data.user._id}`)
+    // "t" (server stage 13). JavaScript cannot read that cookie, so the page keeps its own copy
+    // of { token, user } to know who is signed in (the menu, "is this my profile?").
+    auth.authenticate(data, () => navigate('/'))
   }
 
   return (

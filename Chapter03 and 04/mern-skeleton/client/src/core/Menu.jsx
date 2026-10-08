@@ -1,10 +1,11 @@
-import { NavLink } from 'react-router'
+import { NavLink, useLocation, useNavigate } from 'react-router'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import HomeIcon from '@mui/icons-material/Home'
+import auth from '../auth/auth-helper.js'
 
 // [BEGINNER] NavLink adds the CSS class "active" when its `to` matches the current URL, so the
 // book's isActive(history, path) helper is not needed: the `&.active` rule does the job.
@@ -14,23 +15,50 @@ const navSx = {
   '&.active': { color: 'secondary.main' }
 }
 
-const Menu = () => (
-  <AppBar position="static">
-    <Toolbar>
-      <Typography variant="h6" color="inherit">
-        MERN Skeleton
-      </Typography>
-      {/* [BEGINNER] `component={NavLink}` renders the MUI button AS a router link: one element
-          instead of the book's <Link><Button/></Link>, which nested a <button> in an <a>
-          (invalid HTML). */}
-      <IconButton component={NavLink} to="/" end aria-label="Home" sx={navSx}>
-        <HomeIcon />
-      </IconButton>
-      <Button component={NavLink} to="/users" end sx={navSx}>Users</Button>
-      <Button component={NavLink} to="/signup" sx={navSx}>Sign up</Button>
-      <Button component={NavLink} to="/signin" sx={navSx}>Sign In</Button>
-    </Toolbar>
-  </AppBar>
-)
+const Menu = () => {
+  // [BEGINNER] Hooks replace the book's withRouter(...) wrapper:
+  // useNavigate() gives a function to change page; useLocation() the current URL.
+  const navigate = useNavigate()
+  // Reading the location makes Menu re-render on every page change, so the signed-in /
+  // signed-out buttons update right after signing in or out.
+  useLocation()
+
+  const jwt = auth.isAuthenticated()
+
+  return (
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6" color="inherit">
+          MERN Skeleton
+        </Typography>
+        {/* [BEGINNER] `component={NavLink}` renders the MUI button AS a router link: one element
+            instead of the book's <Link><Button/></Link>, which nested a <button> in an <a>
+            (invalid HTML). */}
+        <IconButton component={NavLink} to="/" end aria-label="Home" sx={navSx}>
+          <HomeIcon />
+        </IconButton>
+        <Button component={NavLink} to="/users" end sx={navSx}>Users</Button>
+
+        {/* [BEGINNER] `condition ? A : B` shows exactly one of the two groups; the book used two
+            separate `&&` blocks that each called auth.isAuthenticated(). */}
+        {jwt ? (
+          <>
+            <Button component={NavLink} to={`/users/${jwt.user._id}`} end sx={navSx}>
+              My Profile
+            </Button>
+            <Button color="inherit" onClick={() => auth.signout(() => navigate('/'))}>
+              Sign out
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button component={NavLink} to="/signup" sx={navSx}>Sign up</Button>
+            <Button component={NavLink} to="/signin" sx={navSx}>Sign In</Button>
+          </>
+        )}
+      </Toolbar>
+    </AppBar>
+  )
+}
 
 export default Menu
