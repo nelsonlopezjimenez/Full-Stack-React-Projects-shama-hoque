@@ -32,3 +32,14 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
   the browser the page shows "Cannot reach the server"; no React warnings.
 - **Note:** no loading state on purpose. The final `Users.jsx` has none, and adding one only to remove
   it later would make a lesson diff go backwards.
+
+## Stage 03 — signup-form (`teach/ch03-client-03-signup-form`)
+
+- **Changed:** `src/Signup.jsx` (controlled inputs, `handleChange(name)`, `onSubmit` + `preventDefault`,
+  POST with JSON, `response.ok`), `App.jsx` lifts a `version` counter that is the `key` of `<Users>`, lesson 03.
+- **Why:** the first write request from the browser, and props in both directions.
+- **Verified:** empty form → "Name is required. Email is required. Password is required."; a valid form
+  → "Successfully signed up!", the fields are cleared and the name appears in the list; the same email
+  again → "Email already exists".
+- **Surprises:** the order of the messages depends on the body. `{}` gives "Password … Email … Name",
+  while empty strings (what the form sends) give "Name … Email … Password". The lesson quotes the form's order.
