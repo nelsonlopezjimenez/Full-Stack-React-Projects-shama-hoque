@@ -28,6 +28,7 @@ const Menu = () => (
       </IconButton>
       <Button component={NavLink} to="/users" end sx={navSx}>Users</Button>
       <Button component={NavLink} to="/signup" sx={navSx}>Sign up</Button>
+      <Button component={NavLink} to="/signin" sx={navSx}>Sign In</Button>
     </Toolbar>
   </AppBar>
 )
