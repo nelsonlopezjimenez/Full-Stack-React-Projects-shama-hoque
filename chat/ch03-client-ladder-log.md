@@ -198,3 +198,23 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Surprises:** the first browser run failed because the scratch server on 3210 had been stopped by the
   30-minute limit for background commands. It was restarted with a longer limit and the run passed.
   The app was not at fault.
+
+---
+
+## Final check (after stage 16)
+
+Every file of `client/` on `teach/ch03-client-16-tests` compared with `refactor/ch03-migration`, comments
+removed from both with `tools/make-nc-ladder.mjs` (on `main`):
+
+| Result | Files |
+|---|---|
+| byte-for-byte identical | `.env.example`, `.gitignore`, `index.html`, `package.json`, `package-lock.json`, the seashell image, `PrivateRoute.jsx`, `Signin.jsx`, `FormError.jsx`, `Home.jsx`, `Menu.jsx`, `NotFound.jsx`, `DeleteUser.jsx`, `EditProfile.jsx`, all six files in `src/test/` |
+| the same code, different comments | `App.jsx`, `MainRouter.jsx`, `main.jsx`, `api-auth.js`, `auth-helper.js`, `request.js`, `Profile.jsx`, `Signup.jsx`, `Users.jsx`, `api-user.js`, `vite.config.js` |
+| documentation | `README.md` = migration README + "Deploying" + "Lessons"; `lessons/` is new |
+| different code | **none** |
+
+The client series does not change any file in `server/` (`git diff teach/ch03-server-19-tests
+teach/ch03-client-16-tests -- server` is empty).
+
+Comments that differ on purpose: they explain things in the ladder's order, refer to server *stages* instead
+of migration checklist steps, and `auth-helper.js` no longer says the server ignores the cookie (server D1).
