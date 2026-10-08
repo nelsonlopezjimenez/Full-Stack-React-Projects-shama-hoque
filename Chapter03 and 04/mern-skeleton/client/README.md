@@ -25,7 +25,7 @@ This is the React 19 single-page app, built with Vite 8. It uses React Router 8 
 | `/` | Home | — |
 | `/users` | All users | — |
 | `/signup`, `/signin` | Forms (controlled inputs) | — |
-| `/users/:userId` | Profile | yes (the browser sends the cookie `t`) |
+| `/users/:userId` | Profile | yes (cookie `t` and the Bearer header) |
 | anything else | Not found | — |
 
 ## Layout
@@ -35,8 +35,8 @@ index.html            the one HTML page; React fills <div id="root">
 src/main.jsx          createRoot + StrictMode, Roboto font
 src/App.jsx           theme, CssBaseline, BrowserRouter
 src/MainRouter.jsx    routes (/users/:userId is a URL parameter)
-src/core/request.js   the one fetch helper (JSON, errors → { error })
+src/core/request.js   the one fetch helper (token, JSON, errors → { error })
 src/core/             Home, Menu, NotFound, FormError
-src/auth/             sign-in page, auth API
+src/auth/             sign-in page, session helper, auth API
 src/user/             user pages and user API
 ```

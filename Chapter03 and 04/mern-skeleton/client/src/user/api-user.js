@@ -6,5 +6,5 @@ export const create = (user) =>
 export const list = (signal) =>
   request('/api/users', { signal })
 
-export const read = (userId, signal) =>
-  request(`/api/users/${userId}`, { signal })
+export const read = (userId, token, signal) =>
+  request(`/api/users/${userId}`, { token, signal })

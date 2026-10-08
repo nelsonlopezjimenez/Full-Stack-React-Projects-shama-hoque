@@ -9,6 +9,7 @@ import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Person from '@mui/icons-material/Person'
+import auth from '../auth/auth-helper.js'
 import { read } from './api-user.js'
 import FormError from '../core/FormError.jsx'
 
@@ -16,11 +17,12 @@ const Profile = () => {
   const { userId } = useParams()
   const [user, setUser] = useState(null)
   const [error, setError] = useState('')
+  const jwt = auth.isAuthenticated()
 
   useEffect(() => {
     const controller = new AbortController()
     setError('')
-    read(userId, controller.signal).then((data) => {
+    read(userId, jwt?.token, controller.signal).then((data) => {
       if (controller.signal.aborted) return
       if (data.error) setError(data.error)
       else setUser(data)

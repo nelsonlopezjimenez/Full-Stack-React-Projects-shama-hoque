@@ -6,6 +6,7 @@ import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import auth from './auth-helper.js'
 import { signin } from './api-auth.js'
 import FormError from '../core/FormError.jsx'
 
@@ -28,7 +29,7 @@ const Signin = () => {
       setError(data.error)
       return
     }
-    navigate(`/users/${data.user._id}`)
+    auth.authenticate(data, () => navigate('/'))
   }
 
   return (

@@ -105,3 +105,17 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
   added up). The warning is kept on purpose; it is the reason for stage 14. (2) The test first typed the
   email while the signup page was still replacing itself with the sign-in page; it now waits for the
   "Sign In" heading. This was a test problem only.
+
+## Stage 09 — auth-helper (`teach/ch03-client-09-auth-helper`)
+
+- **Changed:** `auth/auth-helper.js` and `core/Menu.jsx` (the final files; one comment in the helper
+  changed, see below), `signout()` in `api-auth.js`, `token` → Bearer header in `request.js`,
+  `read(userId, token, signal)`, Profile sends `jwt?.token`, Signin calls `auth.authenticate(...)`, lesson 09.
+- **Why:** the page cannot read the httpOnly cookie, so it keeps `{ token, user }` to know who is signed in (C3).
+- **Verified:** signed out → no "My Profile"; sign in → home, "My Profile" and "Sign out" appear,
+  sessionStorage holds `{ token, user }`; the profile request carries `Authorization: Bearer`; with all cookies
+  cleared the profile still loads (Bearer only); "Sign out" sends `DELETE /api/auth/sessions`, and the storage and
+  cookie `t` are gone, so the menu shows "Sign In" again.
+- **Comment changed from the migration:** `auth-helper.js` said "switching the API to read that cookie … is the
+  more secure design". The ladder's server already reads the cookie first (server D1), so the comment now
+  points to "ask the server who am I?" (idea L1) instead.
