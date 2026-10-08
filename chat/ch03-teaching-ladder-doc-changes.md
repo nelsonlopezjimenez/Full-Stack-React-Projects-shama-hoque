@@ -6,6 +6,8 @@ ladder README and lesson 01, does that need a commit and a rebase?
 
 Related: [ch03-teaching-ladder-checklist.md](ch03-teaching-ladder-checklist.md) (section "Fixing an
 earlier stage later"), [ch03-teaching-ladder-log.md](ch03-teaching-ladder-log.md).
+Follow-up (2026-10-08): the student instructions stay on `main` only, and the client ladder points to them;
+rebase and clone/fork effects explained in [ch03-instructions-on-main-and-rebasing.md](ch03-instructions-on-main-and-rebasing.md).
 
 ## Where the files are
 
