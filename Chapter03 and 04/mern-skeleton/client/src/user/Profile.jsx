@@ -9,6 +9,7 @@ import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Person from '@mui/icons-material/Person'
+import auth from '../auth/auth-helper.js'
 import { read } from './api-user.js'
 import FormError from '../core/FormError.jsx'
 
@@ -18,6 +19,7 @@ const Profile = () => {
   const { userId } = useParams()
   const [user, setUser] = useState(null)
   const [error, setError] = useState('')
+  const jwt = auth.isAuthenticated()
 
   // [BEGINNER] [userId] is the dependency list: the effect runs again whenever userId changes,
   // e.g. going from one profile to another. The book needed a second lifecycle method for
@@ -25,8 +27,10 @@ const Profile = () => {
   useEffect(() => {
     const controller = new AbortController()
     setError('')
+    // [BEGINNER] `jwt?.token`: jwt is false for a signed-out visitor, and `false.token` is
+    // undefined anyway, but `?.` says "this may be missing" (stage 14 protects the page).
     async function loadProfile() {
-      const data = await read(userId, controller.signal)
+      const data = await read(userId, jwt?.token, controller.signal)
       // [ADVANCED] If userId changed (or the page was left) before this answer arrived, the
       // cleanup below already aborted the request: ignore it, or an OLD profile could overwrite
       // the new one (a race condition the book had). In development, StrictMode runs every
@@ -37,6 +41,8 @@ const Profile = () => {
     }
     loadProfile()
     return () => controller.abort()
+    // [ADVANCED] jwt.token is read once per userId on purpose. The linter rule
+    // react-hooks/exhaustive-deps (if you add ESLint) would ask to list it too; both work.
   }, [userId])
 
   return (
