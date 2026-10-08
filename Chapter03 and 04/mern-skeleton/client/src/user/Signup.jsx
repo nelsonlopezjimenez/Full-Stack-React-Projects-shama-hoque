@@ -13,7 +13,7 @@ const fieldSx = { mx: 1, width: 300 }
 
 const emptyForm = { name: '', email: '', password: '' }
 
-const Signup = ({ onCreated }) => {
+const Signup = () => {
   const [values, setValues] = useState(emptyForm)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -33,7 +33,6 @@ const Signup = ({ onCreated }) => {
     }
     setValues(emptyForm)
     setMessage(data.message)
-    onCreated()
   }
 
   return (

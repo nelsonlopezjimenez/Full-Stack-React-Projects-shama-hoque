@@ -1,10 +1,8 @@
-import { useState } from 'react'
+import { BrowserRouter } from 'react-router'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { indigo, pink } from '@mui/material/colors'
-import Home from './core/Home.jsx'
-import Users from './user/Users.jsx'
-import Signup from './user/Signup.jsx'
+import MainRouter from './MainRouter.jsx'
 
 const theme = createTheme({
   palette: {
@@ -26,17 +24,13 @@ const theme = createTheme({
   },
 })
 
-const App = () => {
-  const [version, setVersion] = useState(0)
-
-  return (
+const App = () => (
+  <BrowserRouter>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Home />
-      <Signup onCreated={() => setVersion((v) => v + 1)} />
-      <Users key={version} />
+      <MainRouter />
     </ThemeProvider>
-  )
-}
+  </BrowserRouter>
+)
 
 export default App
