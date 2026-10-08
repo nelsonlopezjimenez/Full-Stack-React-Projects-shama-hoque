@@ -138,3 +138,12 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Verified:** the form is prefilled; the PATCH body is `{"name": …, "email": …}` without `password`; the
   profile shows the new name; no Edit link on someone else's profile; typing their `/edit` URL and
   submitting → "User is not authorized" (403).
+
+## Stage 12 — delete-user (`teach/ch03-client-12-delete-user`)
+
+- **Changed:** `user/DeleteUser.jsx` (the final file), `remove()` in `api-user.js`, Profile renders Edit +
+  DeleteUser in a fragment (now the final markup), lesson 12 with the client-side REST table.
+- **Why:** the last route of the REST table.
+- **Verified:** the dialog opens and Cancel closes it; Confirm sends `DELETE /api/users/<id>`, lands on `/`
+  signed out ("Sign In" visible, no "My Profile"); the user is missing from the page list and from
+  `GET /api/users`.

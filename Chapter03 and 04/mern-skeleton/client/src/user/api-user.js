@@ -21,3 +21,7 @@ export const read = (userId, token, signal) =>
 // PATCH, not the book's PUT: only the changed fields are sent (server stage 06)
 export const update = (userId, token, user) =>
   request(`/api/users/${userId}`, { method: 'PATCH', token, body: user })
+
+// [BEGINNER] `delete` is a reserved word in JavaScript, so the function is called remove.
+export const remove = (userId, token) =>
+  request(`/api/users/${userId}`, { method: 'DELETE', token })

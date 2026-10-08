@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Edit from '@mui/icons-material/Edit'
 import Person from '@mui/icons-material/Person'
+import DeleteUser from './DeleteUser.jsx'
 import auth from '../auth/auth-helper.js'
 import { read } from './api-user.js'
 import FormError from '../core/FormError.jsx'
@@ -52,8 +53,8 @@ const Profile = () => {
     return <Navigate to="/signin" replace state={{ from: location }} />
   }
 
-  // Only the owner sees the edit button. This is only for the looks: the server checks the
-  // same thing on every PATCH and answers 403 (server stage 11).
+  // Only the owner sees the edit and delete buttons. This is only for the looks: the server
+  // checks the same thing on every PATCH and DELETE and answers 403 (server stage 11).
   const isOwnProfile = user && jwt.user._id === user._id
 
   return (
@@ -69,9 +70,12 @@ const Profile = () => {
           {/* [ADVANCED] `secondaryAction` replaces MUI's deprecated <ListItemSecondaryAction>. */}
           <ListItem
             secondaryAction={isOwnProfile && (
-              <IconButton component={Link} to={`/users/${user._id}/edit`} aria-label="Edit" color="primary">
-                <Edit />
-              </IconButton>
+              <>
+                <IconButton component={Link} to={`/users/${user._id}/edit`} aria-label="Edit" color="primary">
+                  <Edit />
+                </IconButton>
+                <DeleteUser userId={user._id} />
+              </>
             )}
           >
             <ListItemAvatar>
