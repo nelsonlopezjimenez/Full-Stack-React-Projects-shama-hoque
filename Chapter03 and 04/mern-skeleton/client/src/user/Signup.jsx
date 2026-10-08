@@ -1,5 +1,16 @@
 import { useState } from 'react'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { create } from './api-user.js'
+import FormError from '../core/FormError.jsx'
+
+// [BEGINNER] Style objects outside the component: they never change, so they are created once.
+const cardSx = { maxWidth: 600, mx: 'auto', mt: 5, pb: 2, textAlign: 'center' }
+const fieldSx = { mx: 1, width: 300 }
 
 const emptyForm = { name: '', email: '', password: '' }
 
@@ -40,25 +51,31 @@ const Signup = ({ onCreated }) => {
   }
 
   return (
-    <section>
-      <h2>Sign Up</h2>
-      {/* [BEGINNER] onSubmit runs for the button AND for Enter in a field. The book only
-          listened to the button's onClick, so Enter did nothing. */}
-      <form onSubmit={handleSubmit}>
-        {/* [BEGINNER] In JSX, `for` is written htmlFor (`for` is a JavaScript keyword). */}
-        <label htmlFor="name">Name</label>{' '}
-        <input id="name" value={values.name} onChange={handleChange('name')} autoComplete="name" /><br />
-        <label htmlFor="email">Email</label>{' '}
-        <input id="email" type="email" value={values.email} onChange={handleChange('email')}
-          autoComplete="email" /><br />
-        <label htmlFor="password">Password</label>{' '}
-        <input id="password" type="password" value={values.password} onChange={handleChange('password')}
-          autoComplete="new-password" /><br />
-        <button type="submit">Submit</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {message && <p>{message}</p>}
-    </section>
+    // [BEGINNER] A real <form> (Card rendered as component="form"): onSubmit runs for the button
+    // AND for Enter in a field. The book only listened to the button's onClick.
+    <Card component="form" onSubmit={handleSubmit} sx={cardSx}>
+      <CardContent>
+        <Typography variant="h6" component="h2" sx={{ mt: 2, color: (theme) => theme.palette.openTitle }}>
+          Sign Up
+        </Typography>
+        {/* [BEGINNER] TextField = label + input + helper text in one component. The `id` links
+            the label to the input, so clicking the label focuses the field. */}
+        <TextField id="name" label="Name" value={values.name} onChange={handleChange('name')}
+          autoComplete="name" sx={fieldSx} margin="normal" /><br />
+        <TextField id="email" type="email" label="Email" value={values.email} onChange={handleChange('email')}
+          autoComplete="email" sx={fieldSx} margin="normal" /><br />
+        <TextField id="password" type="password" label="Password" value={values.password}
+          onChange={handleChange('password')} autoComplete="new-password" sx={fieldSx} margin="normal" />
+        <FormError message={error} />
+        {message && <Typography sx={{ mt: 1, color: 'success.main' }}>{message}</Typography>}
+      </CardContent>
+      <CardActions>
+        {/* [BEGINNER] variant "contained" is the old "raised". type="submit" submits the form. */}
+        <Button type="submit" color="primary" variant="contained" sx={{ mx: 'auto', mb: 2 }}>
+          Submit
+        </Button>
+      </CardActions>
+    </Card>
   )
 }
 
