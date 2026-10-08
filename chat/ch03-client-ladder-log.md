@@ -60,3 +60,14 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Stage 06 starts with a clean-up commit (06a):** it deletes `src/tic-tac-toe/` and puts `App.jsx` and the
   README back to stage 01. The users-list commit after it is the same change as before the insertion.
 - **Verified:** build ok; 05a–05b pass the time-travel check (jump back, play on, the future is dropped, a winner at the end).
+
+## Stage 06 — users-list (`teach/ch03-client-06-users-list`)
+
+- **Changed:** `src/Users.jsx` (useState, useEffect, fetch, AbortController cleanup, list with `key`),
+  `App.jsx` uses it, `vite.config.js` proxies `/api` to port 3000, lesson 02.
+- **Why:** state and effects are the two ideas every later page uses. The list is a GET without
+  sign-in, so nothing else is needed yet.
+- **Verified:** a user created through the API appears in the list; with `/api/users` blocked in
+  the browser the page shows "Cannot reach the server"; no React warnings.
+- **Note:** no loading state on purpose. The final `Users.jsx` has none, and adding one only to remove
+  it later would make a lesson diff go backwards.

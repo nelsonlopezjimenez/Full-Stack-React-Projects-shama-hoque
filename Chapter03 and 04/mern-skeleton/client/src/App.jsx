@@ -1,3 +1,5 @@
+import Users from './Users.jsx'
+
 // [BEGINNER] A React component is a function whose name starts with a capital letter and
 // that returns what to show. The HTML-like syntax is JSX: Vite turns it into plain
 // JavaScript function calls before the browser sees it.
@@ -7,7 +9,8 @@
 const App = () => (
   <main>
     <h1>MERN Skeleton</h1>
-    <p>Hello from React.</p>
+    {/* [BEGINNER] Components are used like HTML tags. Users lives in its own file. */}
+    <Users />
   </main>
 )
 
