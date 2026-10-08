@@ -2,6 +2,9 @@
 
 This is the React 19 single-page app, built with Vite 8.
 
+> How to switch, compare and work on the lesson stages: [`instructions/working-with-the-lesson-stages.md`](http://192.168.1.28:3000/s888888/Full-Stack-React-Projects-shama-hoque/src/branch/main/instructions/working-with-the-lesson-stages.md)
+> on `main` (or `git show origin/main:instructions/working-with-the-lesson-stages.md`).
+
 ## Scripts
 
 | Command | What it does |

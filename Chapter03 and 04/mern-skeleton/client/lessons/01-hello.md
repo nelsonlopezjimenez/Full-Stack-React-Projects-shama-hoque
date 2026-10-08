@@ -2,6 +2,12 @@
 
 **Branch:** `teach/ch03-client-01-hello` (starts from `teach/ch03-server-19-tests`)
 
+> **How to switch, compare and work on the stages:** read
+> [`instructions/working-with-the-lesson-stages.md`](http://192.168.1.28:3000/s888888/Full-Stack-React-Projects-shama-hoque/src/branch/main/instructions/working-with-the-lesson-stages.md).
+> It lives only on `main`, so the `instructions/` folder is not there while a stage is checked out.
+> Read it in Gitea (branch `main`), or in the terminal:
+> `git show origin/main:instructions/working-with-the-lesson-stages.md`
+
 ## Goal
 
 A web page made by React. It is three small files. The server from the server series is finished
