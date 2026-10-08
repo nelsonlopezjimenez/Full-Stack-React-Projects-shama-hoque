@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
+import Paper from '@mui/material/Paper'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import ListItemText from '@mui/material/ListItemText'
+import Avatar from '@mui/material/Avatar'
+import Typography from '@mui/material/Typography'
+import Person from '@mui/icons-material/Person'
 import { list } from './api-user.js'
+import FormError from '../core/FormError.jsx'
 
 const Users = () => {
   const [users, setUsers] = useState([])
@@ -16,15 +25,24 @@ const Users = () => {
   }, [])
 
   return (
-    <section>
-      <h2>All Users</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <ul>
+    <Paper elevation={4} sx={{ p: 1, m: 5 }}>
+      <Typography variant="h6" component="h2" sx={{ mt: 4, mb: 2, mx: 2, color: (theme) => theme.palette.openTitle }}>
+        All Users
+      </Typography>
+      <FormError message={error} />
+      <List dense>
         {users.map((item) => (
-          <li key={item._id}>{item.name}</li>
+          <ListItem key={item._id}>
+            <ListItemAvatar>
+              <Avatar>
+                <Person />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText primary={item.name} />
+          </ListItem>
         ))}
-      </ul>
-    </section>
+      </List>
+    </Paper>
   )
 }
 
