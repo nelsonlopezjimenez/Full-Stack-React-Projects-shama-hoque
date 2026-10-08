@@ -159,3 +159,12 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
   whole stage-10 scenario (redirect, `from`, Back, expired and forged tokens) passes with the new form.
 - **Surprises:** the stage-08 test could not be reused here. It expects sign-in to land on the profile,
   but since stage 09 sign-in goes to `from` (or `/`). The test was changed, not the app.
+
+## Stage 14 — lazy-pages (`teach/ch03-client-14-lazy-pages`)
+
+- **Changed:** `MainRouter.jsx` becomes the final file (`lazy` + `Suspense`); two comments no longer cite
+  migration checklist step numbers. Lesson 14.
+- **Why:** the 500 kB warning that started in stage 08.
+- **Verified:** build with no warning; JS files 1 → 17; largest 510 kB → 256 kB. In the browser `Signin.jsx`
+  is not requested on `/` and is requested when the sign-in page opens. The stage-11 and stage-12
+  scenarios (edit, 403, delete) pass with lazy pages.
