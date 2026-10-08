@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { list } from './api-user.js'
 
 const Users = () => {
   const [users, setUsers] = useState([])
@@ -6,12 +7,11 @@ const Users = () => {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetch('/api/users', { signal: controller.signal })
-      .then((response) => response.json())
-      .then((data) => setUsers(data))
-      .catch((err) => {
-        if (err.name !== 'AbortError') setError('Cannot reach the server')
-      })
+    list(controller.signal).then((data) => {
+      if (controller.signal.aborted) return
+      if (data.error) setError(data.error)
+      else setUsers(data)
+    })
     return () => controller.abort()
   }, [])
 

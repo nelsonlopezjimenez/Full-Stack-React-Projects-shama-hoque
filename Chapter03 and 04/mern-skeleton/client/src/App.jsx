@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import Users from './Users.jsx'
-import Signup from './Signup.jsx'
+import Users from './user/Users.jsx'
+import Signup from './user/Signup.jsx'
 
 const App = () => {
   const [version, setVersion] = useState(0)

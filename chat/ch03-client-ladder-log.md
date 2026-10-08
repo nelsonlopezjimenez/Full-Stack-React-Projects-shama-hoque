@@ -43,3 +43,19 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
   again → "Email already exists".
 - **Surprises:** the order of the messages depends on the body. `{}` gives "Password … Email … Name",
   while empty strings (what the form sends) give "Name … Email … Password". The lesson quotes the form's order.
+
+## Stage 04 — request-helper (`teach/ch03-client-04-request-helper`)
+
+- **Changed:** `src/core/request.js` (never throws, `{ error, status }`), `src/user/api-user.js`
+  (`create`, `list`), `Users.jsx` and `Signup.jsx` moved into `src/user/` (git sees renames) and call
+  the API functions, `vite.config.js` uses `loadEnv` + `API_PROXY_TARGET`, `.env.example`, lesson 04.
+- **Why:** the same reason as server stage 07: ten more requests are coming.
+- **Verified:** the stage-03 scenario still passes; a failed POST now shows "Cannot reach the server"
+  under the form.
+- **Changes to the plan:** (1) the folders `core/` and `user/` come here, not in stage 06, because the
+  new files need a home and server stage 07 also split by folder. (2) `VITE_API_URL` and
+  `credentials: 'include'` move to stage 15. Both are only needed when the client is deployed on another
+  origin, and here they would have no visible effect.
+- **Surprises:** when Express is down, Vite 8's proxy answers **502 with an empty body**, not a network
+  error. So the page shows "Request failed (502)". "Cannot reach the server" only appears when Vite
+  itself is gone (or the request is blocked). Lesson 04 shows both.

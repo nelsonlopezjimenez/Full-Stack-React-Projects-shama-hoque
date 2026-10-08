@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { create } from './api-user.js'
 
 const emptyForm = { name: '', email: '', password: '' }
 
@@ -15,13 +16,8 @@ const Signup = ({ onCreated }) => {
     event.preventDefault()
     setError('')
     setMessage('')
-    const response = await fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values)
-    })
-    const data = await response.json()
-    if (!response.ok) {
+    const data = await create(values)
+    if (data.error) {
       setError(data.error)
       return
     }
