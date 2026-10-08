@@ -1,7 +1,8 @@
 # Chapter 03 (and 04) — teaching ladder, client
 
-**Status:** draft for review (2026-10-07). Nothing built yet.
-**Log:** `ch03-client-ladder-log.md` (created with stage 01)
+**Status:** approved 2026-10-07 and built: `teach/ch03-client-01-hello` … `teach/ch03-client-16-tests`, plus
+the comment-free `teach-nc/*` series (local only). Changes to the plan are recorded in the log.
+**Log:** `ch03-client-ladder-log.md`, on the client branches (results of the final check at its end)
 **Starts from:** `teach/ch03-server-19-tests` (the last server stage)
 **Target:** the client of `refactor/ch03-migration`, plus the intended differences listed under
 "Final check" below.

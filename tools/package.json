@@ -1,0 +1,9 @@
+{
+  "name": "ladder-tools",
+  "private": true,
+  "type": "module",
+  "description": "Helper scripts for the teaching ladders (see make-nc-ladder.mjs)",
+  "dependencies": {
+    "@babel/parser": "^7.29.0"
+  }
+}

@@ -13,6 +13,19 @@ teach/ch03-server-19-tests
 Every stage has a lesson note in `Chapter03 and 04/mern-skeleton/server/lessons/` that explains what's new,
 what to try, and an exercise.
 
+The React client (Chapter 4) continues on top of the last server stage, in **16 more stages**:
+
+```
+teach/ch03-client-01-hello
+...
+teach/ch03-client-16-tests
+```
+
+Their notes are in `Chapter03 and 04/mern-skeleton/client/lessons/`. Everything below works the same way
+for them: replace `server` with `client` in the branch names. To run a client stage, start the server
+(`cd server && npm run dev`) and then the client (`cd client && npm install && npm run dev`) in a
+second terminal.
+
 These instructions show you how to get the code, how to see what each lesson changed, and how to do
 the lessons yourself **without ever getting stuck with git**.
 
