@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useActionState } from 'react'
 import { Link } from 'react-router'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
@@ -17,52 +17,42 @@ import FormError from '../core/FormError.jsx'
 const cardSx = { maxWidth: 600, mx: 'auto', mt: 5, pb: 2, textAlign: 'center' }
 const fieldSx = { mx: 1, width: 300 }
 
-const emptyForm = { name: '', email: '', password: '' }
+const initialState = { error: '', open: false, values: { name: '', email: '' } }
 
 const Signup = () => {
-  const [values, setValues] = useState(emptyForm)
-  const [error, setError] = useState('')
-  const [open, setOpen] = useState(false)
-
-  const handleChange = (name) => (event) => {
-    setValues((v) => ({ ...v, [name]: event.target.value }))
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    setError('')
-    const data = await create(values)
+  const [state, formAction, isPending] = useActionState(async (previousState, formData) => {
+    const user = Object.fromEntries(formData)
+    const data = await create(user)
     if (data.error) {
-      setError(data.error)
-      return
+      return { error: data.error, open: false, values: { name: user.name, email: user.email } }
     }
-    setValues(emptyForm)
-    setOpen(true)
-  }
+    return { ...initialState, open: true }
+  }, initialState)
 
   return (
     <>
-      <Card component="form" onSubmit={handleSubmit} sx={cardSx}>
+      <Card component="form" action={formAction} sx={cardSx}>
         <CardContent>
           <Typography variant="h6" component="h2" sx={{ mt: 2, color: (theme) => theme.palette.openTitle }}>
             Sign Up
           </Typography>
-          <TextField id="name" label="Name" value={values.name} onChange={handleChange('name')}
+          <TextField id="name" name="name" label="Name" defaultValue={state.values.name}
             autoComplete="name" sx={fieldSx} margin="normal" /><br />
-          <TextField id="email" type="email" label="Email" value={values.email} onChange={handleChange('email')}
+          <TextField id="email" name="email" type="email" label="Email" defaultValue={state.values.email}
             autoComplete="email" sx={fieldSx} margin="normal" /><br />
-          <TextField id="password" type="password" label="Password" value={values.password}
-            onChange={handleChange('password')} autoComplete="new-password" sx={fieldSx} margin="normal" />
-          <FormError message={error} />
+          <TextField id="password" name="password" type="password" label="Password"
+            autoComplete="new-password" sx={fieldSx} margin="normal" />
+          <FormError message={state.error} />
         </CardContent>
         <CardActions>
-          <Button type="submit" color="primary" variant="contained" sx={{ mx: 'auto', mb: 2 }}>
+          <Button type="submit" color="primary" variant="contained" disabled={isPending}
+            sx={{ mx: 'auto', mb: 2 }}>
             Submit
           </Button>
         </CardActions>
       </Card>
 
-      <Dialog open={open}>
+      <Dialog open={state.open}>
         <DialogTitle>New Account</DialogTitle>
         <DialogContent>
           <DialogContentText>
