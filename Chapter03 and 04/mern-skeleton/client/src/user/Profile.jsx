@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useLocation, useParams } from 'react-router'
+import { Link, Navigate, useLocation, useParams } from 'react-router'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import Avatar from '@mui/material/Avatar'
+import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
+import Edit from '@mui/icons-material/Edit'
 import Person from '@mui/icons-material/Person'
 import auth from '../auth/auth-helper.js'
 import { read } from './api-user.js'
@@ -37,6 +39,8 @@ const Profile = () => {
     return <Navigate to="/signin" replace state={{ from: location }} />
   }
 
+  const isOwnProfile = user && jwt.user._id === user._id
+
   return (
     <Paper elevation={4} sx={{ maxWidth: 600, mx: 'auto', mt: 5, p: 3 }}>
       <Typography variant="h6" component="h2" sx={{ mt: 1, mb: 2, color: (theme) => theme.palette.protectedTitle }}>
@@ -45,7 +49,13 @@ const Profile = () => {
       <FormError message={error} />
       {user && (
         <List dense>
-          <ListItem>
+          <ListItem
+            secondaryAction={isOwnProfile && (
+              <IconButton component={Link} to={`/users/${user._id}/edit`} aria-label="Edit" color="primary">
+                <Edit />
+              </IconButton>
+            )}
+          >
             <ListItemAvatar>
               <Avatar>
                 <Person />

@@ -8,3 +8,6 @@ export const list = (signal) =>
 
 export const read = (userId, token, signal) =>
   request(`/api/users/${userId}`, { token, signal })
+
+export const update = (userId, token, user) =>
+  request(`/api/users/${userId}`, { method: 'PATCH', token, body: user })

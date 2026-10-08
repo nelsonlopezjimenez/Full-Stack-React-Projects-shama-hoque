@@ -7,6 +7,7 @@ import PrivateRoute from './auth/PrivateRoute.jsx'
 import Users from './user/Users.jsx'
 import Signup from './user/Signup.jsx'
 import Profile from './user/Profile.jsx'
+import EditProfile from './user/EditProfile.jsx'
 
 const MainRouter = () => (
   <>
@@ -19,6 +20,7 @@ const MainRouter = () => (
 
       <Route element={<PrivateRoute />}>
         <Route path="/users/:userId" element={<Profile />} />
+        <Route path="/users/:userId/edit" element={<EditProfile />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
