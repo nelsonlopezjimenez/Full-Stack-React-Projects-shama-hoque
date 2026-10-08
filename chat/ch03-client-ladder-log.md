@@ -90,3 +90,18 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Why:** the first page the server refuses, which is the reason for signing in.
 - **Verified:** clicking a user opens `/users/<24 hex>`; the page shows
   "UnauthorizedError: No authorization token was found" (401).
+
+## Stage 08 — signin (`teach/ch03-client-08-signin`)
+
+- **Changed:** `auth/api-auth.js` (`signin`), `auth/Signin.jsx` (controlled inputs with `required`,
+  `useNavigate` to the own profile), Signup's success text becomes the final dialog with the "Sign In"
+  link, Menu gets "Sign In", route `/signin`, lesson 08.
+- **Why:** decision C3. The cookie alone already makes the protected API work, and the next stage shows
+  why the client still keeps `{ token, user }`.
+- **Verified:** signup → dialog → "Sign In" → `/signin`; wrong password → "Email and password don't match.";
+  right password → own profile with name, email, "Joined"; cookie `t` is httpOnly + SameSite Strict and
+  `document.cookie` is empty.
+- **Surprises:** (1) `vite build` now warns about a chunk larger than 500 kB (MUI dialogs and text fields
+  added up). The warning is kept on purpose; it is the reason for stage 14. (2) The test first typed the
+  email while the signup page was still replacing itself with the sign-in page; it now waits for the
+  "Sign In" heading. This was a test problem only.
