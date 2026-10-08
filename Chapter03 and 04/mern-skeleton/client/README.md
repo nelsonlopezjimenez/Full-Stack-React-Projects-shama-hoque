@@ -17,6 +17,7 @@ This is the React 19 single-page app, built with Vite 8.
 ```
 index.html            the one HTML page; React fills <div id="root">
 src/main.jsx          createRoot + StrictMode
-src/App.jsx           the page: a heading and the users list
+src/App.jsx           the page: a heading, the signup form and the users list
 src/Users.jsx         loads GET /api/users and shows the names
+src/Signup.jsx        form that sends POST /api/users
 ```
