@@ -35,7 +35,7 @@ This is the React 19 single-page app, built with Vite 8. It uses React Router 8 
 index.html            the one HTML page; React fills <div id="root">
 src/main.jsx          createRoot + StrictMode, Roboto font
 src/App.jsx           theme, CssBaseline, BrowserRouter
-src/MainRouter.jsx    routes, PrivateRoute layout route
+src/MainRouter.jsx    routes, lazy-loaded pages, PrivateRoute layout route
 src/core/request.js   the one fetch helper (token, JSON, errors → { error })
 src/core/             Home, Menu, NotFound, FormError
 src/auth/             sign-in page, session helper, PrivateRoute, auth API
