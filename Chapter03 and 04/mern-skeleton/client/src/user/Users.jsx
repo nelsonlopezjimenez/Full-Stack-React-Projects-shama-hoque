@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
+import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
+import ArrowForward from '@mui/icons-material/ArrowForward'
 import Person from '@mui/icons-material/Person'
 import { list } from './api-user.js'
 import FormError from '../core/FormError.jsx'
@@ -32,14 +35,17 @@ const Users = () => {
       <FormError message={error} />
       <List dense>
         {users.map((item) => (
-          <ListItem key={item._id}>
+          <ListItemButton key={item._id} component={Link} to={`/users/${item._id}`}>
             <ListItemAvatar>
               <Avatar>
                 <Person />
               </Avatar>
             </ListItemAvatar>
             <ListItemText primary={item.name} />
-          </ListItem>
+            <ListItemIcon sx={{ minWidth: 0 }}>
+              <ArrowForward />
+            </ListItemIcon>
+          </ListItemButton>
         ))}
       </List>
     </Paper>

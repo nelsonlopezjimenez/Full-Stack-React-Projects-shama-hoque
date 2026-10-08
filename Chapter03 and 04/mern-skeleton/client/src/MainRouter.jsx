@@ -4,6 +4,7 @@ import Menu from './core/Menu.jsx'
 import NotFound from './core/NotFound.jsx'
 import Users from './user/Users.jsx'
 import Signup from './user/Signup.jsx'
+import Profile from './user/Profile.jsx'
 
 const MainRouter = () => (
   <>
@@ -12,6 +13,7 @@ const MainRouter = () => (
       <Route path="/" element={<Home />} />
       <Route path="/users" element={<Users />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/users/:userId" element={<Profile />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
