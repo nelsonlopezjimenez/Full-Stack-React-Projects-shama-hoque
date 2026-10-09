@@ -9,7 +9,7 @@ import App from './App.jsx';
 // index.html and tells React to draw <App /> inside it.
 //
 // [ADVANCED] <StrictMode> only matters in development: React renders every component twice to
-// expose code that is not "pure" (more about that in lesson 06). The production build skips it.
+// expose code that is not "pure" (lesson 08 explains the word). The production build skips it.
 const root = createRoot(document.getElementById('root'));
 root.render(
   <StrictMode>
