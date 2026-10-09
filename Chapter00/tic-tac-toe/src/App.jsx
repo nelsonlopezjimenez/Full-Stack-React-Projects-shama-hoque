@@ -142,9 +142,16 @@ export default function Game() {
   // array of elements, so {moves} below draws them all.
   // map passes each item (a board, unused here) and its index: `move` is 0, 1, 2, …
   //
-  // [BEGINNER] Open the Console (F12): React warns
-  //   Each child in a list should have a unique "key" prop.
-  // That warning is left in on purpose. Stage 11 explains it and fixes it.
+  // [BEGINNER] key={move} tells React WHICH item each <li> is, so after a change it can match the
+  // new list with the old one: same key = same item (keep it), new key = create it, missing key =
+  // remove it. Without a key React warns "Each child in a list should have a unique "key" prop".
+  // A key only has to be unique among its siblings, and it never changes for an item.
+  //
+  // [ADVANCED] The index is usually a BAD key: if items are inserted, removed or re-ordered, the
+  // same index ends up on a different item, and React mixes up their state. Here it is fine,
+  // because a move's number never changes: moves are only added at the end. Data from a database
+  // has a better key, its id: <li key={user.id}>. `key` is not a normal prop; Square or any other
+  // component cannot read it.
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
@@ -153,7 +160,7 @@ export default function Game() {
       description = 'Go to game start';
     }
     return (
-      <li>
+      <li key={move}>
         <button onClick={() => jumpTo(move)}>{description}</button>
       </li>
     );

@@ -113,3 +113,18 @@ stage does not expect.
 - **Verified:** same syntax tree as the tutorial; build ok; "Go to game start" → after two moves three
   buttons; clicking "Go to game start" leaves the board unchanged. The check **requires** the warning
   `Each child in a list should have a unique "key" prop` and fails on any other warning.
+
+## Stage 11 — keys (`teach/ch00-ttt-11-keys`)
+
+- **Changed:** `App.jsx`: `<li key={move}>`; the comment about the warning becomes a comment about keys.
+  Lesson 11.
+- **Why:** keys, and why the index is fine here but usually not.
+- **Verified:** same syntax tree as the tutorial; build ok; the stage-10 scenario passes, and this time
+  the check fails on **any** warning, so the key warning is really gone.
+- **Surprise (checker):** the first version of `tools/ttt-e2e/check-stage.mjs` ran `vite.build()` before
+  starting the dev server. `vite.build()` sets `process.env.NODE_ENV = 'production'` for the whole Node
+  process, so the dev server then served **production React**, which prints no warnings at all. Found
+  because stage 10's expected key warning never appeared. The build now runs after the browser check,
+  and stages 01–09 were checked again with the fixed checker (see the final check).
+  `tools/ladder-e2e/check-stage.mjs` (Ch03) has the same order, so its "fails on a React warning" probably
+  never worked. Not changed here; reported to you.
