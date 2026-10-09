@@ -159,3 +159,18 @@ stage does not expect.
 - **Verified:** the four files joined in order (imports removed, `export` removed from Square, Board and
   calculateWinner) have the same syntax tree as the tutorial's final code; build ok; the stage-12
   time-travel scenario passes; no console warnings.
+
+## Stage 15 — tests (`teach/ch00-ttt-15-tests`)
+
+- **Changed:** `package.json` (scripts `test`, `test:watch`; vitest, jsdom, @testing-library/react,
+  @testing-library/jest-dom with the Ch03 client's versions), the stage-15 lock, `vite.config.js` `test` block,
+  `src/test/setup.js` (same pattern as the Ch03 client), three test files (11 tests), README, lesson 15.
+- **Why:** the same idea as the Ch03 tests, in levels: pure function → controlled component with a mock
+  → the whole game.
+- **Verified:** `npm test`: 3 files, 11 tests pass. The tests can fail: with
+  `[...history, nextSquares]` instead of the `slice` (time-travel bug), exactly the time-travel test
+  fails. Browser check of stage 12's scenario passes; build ok; no console warnings.
+- **Changes to the plan:** no `@testing-library/user-event`; `fireEvent` as in the Ch03 client (one
+  package fewer). The checklist was updated before the build.
+- **Note:** `npm ci` prints EBADENGINE warnings for jsdom 30 (it wants Node ^22.22.2 or ^24.15.0; this
+  machine has 24.13.1). The Ch03 client has the same versions and the same warnings; the tests run fine.

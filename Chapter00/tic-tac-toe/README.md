@@ -29,6 +29,8 @@ npm run dev
 
 Open the address Vite prints (normally http://localhost:5173).
 
+From stage 15 on, `npm test` runs the tests (`npm run test:watch` runs them again on every save).
+
 ## The stages
 
 Read the lesson note of a stage (`lessons/NN-name.md`) next to the react.dev section it links to.
