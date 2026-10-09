@@ -128,3 +128,13 @@ stage does not expect.
   and stages 01–09 were checked again with the fixed checker (see the final check).
   `tools/ladder-e2e/check-stage.mjs` (Ch03) has the same order, so its "fails on a React warning" probably
   never worked. Not changed here; reported to you.
+
+## Stage 12 — time-travel (`teach/ch00-ttt-12-time-travel`)
+
+- **Changed:** `App.jsx`: `currentMove` state, `history[currentMove]`, `handlePlay` with
+  `history.slice(0, currentMove + 1)`, `jumpTo` sets `currentMove` and `xIsNext`. The key comment now
+  says "added or dropped at the end". Lesson 12.
+- **Why:** the tutorial's goal feature.
+- **Verified:** same syntax tree as the tutorial's sandbox; build ok; three moves, back to move #1 shows
+  only the first X and "Next player: O"; a new move there leaves three buttons (start, #1, #2); back to
+  game start empties the board; X still wins the top row afterwards; no console warnings.

@@ -117,24 +117,35 @@ export default function Game() {
   // [ [null × 9], [null, null, null, null, 'X', …], … ]. It starts with one empty board.
   // Array(9).fill(null) makes [null, null, … nine times]; squares[0] is the top-left square.
   //
-  // The board to show is the last one in the list. It is calculated, not stored.
   const [history, setHistory] = useState([Array(9).fill(null)]);
-  const currentSquares = history[history.length - 1];
+  // [BEGINNER] Time travel: which move are we looking at? 0 is the empty board at the start.
+  // The board to show is history[currentMove], not always the last one anymore. It is
+  // calculated from the state, not stored.
+  const [currentMove, setCurrentMove] = useState(0);
+  const currentSquares = history[currentMove];
 
-  // [BEGINNER] Board calls this (as onPlay) after a valid move. [...history, nextSquares] is a NEW
-  // array with all old boards plus the new one: the spread syntax `...` copies the items.
+  // [BEGINNER] Board calls this (as onPlay) after a valid move.
+  // If you went back to an earlier move and play from there, the moves after it are thrown away:
+  // history.slice(0, currentMove + 1) keeps the boards up to the one you are looking at, and
+  // [...kept, nextSquares] adds the new board: a NEW array, the spread syntax `...` copies the items.
   // Never history.push(nextSquares): that would change the state in place (see stage 06).
+  // Then the newest board is the current one again.
   //
-  // Two state updates, one redraw: React waits until handlePlay has finished and then draws once
-  // with both new values. !xIsNext flips true to false and back.
+  // Several state updates, one redraw: React waits until handlePlay has finished and then draws
+  // once with all the new values. !xIsNext flips true to false and back.
   function handlePlay(nextSquares) {
-    setHistory([...history, nextSquares]);
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
     setXIsNext(!xIsNext);
   }
 
-  // [BEGINNER] Called by the move buttons below. It does nothing yet: stage 12 fills it in.
+  // [BEGINNER] Called by the move buttons below: show that move's board. The history itself is
+  // not changed, so you can jump forward again. X plays the even moves (0, 2, 4, …): after an
+  // even number of moves it is X's turn. % is the remainder: 4 % 2 is 0, 5 % 2 is 1.
   function jumpTo(nextMove) {
-    // TODO
+    setCurrentMove(nextMove);
+    setXIsNext(nextMove % 2 === 0);
   }
 
   // [BEGINNER] Turning data into JSX: history.map() calls the arrow function once per board and
@@ -149,7 +160,7 @@ export default function Game() {
   //
   // [ADVANCED] The index is usually a BAD key: if items are inserted, removed or re-ordered, the
   // same index ends up on a different item, and React mixes up their state. Here it is fine,
-  // because a move's number never changes: moves are only added at the end. Data from a database
+  // because a move's number never changes: moves are only added or dropped at the end. Data from a database
   // has a better key, its id: <li key={user.id}>. `key` is not a normal prop; Square or any other
   // component cannot read it.
   const moves = history.map((squares, move) => {
