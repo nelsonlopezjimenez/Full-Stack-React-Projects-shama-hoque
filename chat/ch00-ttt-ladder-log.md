@@ -84,3 +84,12 @@ stage does not expect.
 - **Note:** the tutorial writes `function Square({value, onSquareClick})` (no spaces) in this section
   and in two later ones, and `{ value, onSquareClick }` elsewhere and in its final code. The ladder uses
   the final spelling everywhere, so diffs never show a whitespace-only change.
+
+## Stage 08 — winner (`teach/ch00-ttt-08-winner`)
+
+- **Changed:** `App.jsx`: `calculateWinner()` (with the trailing comma after the last line, as in the
+  tutorial's final code), `winner`/`status`, `<div className="status">`, the guard also checks for a
+  winner. Lesson 08.
+- **Why:** a pure helper function and values derived during rendering.
+- **Verified:** same syntax tree as the tutorial's sandbox; build ok; "Next player: X" → "O"; X wins the
+  top row, "Winner: X", a click on square 9 is ignored; no console warnings.
