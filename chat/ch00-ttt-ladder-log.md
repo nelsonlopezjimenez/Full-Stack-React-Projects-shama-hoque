@@ -174,3 +174,19 @@ stage does not expect.
   package fewer). The checklist was updated before the build.
 - **Note:** `npm ci` prints EBADENGINE warnings for jsdom 30 (it wants Node ^22.22.2 or ^24.15.0; this
   machine has 24.13.1). The Ch03 client has the same versions and the same warnings; the tests run fine.
+
+---
+
+## Final check (2026-10-08)
+
+- **Against the tutorial:** for stages 01–13, `src/App.jsx` with comments removed has the same syntax
+  tree as the tutorial's full `App.js` at the end of the matching section (formatting and JSX whitespace
+  ignored). Stage 13 equals the tutorial's final code. `src/styles.css` is the tutorial's, byte for byte,
+  below our one comment. Stage 14's four files, joined in order, equal the final code as well.
+- **Intended differences** (all listed in the README): `main.jsx` instead of `index.js`, `.jsx`
+  extensions, `index.html` in the project folder, our comments; from stage 14 the split into files;
+  stage 15's tests.
+- **Every stage in a clean checkout:** `node tools/ttt-e2e/run.mjs` (on `main`): stages 01–15 PASS,
+  with React in development mode (so warnings are really checked; stage 10 requires the key warning),
+  plus `npm test` of stage 15: 11 tests PASS.
+- **Branch chain:** every `teach/ch00-ttt-NN` is an ancestor of the next one; stage 01 starts from `main`.
