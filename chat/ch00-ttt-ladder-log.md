@@ -42,3 +42,13 @@ stage does not expect.
 - **Why:** reuse a component and pass data from parent to child.
 - **Verified:** same syntax tree as the tutorial; build ok; squares 1–9 in 3 rows; no console warnings.
 - **Note:** the tutorial's detour (every square shows "1" before props) is a "Try it" step, not a stage.
+
+## Stage 04 — interactive-square (`teach/ch00-ttt-04-interactive-square`)
+
+- **Changed:** `App.jsx`: `import { useState }`, `Square()` with `useState(null)` and `handleClick` →
+  `setValue('X')`, the tutorial's multi-line `<button … onClick={handleClick}>`; `Board` renders nine
+  `<Square />` without props. Lesson 04 (includes the React Developer Tools section and its links).
+- **Why:** events and state, the two things that make a page interactive.
+- **Verified:** same syntax tree as the tutorial; build ok; empty board, clicking squares 1 and 5 shows
+  X in exactly those two; no console warnings.
+- **Note:** the `console.log('clicked!')` step of the tutorial is a "Try it" step, not in the code.
