@@ -24,3 +24,13 @@ stage does not expect.
 - **Notes:** the code follows the tutorial's style (semicolons), so `vite.config.js` has semicolons too,
   unlike the Ch03 client. `main.jsx` imports `./App.jsx` with its extension (the tutorial writes `./App`;
   both work in Vite).
+
+## Stage 02 — board (`teach/ch00-ttt-02-board`)
+
+- **Changed:** `App.jsx`: `Square` renamed to `Board`, a Fragment with three `board-row` divs of
+  numbered buttons. Lesson 02.
+- **Why:** one element per component, Fragments, and CSS classes, before props come in.
+- **Verified:** same syntax tree as the tutorial's code at the end of the section (comments ignored);
+  build ok; 3 `.board-row`, squares 1–9; no console warnings.
+- **Note:** the tutorial reaches this code in three small steps (two squares → Fragment → rows, then the
+  rename). The stage holds only the result; the lesson's "Try it" walks the student through the steps.
