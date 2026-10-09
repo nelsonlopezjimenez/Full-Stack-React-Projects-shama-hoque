@@ -138,3 +138,13 @@ stage does not expect.
 - **Verified:** same syntax tree as the tutorial's sandbox; build ok; three moves, back to move #1 shows
   only the first X and "Next player: O"; a new move there leaves three buttons (start, #1, #2); back to
   game start empties the board; X still wins the top row afterwards; no console warnings.
+
+## Stage 13 — final-cleanup (`teach/ch00-ttt-13-final-cleanup`)
+
+- **Changed:** `App.jsx`: `xIsNext` state removed, `const xIsNext = currentMove % 2 === 0;`, no
+  `setXIsNext` in `handlePlay` / `jumpTo`; the turn comment moved from the removed state to the
+  calculated value. Lesson 13 with the five "Wrapping up" ideas as exercises (answers in a gist, not in the repo).
+- **Why:** avoid redundant state; the tutorial's last code step.
+- **Verified:** same syntax tree as the tutorial's final sandbox **and** as the "What are you building?"
+  sandbox at the top of the page (the two are identical); build ok; the stage-12 time-travel scenario
+  passes; no console warnings.

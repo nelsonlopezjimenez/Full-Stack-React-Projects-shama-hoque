@@ -108,10 +108,6 @@ function Board({ xIsNext, squares, onPlay }) {
 // imports it as App (the name used when importing a default export is up to the importer).
 // It draws the board on the left and, from the next stage on, the list of moves on the right.
 export default function Game() {
-  // [BEGINNER] Whose turn is it? A true/false state: true means X plays next. X always starts.
-  // A component can have as many useState calls as it needs, one per thing to remember.
-  const [xIsNext, setXIsNext] = useState(true);
-
   // [BEGINNER] "Lifting state up, again": to go back to earlier moves, we must remember every
   // board of the game, not only the last one. `history` is a list of boards, one per move:
   // [ [null × 9], [null, null, null, null, 'X', …], … ]. It starts with one empty board.
@@ -122,6 +118,13 @@ export default function Game() {
   // The board to show is history[currentMove], not always the last one anymore. It is
   // calculated from the state, not stored.
   const [currentMove, setCurrentMove] = useState(0);
+  // [BEGINNER] Whose turn is it? true means X plays next. X makes the first move, so it is X's
+  // turn after an even number of moves (0, 2, 4, …). % is the remainder: 4 % 2 is 0, 5 % 2 is 1.
+  //
+  // This used to be a state of its own (useState(true)) that every move and every jump had to
+  // update. But it can always be CALCULATED from currentMove, and a value that is calculated can
+  // never be out of sync. Rule of thumb: don't keep in state what you can compute from other state.
+  const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
   // [BEGINNER] Board calls this (as onPlay) after a valid move.
@@ -131,21 +134,18 @@ export default function Game() {
   // Never history.push(nextSquares): that would change the state in place (see stage 06).
   // Then the newest board is the current one again.
   //
-  // Several state updates, one redraw: React waits until handlePlay has finished and then draws
-  // once with all the new values. !xIsNext flips true to false and back.
+  // Two state updates, one redraw: React waits until handlePlay has finished and then draws once
+  // with both new values.
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-    setXIsNext(!xIsNext);
   }
 
   // [BEGINNER] Called by the move buttons below: show that move's board. The history itself is
-  // not changed, so you can jump forward again. X plays the even moves (0, 2, 4, …): after an
-  // even number of moves it is X's turn. % is the remainder: 4 % 2 is 0, 5 % 2 is 1.
+  // not changed, so you can jump forward again. Whose turn it is follows from currentMove.
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
-    setXIsNext(nextMove % 2 === 0);
   }
 
   // [BEGINNER] Turning data into JSX: history.map() calls the arrow function once per board and
