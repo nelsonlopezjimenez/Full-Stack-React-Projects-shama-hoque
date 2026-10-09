@@ -120,6 +120,8 @@ You need:
 > `'get' is not recognized` or `get: command not found` means the **first word** is misspelled.
 > `'upsteam' does not appear to be a git repository` means the **remote name** is misspelled.
 > Compare it letter by letter with the command in this guide.
+> For any other error, see [Reading error messages](reading-error-messages.md): read from the top,
+> fix the first error, run again.
 >
 > **Tip:** keep a short list of the words *you* tend to mistype (`git`, `upstream`, `server`, your user
 > name…) and check those words before pressing **Enter**.
@@ -319,6 +321,9 @@ when your instructor asks for it.
 ---
 
 ## 8. When something goes wrong
+
+First, read the error **from the top** and fix only the **first** one: see
+[Reading error messages](reading-error-messages.md).
 
 | You see | Why | Fix |
 |---|---|---|
