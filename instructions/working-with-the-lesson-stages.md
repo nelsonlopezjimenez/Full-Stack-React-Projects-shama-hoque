@@ -68,6 +68,64 @@ You need:
 
 ---
 
+## ⌨️ Typo-proof your terminal: let the computer spell for you
+
+> [!IMPORTANT]
+> ### Don't type long names. Press **Tab**.
+>
+> Most git errors are not git problems; they are one wrong letter: `get` instead of `git`,
+> `upsteam` instead of `upstream`, `ch03-sever-05` instead of `ch03-server-05`. Professionals don't
+> spell these by hand. They let the terminal do it.
+>
+> #### 1. Tab completion
+>
+> Type the first few letters and press **Tab**. Press **Tab** twice to see all choices.
+>
+> ```
+> git fetch ups<Tab>                         →  git fetch upstream
+> git diff upstream/teach/ch03-server-0<Tab><Tab>   (lists every stage)
+> ```
+>
+> - **Git Bash** and the VS Code terminal with Git Bash: works out of the box.
+> - **PowerShell**: install **posh-git** once, then open a new terminal:
+>
+>   ```powershell
+>   Install-Module posh-git -Scope CurrentUser
+>   Add-PoshGitToProfile
+>   ```
+>
+> #### 2. Let git fix its own commands (once)
+>
+> ```bash
+> git config --global help.autocorrect prompt
+> ```
+>
+> Now `git comit` or `git fecth` asks *"Did you mean `commit`?"*. Answer `y`.
+>
+> #### 3. Copy, don't retype
+>
+> - **Copy** commands and addresses from this guide (the copy button on each code box).
+> - Press **↑** (up arrow) to bring back a command you already typed correctly.
+>
+> #### 4. Check before you go on
+>
+> | After you…             | Run                          | Look for                        |
+> |------------------------|------------------------------|---------------------------------|
+> | add a remote           | `git remote -v`              | `origin` and `upstream`, spelled right |
+> | switch or create a branch | `git branch --show-current` | the exact name you meant       |
+> | anything else          | `git status`                 | no surprises                    |
+>
+> #### 5. Read the first word of the error
+>
+> `'get' is not recognized` or `get: command not found` means the **first word** is misspelled.
+> `'upsteam' does not appear to be a git repository` means the **remote name** is misspelled.
+> Compare it letter by letter with the command in this guide.
+>
+> **Tip:** keep a short list of the words *you* tend to mistype (`git`, `upstream`, `server`, your user
+> name…) and check those words before pressing **Enter**.
+
+---
+
 ## 2. Get the code (once): fork, clone, add `upstream`
 
 This is the usual way to work on a project you can't change yourself, on Gitea, GitHub and everywhere
@@ -264,6 +322,7 @@ when your instructor asks for it.
 
 | You see | Why | Fix |
 |---|---|---|
+| `'get' is not recognized`, `command not found`, `'upsteam' does not appear to be a git repository`, `is not a git command` | A typo: one letter wrong or missing | Compare letter by letter with this guide; use **Tab** (see *Typo-proof your terminal*) |
 | `fatal: bad revision 'teach/ch03-server-02-...'` | Only branches you switched to exist under the short name | Put `upstream/` in front: `upstream/teach/ch03-server-02-...` |
 | `fatal: bad revision 'upstream/teach/...'` or `'upstream' does not appear to be a git repository` | `upstream` is not connected yet, or not fetched | Section 2, step 3: `git remote add upstream …`, then `git fetch upstream` |
 | A stage is **missing** under `origin/teach/...`, or looks older than the lesson | Your fork is a copy from the day you forked | Use `upstream/teach/...` |
