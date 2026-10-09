@@ -17,6 +17,10 @@ function Square({ value, onSquareClick }) {
 // [BEGINNER] `export default` makes Board the main thing this file offers; main.jsx imports it
 // as App (the name used when importing a default export is up to the importer).
 export default function Board() {
+  // [BEGINNER] Whose turn is it? A true/false state: true means X plays next. X always starts.
+  // A component can have as many useState calls as it needs, one per thing to remember.
+  const [xIsNext, setXIsNext] = useState(true);
+
   // [BEGINNER] "Lifting state up": to find a winner later, ONE component has to know all nine
   // squares. So the state moves from each Square up to their parent, Board, and Board passes the
   // values back down as props. That keeps the squares and the board in sync.
@@ -43,9 +47,21 @@ export default function Board() {
   // cheap, which is also what lets memo() skip redrawing parts that did not change.
   // Other ways to copy: [...squares], or squares.with(i, 'X') (copy with one item replaced).
   function handleClick(i) {
+    // [BEGINNER] An early return: if the square already holds an X or an O, stop here, so a
+    // click can never overwrite it. (null counts as false, 'X' and 'O' count as true.)
+    if (squares[i]) {
+      return;
+    }
     const nextSquares = squares.slice();
-    nextSquares[i] = 'X';
+    if (xIsNext) {
+      nextSquares[i] = 'X';
+    } else {
+      nextSquares[i] = 'O';
+    }
+    // [BEGINNER] Two state updates, one redraw: React waits until handleClick has finished and
+    // then draws once with both new values. !xIsNext flips true to false and back.
     setSquares(nextSquares);
+    setXIsNext(!xIsNext);
   }
 
   // [BEGINNER] A component returns ONE element. Two buttons side by side are two elements, and

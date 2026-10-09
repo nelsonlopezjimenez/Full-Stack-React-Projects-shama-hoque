@@ -73,3 +73,14 @@ stage does not expect.
 - **Verified:** same syntax tree as stage 05 and the tutorial; build ok; the stage-04 scenario passes.
   The "Try it" claim was tested too: with `squares[i] = 'X'; setSquares(squares);` the browser check
   clicked two squares and the board stayed empty.
+
+## Stage 07 — taking-turns (`teach/ch00-ttt-07-taking-turns`)
+
+- **Changed:** `App.jsx`: `xIsNext` state, early return for filled squares, X or O, `setXIsNext(!xIsNext)`.
+  Lesson 07.
+- **Why:** a second state, and a guard in an event handler.
+- **Verified:** same syntax tree as the tutorial; build ok; X then O; clicking a filled square changes
+  nothing; the next click is X again; no console warnings.
+- **Note:** the tutorial writes `function Square({value, onSquareClick})` (no spaces) in this section
+  and in two later ones, and `{ value, onSquareClick }` elsewhere and in its final code. The ladder uses
+  the final spelling everywhere, so diffs never show a whitespace-only change.
