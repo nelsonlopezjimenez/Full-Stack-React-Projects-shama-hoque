@@ -148,3 +148,14 @@ stage does not expect.
 - **Verified:** same syntax tree as the tutorial's final sandbox **and** as the "What are you building?"
   sandbox at the top of the page (the two are identical); build ok; the stage-12 time-travel scenario
   passes; no console warnings.
+
+## Stage 14 — split-files (`teach/ch00-ttt-14-split-files`)
+
+- **Changed:** `src/App.jsx` renamed to `src/Game.jsx` (keeps `Game`), new `src/Board.jsx`,
+  `src/Square.jsx` (default exports) and `src/calculateWinner.js` (a named export); `main.jsx` imports
+  and draws `Game`; README mentions the files. Each component's comments moved with it; new comments on
+  default vs named exports. Lesson 14.
+- **Why:** one job per file, like server stage 07 and client stage 04 of Ch03; prepares the tests.
+- **Verified:** the four files joined in order (imports removed, `export` removed from Square, Board and
+  calculateWinner) have the same syntax tree as the tutorial's final code; build ok; the stage-12
+  time-travel scenario passes; no console warnings.

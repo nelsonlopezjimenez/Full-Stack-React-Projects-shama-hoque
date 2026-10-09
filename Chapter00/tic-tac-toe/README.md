@@ -55,6 +55,8 @@ Read the lesson note of a stage (`lessons/NN-name.md`) next to the react.dev sec
 
 - **Vite instead of CodeSandbox.** The tutorial's `index.js` is `src/main.jsx` here, and `App.js` is
   `src/App.jsx` (Vite expects JSX in `.jsx` files). `index.html` is in the project folder, not in `public/`.
+- **From stage 14 on**, the code of `App.jsx` is split into `Square.jsx`, `Board.jsx`, `Game.jsx` and
+  `calculateWinner.js`.
 - **Comments.** The code is the tutorial's code. The `[BEGINNER]` and `[ADVANCED]` comments are ours:
   `[BEGINNER]` explains what you see, `[ADVANCED]` gives background you can skip the first time.
 
