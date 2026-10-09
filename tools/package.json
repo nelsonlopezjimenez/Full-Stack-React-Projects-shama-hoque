@@ -2,10 +2,11 @@
   "name": "ladder-tools",
   "private": true,
   "type": "module",
-  "description": "Helper scripts for the teaching ladders: make-nc-ladder.mjs and the end-to-end checks in ladder-e2e/",
+  "description": "Helper scripts for the teaching ladders: make-nc-ladder.mjs and the end-to-end checks in ladder-e2e/ (Ch03) and ttt-e2e/ (Tic-Tac-Toe)",
   "scripts": {
     "nc-ladder": "node make-nc-ladder.mjs",
-    "e2e": "node ladder-e2e/run.mjs"
+    "e2e": "node ladder-e2e/run.mjs",
+    "e2e:ttt": "node ttt-e2e/run.mjs"
   },
   "dependencies": {
     "@babel/parser": "^7.29.0",

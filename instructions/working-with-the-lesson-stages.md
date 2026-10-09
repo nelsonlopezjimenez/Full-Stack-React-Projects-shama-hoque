@@ -26,6 +26,30 @@ for them: replace `server` with `client` in the branch names. To run a client st
 (`cd server && npm run dev`) and then the client (`cd client && npm install && npm run dev`) in a
 second terminal.
 
+**New to React? Start with Tic-Tac-Toe.** React's official tutorial,
+[Tutorial: Tic-Tac-Toe](https://react.dev/learn/tutorial-tic-tac-toe), is built in **15 stages**, one
+per section of the tutorial (stages 14 and 15 come after it: one file per component, and tests):
+
+```
+teach/ch00-ttt-01-setup
+...
+teach/ch00-ttt-15-tests
+```
+
+It needs only Node.js: no server, no MongoDB. Its folder is `Chapter00/tic-tac-toe` (no spaces) and its
+notes are in `Chapter00/tic-tac-toe/lessons/`. To run a stage:
+
+```bash
+cd Chapter00/tic-tac-toe
+npm install
+npm run dev
+```
+
+Everything below works the same way: use
+`teach/ch00-ttt-…` branch names and `Chapter00/tic-tac-toe` instead of the server folder, for example
+`git diff origin/teach/ch00-ttt-07-taking-turns origin/teach/ch00-ttt-08-winner -- . ":!package-lock.json"`
+from inside `Chapter00/tic-tac-toe`.
+
 These instructions show you how to get the code, how to see what each lesson changed, and how to do
 the lessons yourself **without ever getting stuck with git**.
 

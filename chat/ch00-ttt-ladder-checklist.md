@@ -1,6 +1,6 @@
 # Chapter 00 — teaching ladder, Tic-Tac-Toe (react.dev tutorial)
 
-**Status:** approved 2026-10-08 (your answers are under "Answers" at the end). Changes to the plan are recorded in the log.
+**Status:** approved and built 2026-10-08: `teach/ch00-ttt-01-setup` … `teach/ch00-ttt-15-tests` (your answers are under "Answers" at the end). Changes to the plan are recorded in the log.
 **Log:** `ch00-ttt-ladder-log.md`, on the ladder branches (like the Ch03 ladders)
 **Source:** https://react.dev/learn/tutorial-tic-tac-toe (the official React tutorial)
 **Target:** the tutorial's final `App.js` (Square, Board, Game, `calculateWinner`, `history`,
@@ -70,6 +70,12 @@ As in the Ch03 ladders: one branch per stage pointing at its last commit, every 
 every stage uses the same versions. Checks run on Vite port 5220 (not 5173, which Ch02 uses), and I stop
 only processes I started. A headless Edge check per stage, `tools/ttt-e2e/` on `main` (it reuses `tools/ladder-e2e/config.mjs`),
 clicks through the game and checks that the key warning appears in 10 and is gone in 11.
+
+## Fixing an earlier stage later
+
+As for Ch03: commit on the stage where the fix belongs, then
+`git switch teach/ch00-ttt-15-tests && git rebase --update-refs <that stage>`, then
+`node tools/ttt-e2e/run.mjs` to check every stage again.
 
 ## Final check
 
