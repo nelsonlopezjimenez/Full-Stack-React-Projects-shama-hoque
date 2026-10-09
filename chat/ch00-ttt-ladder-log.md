@@ -104,3 +104,12 @@ stage does not expect.
   (as planned).
 - **Verified:** same syntax tree as the tutorial's sandbox; build ok; the board is inside
   `.game .game-board`; the stage-08 scenario (turns, win, no move after the win) passes; no console warnings.
+
+## Stage 10 — past-moves (`teach/ch00-ttt-10-past-moves`)
+
+- **Changed:** `App.jsx`: `jumpTo(nextMove)` with `// TODO`, `moves = history.map(...)` with `<li>`
+  but **no key**, `<ol>{moves}</ol>`. Lesson 10.
+- **Why:** lists from arrays; the missing key is the tutorial's own setup for the next section.
+- **Verified:** same syntax tree as the tutorial; build ok; "Go to game start" → after two moves three
+  buttons; clicking "Go to game start" leaves the board unchanged. The check **requires** the warning
+  `Each child in a list should have a unique "key" prop` and fails on any other warning.

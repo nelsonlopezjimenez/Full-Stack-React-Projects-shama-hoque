@@ -132,15 +132,42 @@ export default function Game() {
     setXIsNext(!xIsNext);
   }
 
+  // [BEGINNER] Called by the move buttons below. It does nothing yet: stage 12 fills it in.
+  function jumpTo(nextMove) {
+    // TODO
+  }
+
+  // [BEGINNER] Turning data into JSX: history.map() calls the arrow function once per board and
+  // returns a NEW array with what each call returned, here one <li> per move. React can show an
+  // array of elements, so {moves} below draws them all.
+  // map passes each item (a board, unused here) and its index: `move` is 0, 1, 2, …
+  //
+  // [BEGINNER] Open the Console (F12): React warns
+  //   Each child in a list should have a unique "key" prop.
+  // That warning is left in on purpose. Stage 11 explains it and fixes it.
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = 'Go to move #' + move;
+    } else {
+      description = 'Go to game start';
+    }
+    return (
+      <li>
+        <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
+
   // [BEGINNER] The class names game, game-board and game-info are in styles.css: the board on the
-  // left, the information next to it. The <ol> (ordered list) gets the moves in stage 10.
+  // left, the information next to it. The <ol> (ordered list) numbers the moves 1, 2, 3, …
   return (
     <div className="game">
       <div className="game-board">
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
-        <ol>{/*TODO*/}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
