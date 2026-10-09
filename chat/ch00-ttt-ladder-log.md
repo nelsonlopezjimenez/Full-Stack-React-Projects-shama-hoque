@@ -93,3 +93,14 @@ stage does not expect.
 - **Why:** a pure helper function and values derived during rendering.
 - **Verified:** same syntax tree as the tutorial's sandbox; build ok; "Next player: X" → "O"; X wins the
   top row, "Winner: X", a click on square 9 is ignored; no console warnings.
+
+## Stage 09 — lift-state-again (`teach/ch00-ttt-09-lift-state-again`)
+
+- **Changed:** `App.jsx`: new default export `Game` with `xIsNext`, `history`, `currentSquares`,
+  `handlePlay`, the `game` layout and an empty `<ol>{/*TODO*/}</ol>` (the tutorial's own placeholder);
+  `Board({ xIsNext, squares, onPlay })` without state. The "lifting state up" and "two updates, one
+  redraw" comments moved with the code into `Game`. Lesson 09 covers both tutorial sections.
+- **Why:** the "Storing a history of moves" section has no code of its own, so it shares this stage
+  (as planned).
+- **Verified:** same syntax tree as the tutorial's sandbox; build ok; the board is inside
+  `.game .game-board`; the stage-08 scenario (turns, win, no move after the win) passes; no console warnings.

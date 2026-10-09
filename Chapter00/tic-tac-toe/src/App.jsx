@@ -14,26 +14,16 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-// [BEGINNER] `export default` makes Board the main thing this file offers; main.jsx imports it
-// as App (the name used when importing a default export is up to the importer).
-export default function Board() {
-  // [BEGINNER] Whose turn is it? A true/false state: true means X plays next. X always starts.
-  // A component can have as many useState calls as it needs, one per thing to remember.
-  const [xIsNext, setXIsNext] = useState(true);
-
-  // [BEGINNER] "Lifting state up": to find a winner later, ONE component has to know all nine
-  // squares. So the state moves from each Square up to their parent, Board, and Board passes the
-  // values back down as props. That keeps the squares and the board in sync.
+// [BEGINNER] Board has no state anymore: it was lifted up once more, into Game (below). Board
+// gets everything as props, exactly as Square does: which board to show (`squares`), whose turn
+// it is (`xIsNext`), and a function to call with the new board after a move (`onPlay`).
+// A component that is driven completely by its props is called a "controlled" component.
+function Board({ xIsNext, squares, onPlay }) {
+  // [BEGINNER] Square cannot change the squares itself. Board passes this function down, and
+  // Square calls it.
   //
-  // Array(9).fill(null) makes [null, null, … nine times]. squares[0] is the top-left square,
-  // squares[8] the bottom-right one. Later it will look like ['O', null, 'X', 'X', 'X', 'O', …].
-  const [squares, setSquares] = useState(Array(9).fill(null));
-
-  // [BEGINNER] State is private to the component that owns it: Square cannot change Board's
-  // squares itself. Board passes this function down instead, and Square calls it.
-  //
-  // squares.slice() makes a COPY of the array. The copy is changed and handed to setSquares,
-  // and React draws the board again with the new array.
+  // squares.slice() makes a COPY of the array. The copy is changed and handed to onPlay, and
+  // Game stores it (see handlePlay in Game).
   //
   // [BEGINNER] Why a copy? This is "immutability": never change (mutate) state in place, always
   // replace it with a new value. Two reasons:
@@ -58,10 +48,8 @@ export default function Board() {
     } else {
       nextSquares[i] = 'O';
     }
-    // [BEGINNER] Two state updates, one redraw: React waits until handleClick has finished and
-    // then draws once with both new values. !xIsNext flips true to false and back.
-    setSquares(nextSquares);
-    setXIsNext(!xIsNext);
+    // [BEGINNER] Board does not store the move: it tells its parent, and Game decides.
+    onPlay(nextSquares);
   }
 
   // [BEGINNER] The status line is not state: it is CALCULATED from the state on every render.
@@ -113,6 +101,48 @@ export default function Board() {
         <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
       </div>
     </>
+  );
+}
+
+// [BEGINNER] Game is the new top-level component, so it is the `export default` now: main.jsx
+// imports it as App (the name used when importing a default export is up to the importer).
+// It draws the board on the left and, from the next stage on, the list of moves on the right.
+export default function Game() {
+  // [BEGINNER] Whose turn is it? A true/false state: true means X plays next. X always starts.
+  // A component can have as many useState calls as it needs, one per thing to remember.
+  const [xIsNext, setXIsNext] = useState(true);
+
+  // [BEGINNER] "Lifting state up, again": to go back to earlier moves, we must remember every
+  // board of the game, not only the last one. `history` is a list of boards, one per move:
+  // [ [null × 9], [null, null, null, null, 'X', …], … ]. It starts with one empty board.
+  // Array(9).fill(null) makes [null, null, … nine times]; squares[0] is the top-left square.
+  //
+  // The board to show is the last one in the list. It is calculated, not stored.
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const currentSquares = history[history.length - 1];
+
+  // [BEGINNER] Board calls this (as onPlay) after a valid move. [...history, nextSquares] is a NEW
+  // array with all old boards plus the new one: the spread syntax `...` copies the items.
+  // Never history.push(nextSquares): that would change the state in place (see stage 06).
+  //
+  // Two state updates, one redraw: React waits until handlePlay has finished and then draws once
+  // with both new values. !xIsNext flips true to false and back.
+  function handlePlay(nextSquares) {
+    setHistory([...history, nextSquares]);
+    setXIsNext(!xIsNext);
+  }
+
+  // [BEGINNER] The class names game, game-board and game-info are in styles.css: the board on the
+  // left, the information next to it. The <ol> (ordered list) gets the moves in stage 10.
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+      </div>
+      <div className="game-info">
+        <ol>{/*TODO*/}</ol>
+      </div>
+    </div>
   );
 }
 
