@@ -34,3 +34,11 @@ stage does not expect.
   build ok; 3 `.board-row`, squares 1–9; no console warnings.
 - **Note:** the tutorial reaches this code in three small steps (two squares → Fragment → rows, then the
   rename). The stage holds only the result; the lesson's "Try it" walks the student through the steps.
+
+## Stage 03 — props (`teach/ch00-ttt-03-props`)
+
+- **Changed:** `App.jsx`: new `Square({ value })`, `Board` renders `<Square value="1" />` … `"9"`.
+  Comments on `Board` updated for the new JSX. Lesson 03.
+- **Why:** reuse a component and pass data from parent to child.
+- **Verified:** same syntax tree as the tutorial; build ok; squares 1–9 in 3 rows; no console warnings.
+- **Note:** the tutorial's detour (every square shows "1" before props) is a "Try it" step, not a stage.
