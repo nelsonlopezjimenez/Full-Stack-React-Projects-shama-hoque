@@ -52,3 +52,14 @@ stage does not expect.
 - **Verified:** same syntax tree as the tutorial; build ok; empty board, clicking squares 1 and 5 shows
   X in exactly those two; no console warnings.
 - **Note:** the `console.log('clicked!')` step of the tutorial is a "Try it" step, not in the code.
+
+## Stage 05 — lift-state (`teach/ch00-ttt-05-lift-state`)
+
+- **Changed:** `App.jsx`: `Square({ value, onSquareClick })` without state; `Board` owns
+  `squares = useState(Array(9).fill(null))`, `handleClick(i)` copies with `slice()`, and every square gets
+  `value={squares[i]}` and `onSquareClick={() => handleClick(i)}`. Lesson 05.
+- **Why:** the tutorial's central idea: shared state lives in the parent.
+- **Verified:** same syntax tree as the tutorial's sandbox at the end of the section; build ok; the
+  stage-04 scenario passes unchanged (same behavior); no console warnings.
+- **Note:** the tutorial passes through two intermediate versions (an empty board without clicks, then
+  `handleClick()` that always fills square 0). Both are "Try it" steps in the lesson.
