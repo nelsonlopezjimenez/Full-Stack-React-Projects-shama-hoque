@@ -29,7 +29,19 @@ export default function Board() {
   // squares itself. Board passes this function down instead, and Square calls it.
   //
   // squares.slice() makes a COPY of the array. The copy is changed and handed to setSquares,
-  // and React draws the board again with the new array. (Stage 06 explains why a copy.)
+  // and React draws the board again with the new array.
+  //
+  // [BEGINNER] Why a copy? This is "immutability": never change (mutate) state in place, always
+  // replace it with a new value. Two reasons:
+  // 1. React compares the old and the new state to see if something changed. The same array,
+  //    changed inside, looks unchanged, so `squares[i] = 'X'; setSquares(squares);` may draw
+  //    nothing at all.
+  // 2. The old array stays as it was. Later (time travel, stage 12) we keep every old board.
+  //
+  // [ADVANCED] React compares with Object.is(old, new), which for arrays and objects checks
+  // whether they are the SAME object, not whether they have the same contents. That check is
+  // cheap, which is also what lets memo() skip redrawing parts that did not change.
+  // Other ways to copy: [...squares], or squares.with(i, 'X') (copy with one item replaced).
   function handleClick(i) {
     const nextSquares = squares.slice();
     nextSquares[i] = 'X';

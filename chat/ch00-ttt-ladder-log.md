@@ -63,3 +63,13 @@ stage does not expect.
   stage-04 scenario passes unchanged (same behavior); no console warnings.
 - **Note:** the tutorial passes through two intermediate versions (an empty board without clicks, then
   `handleClick()` that always fills square 0). Both are "Try it" steps in the lesson.
+
+## Stage 06 — immutability (`teach/ch00-ttt-06-immutability`)
+
+- **Changed:** only the comment above `handleClick` (mutate vs copy, `Object.is`, other ways to copy).
+  Lesson 06 with a "break it on purpose" step.
+- **Why:** you chose to keep the tutorial's "talk only" section as a stage of its own. The diff from
+  stage 05 is comments only, so students see that nothing in the code changed.
+- **Verified:** same syntax tree as stage 05 and the tutorial; build ok; the stage-04 scenario passes.
+  The "Try it" claim was tested too: with `squares[i] = 'X'; setSquares(squares);` the browser check
+  clicked two squares and the board stayed empty.
