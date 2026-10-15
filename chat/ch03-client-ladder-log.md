@@ -44,3 +44,11 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Changed:** three commits (03a–03c): "Why immutability is important" (comments only), "Taking turns",
   "Declaring a winner" (Tic-Tac-Toe ladder stages 06–08), lesson 03.
 - **Verified:** build ok; 03a–03c pass their Tic-Tac-Toe checks (turns, filled squares, winner, no moves after a win).
+
+## Stage 04 — ttt-keys (`teach/ch03-client-04-ttt-keys`)
+
+- **Changed:** three commits (04a–04c): history and `Game` ("Storing a history", "Lifting state up, again"),
+  "Showing the past moves", "Picking a key" (Tic-Tac-Toe ladder stages 09–11), lesson 04.
+- **Note:** commit 04b has React's "unique key" warning on purpose (as the tutorial does); the stage itself
+  (04c) has none.
+- **Verified:** build ok; 04a–04c pass their Tic-Tac-Toe checks; 04b prints the expected key warning, 04c prints none.
