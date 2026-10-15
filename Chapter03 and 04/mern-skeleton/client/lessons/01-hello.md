@@ -6,12 +6,45 @@
 > [`instructions/working-with-the-lesson-stages.md`](http://192.168.1.28:3000/s888888/Full-Stack-React-Projects-shama-hoque/src/branch/main/instructions/working-with-the-lesson-stages.md).
 > It lives only on `main`, so the `instructions/` folder is not there while a stage is checked out.
 > Read it in Gitea (branch `main`), or in the terminal:
-> `git show origin/main:instructions/working-with-the-lesson-stages.md`
+> `git show upstream/main:instructions/working-with-the-lesson-stages.md`
 
 ## Goal
 
 A web page made by React. It is three small files. The server from the server series is finished
 and stays as it is; from now on we build the part that runs **in the browser**.
+
+## Build it yourself first
+
+Try the goal on your own before you look at this stage's code. Start where the server series ends,
+and copy this note into your branch (it is not there yet, because the stage you start from is older):
+
+```bash
+git fetch upstream
+git switch --no-track -c my/ch03-client-01-hello upstream/teach/ch03-server-19-tests
+git restore --source=upstream/teach/ch03-client-01-hello -- ":/Chapter03 and 04/mern-skeleton/client/lessons/01-hello.md"
+```
+
+`:/` at the start of the path means "from the top folder of the repository", so the last command works
+from any folder. The note appears as a new file; commit it together with your work.
+
+**What must be running:** nothing yet. The server and MongoDB are not needed until stage 06.
+
+**Your task:**
+
+1. Make a `client` folder next to `server`, with a `package.json` that has the scripts `dev` (`vite`) and
+   `build` (`vite build`), and install `react`, `react-dom`, `vite` and `@vitejs/plugin-react`.
+   (A shortcut: `npm create vite@latest client -- --template react` makes a similar project with a few
+   extra files. Delete what you don't need.)
+2. Write `index.html` with a `<div id="root">`, `vite.config.js` with the React plugin and port 5173,
+   `src/main.jsx` that renders `<App />`, and `src/App.jsx` with a heading.
+
+**Done when:** `npm run dev` shows your heading on http://localhost:5173, and `npm run build` writes `dist/`.
+
+**Compare** with the finished stage (from the `client` folder):
+
+```bash
+git diff upstream/teach/ch03-client-01-hello -- . ":!package-lock.json"
+```
 
 ## New ideas
 
@@ -24,7 +57,7 @@ and stays as it is; from now on we build the part that runs **in the browser**.
 - **Vite** is that build tool. `npm run dev` starts a development server with **hot reload** (save a
   file and the page updates without losing its state); `npm run build` makes the files for production.
 - **`createRoot(...).render(<App />)`** connects React to the `<div id="root">` in `index.html`.
-- **`<StrictMode>`** is a development helper (more about it in stage 02).
+- **`<StrictMode>`** is a development helper (more about it in stage 06).
 
 ## What changed
 
@@ -59,3 +92,9 @@ npm run dev
 Add a second component `Footer` in `App.jsx` that shows the current year
 (`new Date().getFullYear()`), and use it below the paragraph as `<Footer />`. In JSX, a JavaScript
 value goes inside curly braces: `<p>{year}</p>`.
+
+## Next
+
+Stages 02–05 are React's official tutorial, **Tic-Tac-Toe**, built inside this client: components, props,
+state, events, lists and keys, with no server. Stage 06 comes back to the MERN app and loads the users
+from the server.
