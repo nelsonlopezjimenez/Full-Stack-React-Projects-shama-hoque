@@ -272,3 +272,33 @@ of migration checklist steps, and `auth-helper.js` no longer says the server ign
 - **Surprise:** `--update-refs` also moved the backup branch that pointed at the old stage 16; it was reset from
   the reflog. Tags are never moved, so a tag is the better backup.
 - Question, analysis and rebase/clone/fork notes: `chat/ch03-instructions-on-main-and-rebasing.md` (on `main`).
+
+---
+
+## Change after the build — Tic-Tac-Toe as client stages 02–05 (2026-10-15)
+
+- **Asked for by the user:** the Tic-Tac-Toe tutorial right after stage 01 (grouped as 02 "setup … lifting
+  state up", 03 "… declaring a winner", 04 "… picking a key", 05 "… final cleanup"), then the old stages
+  02–16 as 06–20. Every lesson gets a **Build it yourself first** section, because a student who starts from
+  the previous stage does not have the new lesson note yet.
+- **How:** not a `git rebase` (every old stage would have conflicted on the renamed lesson files and on this
+  log). A script replayed each old commit's *tree* on top of the new stage 05: lesson files come from the
+  reviewed new versions, `client/README.md` and code comments get the stage numbers moved up by 4 (server stage
+  numbers untouched), and this log is rebuilt from its old per-stage parts with the Tic-Tac-Toe entries inserted.
+  Commit messages are renumbered; author dates are kept. A new first commit in stage 06 (06a) removes the game.
+- **Also changed:** stage 01 got one more commit (its lesson's new section; fast-forward, so the pushed
+  stage 01 is not rewritten). Git commands in the client lessons and README use `upstream/` (the fork
+  workflow on `main`); the old notes still said `origin/`.
+- **Old stages:** local tags `backup/old-client/02-users-list` … `16-tests` (the old branches are still on
+  GitHub until they are deleted there).
+- **Verified:**
+  - code: old stage *k* and new stage *k*+4 have identical files outside `lessons/`, `README.md` and this log,
+    except comments that name client stages (one or two lines in eight stages, e.g. "Stage 04 moves all fetch
+    code" → "Stage 08");
+  - stages 01–05 and all 13 Tic-Tac-Toe commits pass the browser checks (see the stage entries);
+  - stages 06–20: `vite build` ok for each (the 500 kB chunk warning appears in 12–17 only, as lessons 12 and
+    18 say); stage 20's `npm test`: 4 files, 13 tests passed;
+  - lesson 06's failure message without the proxy, reproduced: Vite answers `/api/users` with `index.html`
+    (200, `text/html`) and `response.json()` throws *SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON*.
+  - **not yet:** the browser scenarios of stages 06–20 (`node tools/ladder-e2e/run.mjs`, renumbered on `main`)
+    need MongoDB, which was not running on 2026-10-15.
