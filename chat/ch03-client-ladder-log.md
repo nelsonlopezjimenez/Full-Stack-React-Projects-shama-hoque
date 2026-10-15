@@ -38,3 +38,9 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Verified:** build ok; every commit 02a–02e passes the Tic-Tac-Toe ladder's browser check for its tutorial section
   (`tools/ttt-e2e/check-stage.mjs`, run against the client folder), and the stage passes `ladder-e2e` s02
   (the game below the "MERN Skeleton" heading); no console warnings.
+
+## Stage 03 — ttt-winner (`teach/ch03-client-03-ttt-winner`)
+
+- **Changed:** three commits (03a–03c): "Why immutability is important" (comments only), "Taking turns",
+  "Declaring a winner" (Tic-Tac-Toe ladder stages 06–08), lesson 03.
+- **Verified:** build ok; 03a–03c pass their Tic-Tac-Toe checks (turns, filled squares, winner, no moves after a win).

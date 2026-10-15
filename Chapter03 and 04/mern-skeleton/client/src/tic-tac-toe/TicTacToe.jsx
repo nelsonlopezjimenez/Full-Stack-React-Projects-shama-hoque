@@ -50,9 +50,9 @@ export default function Board() {
   // cheap, which is also what lets memo() skip redrawing parts that did not change.
   // Other ways to copy: [...squares], or squares.with(i, 'X') (copy with one item replaced).
   function handleClick(i) {
-    // [BEGINNER] An early return: if the square already holds an X or an O, stop here, so a
-    // click can never overwrite it. (null counts as false, 'X' and 'O' count as true.)
-    if (squares[i]) {
+    // [BEGINNER] An early return: if somebody has already won, or the square already holds an
+    // X or an O, stop here. (null counts as false, 'X' and 'O' count as true.)
+    if (calculateWinner(squares) || squares[i]) {
       return;
     }
     const nextSquares = squares.slice();
@@ -67,6 +67,18 @@ export default function Board() {
     setXIsNext(!xIsNext);
   }
 
+  // [BEGINNER] The status line is not state: it is CALCULATED from the state on every render.
+  // There is nothing to keep in sync, because it can never be out of date.
+  //
+  // [BEGINNER] `Winner: ${winner}` is a template literal: text in backticks, where ${…} puts a
+  // value into the text. It is today's way to build strings; react.dev still writes
+  // 'Winner: ' + winner. `a ? b : c` (a ternary) picks b when a is true, otherwise c.
+  //
+  // [ADVANCED] react.dev declares `let status;` and assigns it in an if/else. A const with a
+  // ternary is the current practice: the value is set once and cannot be changed by accident.
+  const winner = calculateWinner(squares);
+  const status = winner ? `Winner: ${winner}` : `Next player: ${xIsNext ? 'X' : 'O'}`;
+
   // [BEGINNER] A component returns ONE element. Two buttons side by side are two elements, and
   // JSX refuses them ("Adjacent JSX elements must be wrapped in an enclosing tag").
   // <>…</> is a Fragment: a wrapper that groups them but adds nothing to the page.
@@ -77,6 +89,7 @@ export default function Board() {
   // Fragment is needed. A <div> would work too, but would add a real element.
   return (
     <>
+      <div className="status">{status}</div>
       {/* [BEGINNER] className="board-row" matches .board-row in styles.css: each row ends the
           line, so the 3 × 3 squares form a grid instead of one line of nine.
           Your own components start with a capital letter (<Square />), so React can tell them
@@ -103,4 +116,34 @@ export default function Board() {
       </div>
     </>
   );
+}
+
+// [BEGINNER] A plain JavaScript function, not a component: no JSX, no state, it does not even
+// need React. It gets the nine squares and returns 'X', 'O' or null (no winner yet).
+// `lines` lists the eight ways to win: three rows, three columns, two diagonals (by index).
+//
+// [ADVANCED] `for (const [a, b, c] of lines)` visits each line in turn (for…of) and unpacks its
+// three indexes with array destructuring. react.dev uses the older counting loop
+// `for (let i = 0; i < lines.length; i++)` with `lines[i]`; for…of needs no index to manage.
+// Functions like this one,
+// whose result depends only on their arguments, are "pure": easy to test and safe
+// to call during rendering. It is defined below Board, which is fine: function declarations are
+// hoisted, so they exist before the line that calls them runs.
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (const [a, b, c] of lines) {
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
 }
