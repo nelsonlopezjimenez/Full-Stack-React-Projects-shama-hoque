@@ -52,3 +52,11 @@ the stage's own `vite.config.js` on port **5210** with `/api` forwarded to 3210.
 - **Note:** commit 04b has React's "unique key" warning on purpose (as the tutorial does); the stage itself
   (04c) has none.
 - **Verified:** build ok; 04a–04c pass their Tic-Tac-Toe checks; 04b prints the expected key warning, 04c prints none.
+
+## Stage 05 — ttt-time-travel (`teach/ch03-client-05-ttt-time-travel`)
+
+- **Changed:** two commits (05a–05b): "Implementing time travel" and "Final cleanup" (Tic-Tac-Toe ladder
+  stages 12–13), lesson 05 with the tutorial's "Wrapping up" exercises and a table "what you take into stage 06".
+- **Stage 06 starts with a clean-up commit (06a):** it deletes `src/tic-tac-toe/` and puts `App.jsx` and the
+  README back to stage 01. The users-list commit after it is the same change as before the insertion.
+- **Verified:** build ok; 05a–05b pass the time-travel check (jump back, play on, the future is dropped, a winner at the end).
