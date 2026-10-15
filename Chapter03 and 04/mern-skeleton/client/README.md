@@ -17,6 +17,5 @@ This is the React 19 single-page app, built with Vite 8.
 ```
 index.html            the one HTML page; React fills <div id="root">
 src/main.jsx          createRoot + StrictMode
-src/App.jsx           the heading and the game
-src/tic-tac-toe/      React's Tic-Tac-Toe tutorial (stages 02–05): TicTacToe.jsx, styles.css
+src/App.jsx           the first component
 ```
