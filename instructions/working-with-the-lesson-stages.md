@@ -13,20 +13,26 @@ teach/ch03-server-19-tests
 Every stage has a lesson note in `Chapter03 and 04/mern-skeleton/server/lessons/` that explains what's new,
 what to try, and an exercise.
 
-The React client (Chapter 4) continues on top of the last server stage, in **16 more stages**:
+The React client (Chapter 4) continues on top of the last server stage, in **20 more stages**:
 
 ```
 teach/ch03-client-01-hello
+teach/ch03-client-02-ttt-lift-state     ┐
+teach/ch03-client-03-ttt-winner         │ React's Tic-Tac-Toe tutorial,
+teach/ch03-client-04-ttt-keys           │ inside the client, no server needed
+teach/ch03-client-05-ttt-time-travel    ┘
+teach/ch03-client-06-users-list          the first request to the server
 ...
-teach/ch03-client-16-tests
+teach/ch03-client-20-tests
 ```
 
 Their notes are in `Chapter03 and 04/mern-skeleton/client/lessons/`. Everything below works the same way
-for them: replace `server` with `client` in the branch names. To run a client stage, start the server
+for them: replace `server` with `client` in the branch names. From client stage 06 on, start the server
 (`cd server && npm run dev`) and then the client (`cd client && npm install && npm run dev`) in a
-second terminal.
+second terminal. Stages 01–05 need only the client.
 
-**New to React? Start with Tic-Tac-Toe.** React's official tutorial,
+**Tic-Tac-Toe on its own.** Client stages 02–05 group the tutorial four sections at a time. The same
+tutorial also exists as a separate ladder, one stage per section, with more detailed notes. React's official tutorial,
 [Tutorial: Tic-Tac-Toe](https://react.dev/learn/tutorial-tic-tac-toe), is built in **15 stages**, one
 per section of the tutorial (stages 14 and 15 come after it: one file per component, and tests):
 
@@ -262,6 +268,29 @@ git switch --no-track -c my/05-delete upstream/teach/ch03-server-04-read-one
 `--no-track` keeps your branch apart from the instructor's stage: it starts there, but it belongs to
 you, and you push it to your fork (section 6).
 
+**Bring the lesson note along.** Your branch starts at stage 04, and stage 04 does not have lesson 05's
+note yet: it is added *in* stage 05. Copy just that one file from stage 05 into your branch:
+
+```bash
+git restore --source=upstream/teach/ch03-server-05-delete -- ":/Chapter03 and 04/mern-skeleton/server/lessons/05-delete.md"
+```
+
+- `--source=` is the stage to copy from (the stage you are about to build), and the path after `--` is the
+  file. Nothing else in your folder changes.
+- `:/` at the start of the path means "from the top folder of the repository", so the command works from
+  whichever folder your terminal is in.
+- `git status` now shows the note as a new file. Commit it together with your work; then it never shows up
+  as a difference when you compare with the instructor's stage (step 5).
+- The same for a client lesson, for example lesson 06:
+  `git restore --source=upstream/teach/ch03-client-06-users-list -- ":/Chapter03 and 04/mern-skeleton/client/lessons/06-users-list.md"`.
+  Every client lesson starts with these commands, with the right names filled in.
+- Just reading is fine too: `git show "upstream/teach/ch03-server-05-delete:Chapter03 and 04/mern-skeleton/server/lessons/05-delete.md"`
+  prints it in the terminal, and Gitea shows it if you pick the stage's branch.
+
+Every client lesson starts with a **Build it yourself first** section: what must be running, the task in
+small steps, how to check your result, and the command to compare with the finished stage. Try it before
+you look at the stage's code.
+
 1. Read `server/lessons/05-delete.md`.
 2. Write the code yourself.
 3. Test it with `api.http`.
@@ -330,6 +359,8 @@ First, read the error **from the top** and fix only the **first** one: see
 | `'get' is not recognized`, `command not found`, `'upsteam' does not appear to be a git repository`, `is not a git command` | A typo: one letter wrong or missing | Compare letter by letter with this guide; use **Tab** (see *Typo-proof your terminal*) |
 | `fatal: bad revision 'teach/ch03-server-02-...'` | Only branches you switched to exist under the short name | Put `upstream/` in front: `upstream/teach/ch03-server-02-...` |
 | `fatal: bad revision 'upstream/teach/...'` or `'upstream' does not appear to be a git repository` | `upstream` is not connected yet, or not fetched | Section 2, step 3: `git remote add upstream …`, then `git fetch upstream` |
+| `error: pathspec '…lessons/…md' did not match any file(s) known to git` after `git restore --source=…` | The note is not in that stage: wrong stage name, or a typo in the path | Copy the command from the top of the lesson; check that `--source=` names the stage of that lesson |
+| The client stage you knew as `teach/ch03-client-02-users-list` is gone | Tic-Tac-Toe was inserted as client stages 02–05 (October 2026), so the later client stages moved up by 4 | `git fetch upstream --prune`; the users list is now `teach/ch03-client-06-users-list`, and so on up to `…-20-tests`. Your own `my/...` branches are not touched |
 | A stage is **missing** under `origin/teach/...`, or looks older than the lesson | Your fork is a copy from the day you forked | Use `upstream/teach/...` |
 | The diff is **empty** | The path at the end is wrong for the folder you're in | `-- .` inside `server`, `-- server` inside `mern-skeleton` |
 | `Your local changes ... would be overwritten by checkout` | You have unsaved edits | Commit them on your `my/...` branch (or `git stash`), then switch |

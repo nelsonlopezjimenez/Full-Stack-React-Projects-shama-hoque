@@ -1,11 +1,12 @@
 // One browser scenario per client stage: sNN runs against stage NN.
 // A scenario checks what that stage's lesson adds, and some later ones re-run earlier scenarios
-// (s04 runs s03, s13 runs s10, s16 runs s13 + s14) so a later stage cannot silently break them.
+// (s08 runs s07, s17 runs s14, s20 runs s17 + s18) so a later stage cannot silently break them.
 // Each run uses fresh users (the time is in their names and emails), so runs never collide.
 //
 // The helpers use Playwright's user-facing locators: getByRole / getByLabel / getByText find
 // things the way a person (or a screen reader) would, not by CSS classes.
 import { apiBase } from './config.mjs'
+import * as ttt from '../ttt-e2e/scenarios.mjs'
 
 export const s01 = async ({ page, base, see, step }) => {
   step('home page renders the heading')
@@ -13,6 +14,18 @@ export const s01 = async ({ page, base, see, step }) => {
   await see('MERN Skeleton')
   await see('Hello from React.')
 }
+
+// Stages 02–05 are the Tic-Tac-Toe tutorial inside the client: the Tic-Tac-Toe ladder's own
+// scenarios (tools/ttt-e2e) for the last tutorial section of each stage, below the client's heading.
+const game = (scenario) => async (ctx) => {
+  await ctx.page.goto(ctx.base + '/')
+  await ctx.see('MERN Skeleton')
+  await scenario(ctx)
+}
+export const s02 = game(ttt.s05)
+export const s03 = game(ttt.s08)
+export const s04 = game(ttt.s11)
+export const s05 = game(ttt.s13)
 
 // Talks to the API directly (no browser), to prepare data for a scenario.
 export const api = async (method, path, body) => {
@@ -22,7 +35,7 @@ export const api = async (method, path, body) => {
   return { status: r.status, data: await r.json().catch(() => ({})) }
 }
 
-export const s02 = async ({ page, base, see, step, email }) => {
+export const s06 = async ({ page, base, see, step, email }) => {
   const name = 'Lister ' + Date.now()
   const created = await api('POST', '/api/users', { name, email, password: 'secret123' })
   if (created.status !== 201) throw new Error('seed failed ' + JSON.stringify(created))
@@ -44,7 +57,7 @@ export const fillSignup = async (page, { name, email, password }) => {
   await page.getByRole('button', { name: 'Submit' }).click()
 }
 
-export const s03 = async ({ page, base, see, step, email }) => {
+export const s07 = async ({ page, base, see, step, email }) => {
   const name = 'Signer ' + Date.now()
   await page.goto(base + '/')
   step('empty form → all server validation messages')
@@ -60,8 +73,8 @@ export const s03 = async ({ page, base, see, step, email }) => {
   await see('Email already exists')
 }
 
-export const s04 = async (ctx) => {
-  await s03(ctx)
+export const s08 = async (ctx) => {
+  await s07(ctx)
   const { page, see, step } = ctx
   step('form shows "Cannot reach the server" when the request fails')
   await page.route('**/api/users', (route) => route.request().method() === 'POST' ? route.abort() : route.continue())
@@ -70,7 +83,7 @@ export const s04 = async (ctx) => {
   await page.unroute('**/api/users')
 }
 
-export const s05 = async (ctx) => {
+export const s09 = async (ctx) => {
   const { page, base, see, step } = ctx
   await page.goto(base + '/')
   step('MUI home card with the seashell image')
@@ -82,7 +95,7 @@ export const s05 = async (ctx) => {
   const font = await page.locator('body').evaluate((el) => getComputedStyle(el).fontFamily)
   if (!font.includes('Roboto')) throw new Error('font ' + font)
   console.log('  ✓ font', font)
-  await s04(ctx)
+  await s08(ctx)
 }
 
 export const expectUrl = async (page, path) => {
@@ -91,7 +104,7 @@ export const expectUrl = async (page, path) => {
 }
 const hasClass = async (loc, cls) => (await loc.getAttribute('class')).split(' ').includes(cls)
 
-export const s06 = async ({ page, base, see, step, email }) => {
+export const s10 = async ({ page, base, see, step, email }) => {
   const name = 'Router ' + Date.now()
   await page.goto(base + '/')
   await see('MERN Skeleton')
@@ -122,7 +135,7 @@ export const s06 = async ({ page, base, see, step, email }) => {
   await expectUrl(page, '/')
 }
 
-export const s07 = async ({ page, base, see, step, email }) => {
+export const s11 = async ({ page, base, see, step, email }) => {
   const name = 'Profiled ' + Date.now()
   await api('POST', '/api/users', { name, email, password: 'secret123' })
   await page.goto(base + '/users')
@@ -141,7 +154,7 @@ export const fillSignin = async (page, email, password) => {
   await page.getByRole('button', { name: 'Submit' }).click()
 }
 
-export const s08 = async ({ page, base, see, step, email }) => {
+export const s12 = async ({ page, base, see, step, email }) => {
   const name = 'Signin ' + Date.now()
   step('sign up → dialog → Sign In button → /signin')
   await page.goto(base + '/signup')
@@ -175,7 +188,7 @@ export const signUpAndIn = async (page, base, email, name) => {
   await fillSignin(page, email, 'secret123')
 }
 
-export const s09 = async ({ page, base, see, notSee, step, email }) => {
+export const s13 = async ({ page, base, see, notSee, step, email }) => {
   const name = 'Helper ' + Date.now()
   step('signed out: menu offers Sign up / Sign In')
   await page.goto(base + '/')
@@ -220,7 +233,7 @@ const fakeJwt = (payload) => {
   return `${enc({ alg: 'HS256', typ: 'JWT' })}.${enc(payload)}.bad-signature`
 }
 
-export const s10 = async ({ page, base, see, step, email }) => {
+export const s14 = async ({ page, base, see, step, email }) => {
   const name = 'Private ' + Date.now()
   await api('POST', '/api/users', { name, email, password: 'secret123' })
   step('signed out: list → profile redirects to /signin')
@@ -249,7 +262,7 @@ export const s10 = async ({ page, base, see, step, email }) => {
   await expectUrl(page, '/signin')
 }
 
-export const s11 = async ({ page, base, see, notSee, step, email }) => {
+export const s15 = async ({ page, base, see, notSee, step, email }) => {
   const name = 'Editor ' + Date.now()
   const other = 'Other ' + Date.now()
   await api('POST', '/api/users', { name: other, email: 'o' + email, password: 'secret123' })
@@ -289,7 +302,7 @@ export const s11 = async ({ page, base, see, notSee, step, email }) => {
   await see('User is not authorized')
 }
 
-export const s12 = async ({ page, base, see, notSee, step, email }) => {
+export const s16 = async ({ page, base, see, notSee, step, email }) => {
   const name = 'Deleter ' + Date.now()
   await signUpAndIn(page, base, email, name)
   await expectUrl(page, '/')
@@ -319,7 +332,7 @@ export const s12 = async ({ page, base, see, notSee, step, email }) => {
   console.log('  ✓ not in GET /api/users either')
 }
 
-export const s13 = async (ctx) => {
+export const s17 = async (ctx) => {
   const { page, base, see, step, email } = ctx
   step('signup: empty form → all messages')
   await page.goto(base + '/signup')
@@ -352,13 +365,13 @@ export const s13 = async (ctx) => {
   await page.getByRole('button', { name: 'Submit' }).click()
   await expectUrl(page, '/')
   await see('My Profile')
-  step('stage 10 flow (PrivateRoute + from) with the new sign-in form')
+  step('stage 14 flow (PrivateRoute + from) with the new sign-in form')
   await page.evaluate(() => sessionStorage.clear())
   await page.context().clearCookies()
-  await s10({ ...ctx, email: 'p' + email })
+  await s14({ ...ctx, email: 'p' + email })
 }
 
-export const s14 = async (ctx) => {
+export const s18 = async (ctx) => {
   const { page, base, step } = ctx
   step('home page does not download the Signin module')
   const loaded = []
@@ -373,18 +386,18 @@ export const s14 = async (ctx) => {
   console.log('  ✓ Signin.jsx requested when the page opened')
   await page.evaluate(() => sessionStorage.clear())
   await page.context().clearCookies()
-  await s11({ ...ctx, email: 'e' + ctx.email })
+  await s15({ ...ctx, email: 'e' + ctx.email })
   await page.evaluate(() => sessionStorage.clear())
-  await s12({ ...ctx, email: 'x' + ctx.email })
+  await s16({ ...ctx, email: 'x' + ctx.email })
 }
 
-// Stage 15 changes how the app is built and deployed; check-production.mjs covers that.
-// In the dev server it must still sign in and out as in stage 09.
-export const s15 = async (ctx) => { await s09(ctx) }
+// Stage 19 changes how the app is built and deployed; check-production.mjs covers that.
+// In the dev server it must still sign in and out as in stage 13.
+export const s19 = async (ctx) => { await s13(ctx) }
 
-export const s16 = async (ctx) => {
-  await s13(ctx)
+export const s20 = async (ctx) => {
+  await s17(ctx)
   await ctx.page.evaluate(() => sessionStorage.clear())
   await ctx.page.context().clearCookies()
-  await s14({ ...ctx, email: 'z' + ctx.email })
+  await s18({ ...ctx, email: 'z' + ctx.email })
 }

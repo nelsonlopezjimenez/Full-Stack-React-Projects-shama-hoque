@@ -2,6 +2,22 @@
 
 **Status:** approved 2026-10-07 and built: `teach/ch03-client-01-hello` … `teach/ch03-client-16-tests`, plus
 the comment-free `teach-nc/*` series (local only). Changes to the plan are recorded in the log.
+
+> **Renumbered 2026-10-15.** React's Tic-Tac-Toe tutorial was inserted after stage 01, and every later stage
+> moved up by 4. This plan below keeps the **old** numbers (it is the plan as approved). Mapping:
+>
+> | New | Branch | Was |
+> |---|---|---|
+> | 01 | `teach/ch03-client-01-hello` | 01 (one more commit: "Build it yourself first") |
+> | 02 | `teach/ch03-client-02-ttt-lift-state` | new: tutorial from "Setup" to "Lifting state up" |
+> | 03 | `teach/ch03-client-03-ttt-winner` | new: "Why immutability…" to "Declaring a winner" |
+> | 04 | `teach/ch03-client-04-ttt-keys` | new: "Storing a history…" to "Picking a key" |
+> | 05 | `teach/ch03-client-05-ttt-time-travel` | new: "Implementing time travel", "Final cleanup" |
+> | 06–20 | `…-06-users-list` … `…-20-tests` | 02–16 (code unchanged except comments that name stage numbers) |
+>
+> Every client lesson now starts with **Build it yourself first** (start + restore commands, what must be
+> running, the task, "done when", compare). Why and how, and what was verified: the last entry of
+> `ch03-client-ladder-log.md` on the client branches. Old stages: local tags `backup/old-client/*`.
 **Log:** `ch03-client-ladder-log.md`, on the client branches (results of the final check at its end)
 **Starts from:** `teach/ch03-server-19-tests` (the last server stage)
 **Target:** the client of `refactor/ch03-migration`, plus the intended differences listed under

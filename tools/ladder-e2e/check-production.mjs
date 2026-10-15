@@ -1,5 +1,5 @@
 // node check-production.mjs <clientDir> <serverDir>
-// The three ways of running the built client (client stage 15 and later):
+// The three ways of running the built client (client stage 19 and later):
 //   1. `vite preview` of dist/ with the /api proxy
 //   2. one process: the Express server serves dist/ (CLIENT_DIST), with the SPA fallback
 //   3. client on its own origin: a build with VITE_API_URL, against a server with CORS_ORIGIN,

@@ -1,7 +1,7 @@
 # Ladder end-to-end checks
 
 Instructor tooling, not course material. These scripts check that every stage of the Chapter 3/4 client
-ladder (`teach/ch03-client-01-hello` … `teach/ch03-client-16-tests`) still builds and still works in a real
+ladder (`teach/ch03-client-01-hello` … `teach/ch03-client-20-tests`) still builds and still works in a real
 browser. Run them after fixing a stage and rebasing, before pushing.
 
 They were written while the client ladder was built (2026-10-07), and are the checks recorded as "Verified"
@@ -39,7 +39,7 @@ node tools/ladder-e2e/run.mjs --no-suites          # skip npm test at the end
 node tools/ladder-e2e/run.mjs --keep               # leave the worktree, to look around afterwards
 ```
 
-A full run takes about ten minutes, most of it `npm ci` and building 16 stages. The last lines are a summary:
+A full run takes about ten minutes, most of it `npm ci` and building 20 stages. The last lines are a summary:
 one `PASS`/`FAIL` per stage, `production`, `server: node --test` and `client: vitest`.
 Screenshots of failures and the build outputs go to `%TEMP%\ladder-e2e` (`$TMPDIR/ladder-e2e`).
 
@@ -50,7 +50,7 @@ and run `git worktree prune`. A test server still running would hold port 3210; 
 Two things learned the hard way, already handled by the scripts:
 
 - **Short Windows paths.** Node may report the temp folder as `C:\Users\ABCDEF~1\…` (an 8.3 short name). A Vite
-  dev server started there answers 404 for `/@vite/client` as soon as it pre-bundles dependencies (stage 05, MUI),
+  dev server started there answers 404 for `/@vite/client` as soon as it pre-bundles dependencies (stage 09, MUI),
   and the page stays blank. `config.mjs` therefore always uses the long real path of the temp folder.
   Background and other systems: `chat/paths-short-long-and-real.md`.
 - **The first page load is slow** in a fresh install, while Vite pre-bundles the dependencies. `check-stage.mjs`
@@ -68,7 +68,7 @@ scenario causes on purpose (400 on a bad signup, 401, 403, a blocked request) ar
 | `LADDER_VITE_PORT` | `5210` | the stage's Vite dev server |
 | `LADDER_OUT` | `<temp>/ladder-e2e` | where builds and screenshots go |
 
-PowerShell sets them like `$env:LADDER_HEADED='1'; node tools/ladder-e2e/run.mjs --stages 10`.
+PowerShell sets them like `$env:LADDER_HEADED='1'; node tools/ladder-e2e/run.mjs --stages 14`.
 
 ## The files
 
@@ -76,14 +76,14 @@ PowerShell sets them like `$env:LADDER_HEADED='1'; node tools/ladder-e2e/run.mjs
 |---|---|
 | `run.mjs` | the runner: a worktree in the temp folder, `npm ci`, the stage-19 server on 3210, then every stage, then the suites, then cleanup |
 | `check-stage.mjs` | one stage: `vite build`, then the stage's own `vite.config.js` on 5210 (with `/api` sent to 3210), then scenario `sNN` in the browser. Fails on a failed step, an uncaught page error or a React warning in the console. |
-| `check-production.mjs` | stage 15 and later: `vite preview`; Express serving the build (`CLIENT_DIST`); a build with `VITE_API_URL` on another origin with and without `CORS_ORIGIN` |
-| `scenarios.mjs` | the browser scenarios `s01` … `s16`, plus small helpers (`fillSignup`, `fillSignin`, `api`) |
+| `check-production.mjs` | stage 19 and later: `vite preview`; Express serving the build (`CLIENT_DIST`); a build with `VITE_API_URL` on another origin with and without `CORS_ORIGIN` |
+| `scenarios.mjs` | the browser scenarios `s01` … `s20`, plus small helpers (`fillSignup`, `fillSignin`, `api`). `s02`–`s05` (the Tic-Tac-Toe stages) reuse `../ttt-e2e/scenarios.mjs` |
 | `config.mjs` | ports, database, browser, starting a server |
 
-Each scenario checks what its lesson adds. For example `s08` signs in and checks that cookie `t` is `httpOnly` and
-invisible to `document.cookie`, `s10` plants an expired and a forged token, and `s11` opens someone else's edit
-page and expects the server's 403. Some scenarios re-run earlier ones (`s13` runs `s10`, `s16` runs `s13` and
-`s14`), so a later stage cannot quietly break an earlier feature.
+Each scenario checks what its lesson adds. For example `s12` signs in and checks that cookie `t` is `httpOnly` and
+invisible to `document.cookie`, `s14` plants an expired and a forged token, and `s15` opens someone else's edit
+page and expects the server's 403. Some scenarios re-run earlier ones (`s17` runs `s14`, `s20` runs `s17` and
+`s18`), so a later stage cannot quietly break an earlier feature.
 
 **A new or changed stage** needs a matching `sNN` in `scenarios.mjs`. A scenario gets `{ page, base, see, notSee, step, email }`:
 `page` is Playwright's page, `base` the stage's URL, and `email` a fresh address for this run.
@@ -108,8 +108,8 @@ Both kinds matter, for different reasons:
   checked while building this ladder. E2E tests are slower and break more easily, so you keep fewer of them, for
   the paths that matter most. This is the usual "test pyramid": many unit tests, some integration tests, a few e2e tests.
 
-For a teaching ladder, e2e has one more use: after a rebase rewrites 16 stages, it proves that every stage *still
-does what its lesson says*. Unit tests only exist from stage 16 on.
+For a teaching ladder, e2e has one more use: after a rebase rewrites 20 stages, it proves that every stage *still
+does what its lesson says*. Unit tests only exist from stage 20 on.
 
 ## Why these packages
 

@@ -5,7 +5,7 @@
 //   2. installs the server's and the final client's packages there (npm ci)
 //   3. starts the stage-19 server on LADDER_API_PORT with its own database
 //   4. for every client stage: checks it out, runs check-stage.mjs (build + browser scenario);
-//      for stage 15 and later also check-production.mjs once (on the last stage checked)
+//      for stage 19 and later also check-production.mjs once (on the last stage checked)
 //   5. runs the committed test suites of the last stage (server: node --test, client: vitest)
 //   6. stops everything and removes the worktree (--keep leaves it, to look around)
 //
@@ -100,7 +100,7 @@ try {
     results.push([`stage ${nn}`, r.status === 0])
   }
 
-  if (Number(stageOf(lastRef)) >= 15) {
+  if (Number(stageOf(lastRef)) >= 19) {
     console.log('\n===== production builds (on the last stage checked)')
     const r = spawnSync(process.execPath, [path.join(here, 'check-production.mjs'), clientDir, serverDir], { stdio: 'inherit', timeout: 300_000 })
     results.push(['production', r.status === 0])
