@@ -10,6 +10,7 @@
 | `npm config get cache` | `C:\Users\localepsilon\AppData\Local\npm-cache` |
 | Package folders in storage | 3425 (top-level names; a scope like `@babel/` counts once) |
 | `.tgz` tarballs in storage | 8775 |
+| Size of the storage folder | 4.7 GB (`du -sh storage`) |
 | Config backups next to the live config | `config.yaml.1.bak` (2025-11-03), `config.yaml.2.bak` (May 16), `config.yaml.4.cache` (May 16) |
 
 ## Commands to check it
