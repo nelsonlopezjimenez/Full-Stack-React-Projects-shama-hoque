@@ -12,6 +12,12 @@ For everyday syncing (new commits only, nothing rewritten), the gentler commands
 - or you're simply not sure, and want both servers to match exactly.
 
 Everything runs on the **bridge machine** (remotes `github` and `gitea`; check with `git remote -v`).
+
+> **Two networks (2026-10-16).** The bridge reaches GitHub and Gitea only one at a time. Run the
+> `github` commands (`git fetch --prune github`, `git fetch --force github --tags`) while on the GitHub
+> network, and everything that talks to `gitea` later, on the Gitea network. The pushes use the copies of
+> GitHub's branches that the fetch saved on the bridge. See
+> [gitea-sync-via-bridge.md](gitea-sync-via-bridge.md), Part 1 and Part 2.
 **You don't need to switch branches**: the commands never touch your checked-out branch, your local
 branches or your working files.
 
@@ -316,6 +322,10 @@ only deletes Gitea branches that match the pattern (`teach/ch03-server-*`); othe
 
 ## Check that both servers match
 
+> These commands ask both servers at once, so they only work where the bridge reaches both. On two
+> separate networks, use the check in [gitea-sync-via-bridge.md](gitea-sync-via-bridge.md) (Part 2), which
+> compares GitHub's saved copy with a fresh fetch of Gitea.
+
 Bash (Git Bash):
 
 ```bash
@@ -361,11 +371,13 @@ Remove-Item gh.txt, gt.txt
 git config remote.github.followRemoteHEAD never
 git remote set-head github --delete
 
-# every time
+# every time — on the GitHub network
 git fetch --prune github
+git fetch --force github --tags
+
+# later — on the Gitea network
 git fetch --prune gitea
 git push --dry-run --force-with-lease --prune gitea "refs/remotes/github/*:refs/heads/*"
 git push --force-with-lease --prune gitea "refs/remotes/github/*:refs/heads/*"
-git fetch --force github --tags
 git push --force gitea "refs/tags/*:refs/tags/*"
 ```
