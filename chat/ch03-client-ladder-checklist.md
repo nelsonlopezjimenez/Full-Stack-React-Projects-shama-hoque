@@ -144,6 +144,27 @@ As for the server: commit on the stage where the fix belongs, then
 `git switch teach/ch03-client-16-tests && git rebase --update-refs <that stage>`, then run
 `node tools/make-nc-ladder.mjs` again to rebuild the comment-free series.
 
+When the same lines change again in later stages (a rebase would conflict in every one of them), use
+`tools/ladder-replay/` instead: text rules applied to every commit's tree, no conflicts (see its README).
+
+## Modern syntax pass (2026-10-16)
+
+The user asked for async/await wherever possible, one explanation of `.then` → `async`/`await` at the
+start of the client ladder, and current practices and syntax in general. Decisions (user, 2026-10-16):
+Tic-Tac-Toe is modernized too, even where it then differs from react.dev; the stages are rewritten in
+place and force-pushed (no students on the client stages yet).
+
+| ID | Change | Stages | Decision |
+|---|---|---|---|
+| M1 | `Users.jsx`: `fetch` with `async`/`await` + `try`/`catch` inside an async inner function; the comment shows the `.then` version and why `async`/`await` is today's practice; lesson 06 follows | 06–07 | do |
+| M2 | `list()` / `read()` in effects: `.then((data) => …)` → `async function loadX() { const data = await … }` (`Users`, `Profile`, `EditProfile`) | 08–20 | do |
+| M3 | `request.js`: `response.json().catch(() => ({}))` → `try`/`catch` with optional catch binding | 08–20 | do |
+| M4 | `replaceAll` instead of `.replace(/x/g, …)` (`auth-helper.js`, test `helpers.js`) | 13–20 | do |
+| M5 | Tic-Tac-Toe: template literals, `const` + ternary instead of `let` + `if`/`else`, `for…of`; comments show react.dev's version; lessons 02–03 say so | 03c–05 | do |
+| M6 | Semicolons and `function` declarations in Tic-Tac-Toe (react.dev's style) | 02–05 | keep (style, not old syntax) |
+| M7 | `squares.slice()` (lesson 02/03 teach it by name) | 02–05 | keep |
+| M8 | Same changes in the migration code on `main` (`Chapter03 and 04/mern-skeleton/client`) | — | open: only if the ladder is not merged into `main` |
+
 ## Later / ideas
 
 | ID | Idea |
