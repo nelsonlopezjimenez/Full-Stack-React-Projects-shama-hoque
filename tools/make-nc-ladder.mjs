@@ -15,7 +15,7 @@
 // Nobody edits teach-nc branches by hand. Commit dates and authors are copied from the source
 // commits, so a run without changes produces the same commit ids and moves nothing.
 //
-// Removed: //, /* */ and JSX {/* */} comments in .js/.jsx/.mjs/.cjs; <!-- --> in .html;
+// Removed: //, /* */ and JSX {/* */} comments in .js/.jsx/.mjs/.cjs; <!-- --> in .html; /* */ in .css;
 // "# ..." lines in .env.example, .gitignore and .http files (REST Client's "###" separators and
 // "# @name"-style directives stay). Markdown (README, lessons) is documentation and stays.
 // Every stripped JavaScript file is parsed again and must give the same syntax tree.
@@ -101,6 +101,16 @@ const stripHtml = (src) => {
   return tidy(removeRanges(src, ranges))
 }
 
+// /* */ comments in CSS. Quoted strings are matched first and skipped, so a "/*" inside
+// content: '…' or url("…") is never taken for a comment.
+const stripCss = (src) => {
+  const ranges = []
+  for (const m of src.matchAll(/("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|\/\*[\s\S]*?\*\//g)) {
+    if (!m[1]) ranges.push([m.index, m.index + m[0].length])
+  }
+  return tidy(removeRanges(src, ranges))
+}
+
 const stripHashLines = (src) => {
   const ranges = []
   for (const m of src.matchAll(/^[ \t]*#.*$/gm)) {
@@ -114,6 +124,7 @@ const stripperFor = (file) => {
   const base = path.posix.basename(file)
   if (/\.(m|c)?jsx?$/.test(base)) return stripJs
   if (base.endsWith('.html')) return stripHtml
+  if (base.endsWith('.css')) return stripCss
   if (base === '.env.example' || base === '.gitignore' || base.endsWith('.http')) return stripHashLines
   return null
 }
