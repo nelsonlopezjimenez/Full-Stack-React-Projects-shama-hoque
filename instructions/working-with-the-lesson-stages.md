@@ -294,6 +294,29 @@ try changes, but a commit you make there belongs to no branch and is easy to los
 right there: `git switch -c my/try-02b`. Commit your own work before you switch, and use
 `git switch -` (or `git switch <your branch>`) to go back.
 
+**In the browser (Gitea).** You can read every step there too, but not run it (that needs
+`git switch --detach`):
+
+1. Open the [course repository](http://192.168.1.28:3000/s888888/Full-Stack-React-Projects-shama-hoque) and
+   choose the stage in the **branch** menu above the files (type `ttt` to filter).
+2. Click **"N Commits"** in the bar above the files. The newest commit is at the top, so the stage's steps
+   come first, the last step (`02e`) on top; the commits below them belong to earlier stages.
+3. Click a step's **short id** (like `11f9fe7`) to see what that step changed, the same as `git show`.
+   On that page, **Browse Source** (top right) shows all the files as they were after that step.
+
+The same pages have direct addresses. Add them to the course repository's address:
+
+| What | Add |
+|---|---|
+| the steps of a stage | `/commits/branch/teach/ch03-client-02-ttt-lift-state` |
+| what step 02b changed | `/commit/11f9fe7` |
+| one file after step 02b | `/src/commit/11f9fe7/Chapter03%20and%2004/mern-skeleton/client/src/tic-tac-toe/TicTacToe.jsx` |
+| two steps compared (02b → 02d) | `/compare/11f9fe7...2e57b36` |
+
+`%20` is a space in a web address (the folder is `Chapter03 and 04`). On GitHub it works the same way: the
+clock icon with **"N Commits"** opens the history, a click on the message shows the change, and the `<>` button
+in a row ("Browse repository at this point") shows the files after that step.
+
 ---
 
 ## 5. Do a lesson yourself: your own branch
