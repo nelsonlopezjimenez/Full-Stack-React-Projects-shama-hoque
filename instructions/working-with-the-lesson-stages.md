@@ -251,6 +251,49 @@ git diff upstream/teach/ch03-server-04-read-one upstream/teach/ch03-server-05-de
   git show <commit id>
   ```
 
+### Stages with several steps: one commit per step
+
+Some stages are made of several steps, and **each step is its own commit** inside the stage's branch.
+`git switch` to a stage shows only its **last** step; the earlier steps are in the branch's history. The
+Tic-Tac-Toe stages have one step per section of the react.dev tutorial:
+
+| Stage | Steps | One commit each |
+|---|---|---|
+| `teach/ch03-client-02-ttt-lift-state` | 5 | 02a starter Square · 02b building the board · 02c props · 02d interactive square · 02e lifting state up |
+| `teach/ch03-client-03-ttt-winner` | 3 | 03a why immutability · 03b taking turns · 03c declaring a winner |
+| `teach/ch03-client-04-ttt-keys` | 3 | 04a history, lifting state up again · 04b past moves · 04c picking a key |
+| `teach/ch03-client-05-ttt-time-travel` | 2 | 05a time travel · 05b final cleanup |
+| `teach/ch03-client-06-users-list` | 2 | 06a put the game away · 06 the users list |
+| `teach/ch03-server-07-split` | 6 | 07a … 07f (see above) |
+
+The commit message starts with the step, for example `client stage 02b — Tic-Tac-Toe, building the board`.
+
+**List the steps of a stage** (the older stage first, then the stage you want):
+
+```bash
+git log --oneline --reverse upstream/teach/ch03-client-01-hello..upstream/teach/ch03-client-02-ttt-lift-state
+```
+
+- `A..B` means "the commits in B that are not in A", so exactly the steps of stage B.
+- `--oneline` prints one line per commit: its short id (like `11f9fe7`) and its message.
+- `--reverse` lists them oldest first, so in the order you would build them (02a, 02b, …).
+
+**Look at one step** with its id from that list:
+
+```bash
+git show 11f9fe7 -- .            # what this one step changed (from inside the client folder)
+git switch --detach 11f9fe7      # the whole project as it was after this step
+npm run dev                      # run it (in the client folder), look, stop with Ctrl+C
+git switch -                     # back to the branch you were on before
+```
+
+**What `--detach` means.** Normally you are *on a branch*, and new commits are added to that branch.
+`git switch --detach <commit>` puts you on a single commit without any branch; Git calls this a
+**detached HEAD** (`git status` says *HEAD detached at 11f9fe7*). You can look around, run the app and even
+try changes, but a commit you make there belongs to no branch and is easy to lose. To keep it, make a branch
+right there: `git switch -c my/try-02b`. Commit your own work before you switch, and use
+`git switch -` (or `git switch <your branch>`) to go back.
+
 ---
 
 ## 5. Do a lesson yourself: your own branch
