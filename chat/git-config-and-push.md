@@ -44,7 +44,7 @@ What you get from the link: `git status` shows **ahead / behind**, and plain `gi
 State on this machine on 2026-10-03:
 
 - `main` had **no** upstream, probably lost in a `master` → `main` rename (Git still has a `vscode-merge-base` entry for `origin/master`). It was linked with `git branch --set-upstream-to=origin/main main`, and `git status` immediately showed `[ahead 1]` for an unpushed commit.
-- Still without upstream: `refactor/separate-client-server` (it exists on GitHub) and `refactor/ch03-simple-auth` (local only).
+- Still without upstream: `refactor/separate-client-server` (it exists on GitHub) and `refactor/ch03-simple-auth` (local only; deleted 2026-10-16, archived as the tag `backup/ch03-simple-auth`, see [git-tag-before-deleting-a-branch.md](git-tag-before-deleting-a-branch.md)).
 - All `teach/ch03-server-*` branches and `refactor/ch03-migration` were already linked.
 
 To see the links: `git branch -vv`.

@@ -226,6 +226,29 @@ The newest entry goes at the bottom. There is one entry for each commit; a commi
 
 ### Open decisions for the user
 
-- Merge `refactor/ch03-migration` into `main`, or keep it as a separate branch for teaching.
+- ~~Merge `refactor/ch03-migration` into `main`, or keep it as a separate branch for teaching.~~ Done 2026-10-16: rebased onto `main` and fast-forwarded (see the last entry below).
 - Ch05 follow-ups found here: the `router.param` order note in `docs/rest-routes.md`, the `dbErrorHandler` fix, `PUT` vs `PATCH`, jest-dom 7 setup.
 - `later` steps: 6.9 rate limiting, 9.2 Docker.
+
+### 2026-10-16 — Merged into `main`; old branches cleaned up
+- **Changed:** `refactor/ch03-migration` was rebased onto `main` and `main` was fast-forwarded to it (no merge commit). The branch was then deleted locally and on GitHub. The dry run (`git merge-tree`) found 0 conflicts: the branch only touched `Chapter03 and 04/` and two `chat/` files, and `main` had not touched any of them.
+- **Why:** start cleaning up old branches; the migration was finished and had no conflicts with `main`.
+- **Verified:** `Chapter03 and 04/` on `main` is identical to the old branch tip `f916e1c` (`git diff f916e1c main -- "Chapter03 and 04"` is empty).
+- **Notes / surprises:** a rebase gives every commit a new hash, so the hashes in the summary table above are the **old** ones. They match `main` like this:
+
+  | Old (table above) | On `main` | Old | On `main` |
+  |---|---|---|---|
+  | `07cf12f` | `850023a` | `3db2a19` | `c50f2b7` |
+  | `18c7c4e` | `60ffc78` | `cb19e78` | `e3b13ed` |
+  | `3df2e99` | `8459dbe` | `a06f3ae` | `9de62f9` |
+  | `5eb10e8` | `35a7fe4` | `ba0b951` | `91d07bc` |
+  | `606c69e` | `3c6f516` | `5e31f0f` | `24e4a6d` |
+  | `ed49774` | `d5fea00` | `61cb7fd` | `aaba1a4` |
+  | `4799cda` | `44e944e` | `018d252` | `37a9735` |
+  | `74847d5` | `f4768b8` | `665bcc2` | `9b6fdec` |
+  | `3498aaa` | `09256af` | `7051e92` | `884a848` |
+  |  |  | `302417b` | `c0a4dd8` |
+  |  |  | `f916e1c` | `5220327` |
+
+- **`refactor/ch03-simple-auth` deleted, kept as the local tag `backup/ch03-simple-auth` (3265c61).** It was created from `f916e1c` to strip the finished code back to a beginner version (plain-text password, cookie with the user id, then add JWT and hashing back). Of its 22 commits, 20 are the old migration commits above (now on `main`). The other two were only on that branch: `f77b6c6` (the plan `chat/ch03-simple-auth-checklist.md`) and `3265c61` (WIP: steps S1+S2, plain-text password in the model and sign-in). The `teach/ch03-server-*` ladder replaced it: it builds the same sequence forward (stages 09–14: plain password → cookie userId → hasAuthorization → signed cookie → JWT → scrypt). The branch was never pushed. Why a tag instead of keeping the branch: [git-tag-before-deleting-a-branch.md](git-tag-before-deleting-a-branch.md).
+- **Still open:** whether to merge the ladder's last stage `teach/ch03-client-20-tests` into `main`. The dry run shows 24 conflicting files (~54 blocks) in `mern-skeleton/`, because the ladder and the migration built the same folder separately. The code is the same apart from deliberate ladder changes; most of the conflicts are the two sets of comments (migration: what changed from the book; ladder: beginner explanations). Options: take the ladder's side (`-X theirs`), keep `main`'s, resolve file by file, or do not merge the ladder.
