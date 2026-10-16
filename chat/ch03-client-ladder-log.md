@@ -302,3 +302,31 @@ of migration checklist steps, and `auth-helper.js` no longer says the server ign
     (200, `text/html`) and `response.json()` throws *SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON*.
   - **not yet:** the browser scenarios of stages 06–20 (`node tools/ladder-e2e/run.mjs`, renumbered on `main`)
     need MongoDB, which was not running on 2026-10-15.
+
+---
+
+## Change after the build — async/await and current syntax in every stage (2026-10-16)
+
+- **Asked for by the user:** async/await wherever possible, the `.then` pattern and the switch to async/await
+  explained once at the start of the client ladder, and current practices and syntax in general. Decisions:
+  Tic-Tac-Toe is modernized too; the stages are rewritten in place (no students on the client stages yet).
+  Checklist rows M1–M8: "Modern syntax pass" in `chat/ch03-client-ladder-checklist.md` (on `main`).
+- **Changed:**
+  - stage 06 `Users.jsx`: `fetch` with `await` and `try`/`catch` inside `async function loadUsers()`, called
+    right away; the comment shows the `.then` chain, says why async/await is today's practice, and why an
+    effect cannot be `async` itself. Lesson 06: the `fetch` notes, the table and "New ideas" follow;
+  - stages 08–20: `list()` / `read()` in `Users`, `Profile` and `EditProfile` with `await` in an inner async
+    function instead of `.then`; `request.js` reads the body with `try`/`catch` (optional catch binding)
+    instead of `response.json().catch(() => ({}))`;
+  - stages 13–20: `replaceAll` instead of `.replace(/-/g, …)` in `auth-helper.js` (and stage 20's test helper);
+  - stages 03c–05: Tic-Tac-Toe uses template literals, `const` + ternary for `status` and `description`, and
+    `for…of` in `calculateWinner`; each spot's comment shows react.dev's older form. Lessons 02 and 03 say so.
+    Semicolons, `function` declarations and `squares.slice()` stay as in react.dev.
+- **How:** `tools/ladder-replay/replay.mjs` with `transforms-2026-10-16-async-await.mjs` (on `main`): every
+  commit's tree replayed with the rules, messages/authors/dates kept. A rebase would have conflicted in every
+  stage that touches the same effect again. Stage 01 is unchanged (same hash). Old tips: local tags
+  `backup/before-async/ch03-client-02-…` … `20-tests`.
+- **Verified:**
+  - `vite build` ok in stages 02–20; stage 20 `npm test`: 4 files, 13 tests passed;
+  - `node tools/ladder-e2e/run.mjs` (MongoDB running): stages 01–20, production, server `node --test` and
+    client Vitest all PASS. This also closes the 2026-10-15 "not yet" for the browser checks of stages 06–20.
