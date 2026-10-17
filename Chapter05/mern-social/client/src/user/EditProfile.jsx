@@ -111,7 +111,7 @@ class EditProfile extends Component {
   render() {
     const { classes } = this.props;
     const photoUrl = this.state.id
-      ? `/api/users/photo/${this.state.id}?${new Date().getTime()}`
+      ? `/api/users/${this.state.id}/photo?${new Date().getTime()}`
       : '/api/users/defaultphoto';
     if (this.state.redirectToProfile) {
       return <Navigate to={'/user/' + this.state.id} />;

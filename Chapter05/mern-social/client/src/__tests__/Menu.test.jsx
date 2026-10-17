@@ -1,19 +1,24 @@
 /**
  * LEVEL 4 — React component test
  *
- * NOTE (main branch): source files are at client/*.jsx (not client/src/*.jsx).
- * Paths from client/__tests__/ → ../core/Menu, ../auth/auth-helper, etc.
+ * We render a real component, interact with it, and assert on what appears
+ * in the DOM.  No browser needed — jsdom provides the DOM layer.
  *
- * render()         — mount component into jsdom DOM
- * screen           — query the rendered DOM
- * MemoryRouter     — router context without a real browser URL
- * mockReturnValue()— control what isAuthenticated() returns per test
+ * New concepts:
+ *   - render()           — mounts a component into the jsdom DOM
+ *   - screen             — queries the rendered DOM (getByText, queryByText, …)
+ *   - MemoryRouter       — provides router context without a real browser URL bar
+ *   - vi.mock()          — swap auth-helper with a controllable fake
+ *   - mockReturnValue()  — tell the mock what to return for this test
+ *   - getByText()        — assert the element EXISTS (throws if not found)
+ *   - queryByText()      — returns null if not found (use for "should NOT exist")
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 
+// Replace auth-helper so we control what isAuthenticated() returns
 vi.mock('../auth/auth-helper', () => ({
   default: {
     isAuthenticated: vi.fn(),
@@ -21,6 +26,7 @@ vi.mock('../auth/auth-helper', () => ({
   },
 }))
 
+// Replace api-auth so signout() doesn't try to fetch
 vi.mock('../auth/api-auth.jsx', () => ({
   signout: vi.fn().mockResolvedValue({}),
 }))
@@ -28,6 +34,7 @@ vi.mock('../auth/api-auth.jsx', () => ({
 import Menu from '../core/Menu'
 import auth from '../auth/auth-helper'
 
+// Helper: render Menu inside MemoryRouter at a given path
 const renderMenu = (path = '/') =>
   render(
     <MemoryRouter initialEntries={[path]}>
@@ -37,11 +44,13 @@ const renderMenu = (path = '/') =>
 
 describe('Menu component', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
+    vi.clearAllMocks() // reset call counts and return values between tests
   })
 
+  // ── unauthenticated state ──────────────────────────────────────────────────
   describe('when the user is NOT signed in', () => {
     beforeEach(() => {
+      // isAuthenticated() returns false → guest UI
       auth.isAuthenticated.mockReturnValue(false)
     })
 
@@ -58,10 +67,12 @@ describe('Menu component', () => {
     })
   })
 
+  // ── authenticated state ────────────────────────────────────────────────────
   describe('when the user IS signed in', () => {
     const fakeAuth = { token: 'tok', user: { _id: 'u1', name: 'Alice', email: 'a@test.com' } }
 
     beforeEach(() => {
+      // isAuthenticated() returns a JWT-shaped object → logged-in UI
       auth.isAuthenticated.mockReturnValue(fakeAuth)
     })
 

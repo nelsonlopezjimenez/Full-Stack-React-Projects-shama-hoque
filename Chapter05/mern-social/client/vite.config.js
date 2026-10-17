@@ -8,17 +8,15 @@ export default defineConfig({
     port: 5174,
     proxy: {
       '/api': 'http://localhost:3333',
-      '/auth': 'http://localhost:3333',
       '/media': 'http://localhost:3333',
     }
   },
   build: {
-    outDir: 'dist/client'
+    outDir: '../dist/client'
   },
   test: {
     environment: 'jsdom',
-    setupFiles: ['./client/test/setup.js'],
+    setupFiles: ['./src/test/setup.js'],
     globals: true,
-    include: ['client/__tests__/**/*.test.{js,jsx}'],
   }
 })

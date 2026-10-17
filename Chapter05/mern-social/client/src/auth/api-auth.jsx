@@ -1,5 +1,5 @@
 const signin = (user) => {
-  return fetch('/auth/signin/', {
+  return fetch('/api/auth/sessions', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -15,8 +15,8 @@ const signin = (user) => {
 };
 
 const signout = () => {
-  return fetch('/auth/signout/', {
-    method: 'GET',
+  return fetch('/api/auth/sessions', {
+    method: 'DELETE',
   })
     .then((response) => {
       return response.json();

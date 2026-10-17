@@ -83,7 +83,6 @@ class Post extends Component {
     const callApi = this.state.like ? unlike : like;
     const jwt = auth.isAuthenticated();
     callApi(
-      { userId: jwt.user._id },
       { t: jwt.token },
       this.props.post._id
     ).then((data) => {
@@ -116,7 +115,7 @@ class Post extends Component {
       <Card className={classes.card}>
         <CardHeader
           avatar={
-            <Avatar src={'/api/users/photo/' + this.props.post.postedBy._id} />
+            <Avatar src={`/api/users/${this.props.post.postedBy._id}/photo`} />
           }
           action={
             this.props.post.postedBy._id ===
@@ -145,7 +144,7 @@ class Post extends Component {
             <div className={classes.photo}>
               <img
                 className={classes.media}
-                src={'/api/posts/photo/' + this.props.post._id}
+                src={`/api/posts/${this.props.post._id}/photo`}
                 alt='post'
               />
             </div>

@@ -1,20 +1,8 @@
 # Architecture & Refactoring Decisions
 
 ## Project: mern-social (Chapter 05)
-**Branch:** main (single package, original RPC routes)
+**Branch:** main (merged from `refactor/separate-client-server` on 2026-10-17)
 **Last updated:** 2026-05-23
-
-> **Note on branch context:**
-> This file was ported from `refactor/separate-client-server` which contains:
-> - REST route refactor (Section 3) — **not present on this branch**
-> - Client/server folder separation (Section 5) — **not present on this branch**
-> - Vitest test infrastructure across two packages — **adapted for single package below**
->
-> On `main`, routes remain the original RPC style (`POST /auth/signin`,
-> `PUT /api/users/follow`, IDs in `req.body`, etc.). The error handling fixes
-> in Section 7 are implemented here using those original routes. When this
-> branch is eventually reconciled with `refactor/separate-client-server`, the
-> error handling will be adapted to the REST route structure at that time.
 
 ---
 

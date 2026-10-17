@@ -1,7 +1,7 @@
 import User from '../models/user.model.js'
 import jwt from 'jsonwebtoken'
 import { expressjwt } from 'express-jwt'
-import config from './../../config/config.js'
+import config from '../config/config.js'
 
 // at the top of auth.controller.js
 const isDev = process.env.NODE_ENV !== 'production'

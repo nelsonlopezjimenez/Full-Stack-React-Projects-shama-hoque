@@ -48,7 +48,7 @@ class FollowGrid extends Component {
             >
               <Link to={'/user/' + person._id}>
                 <Avatar
-                  src={'/api/users/photo/' + person._id}
+                  src={`/api/users/${person._id}/photo`}
                   className={classes.bigAvatar}
                 />
                 <Typography className={classes.tileText}>

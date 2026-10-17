@@ -51,7 +51,7 @@ class Comments extends Component {
     if (event.keyCode === 13 && event.target.value) {
       event.preventDefault();
       const jwt = auth.isAuthenticated();
-      comment({ userId: jwt.user._id }, { t: jwt.token }, this.props.postId, {
+      comment({ t: jwt.token }, this.props.postId, {
         text: this.state.text,
       }).then((data) => {
         if (data.error) {
@@ -67,10 +67,9 @@ class Comments extends Component {
   deleteComment = (commentItem) => (event) => {
     const jwt = auth.isAuthenticated();
     uncomment(
-      { userId: jwt.user._id },
       { t: jwt.token },
       this.props.postId,
-      commentItem
+      commentItem._id
     ).then((data) => {
       if (data.error) {
         console.log(data.error);
@@ -107,7 +106,7 @@ class Comments extends Component {
           avatar={
             <Avatar
               className={classes.smallAvatar}
-              src={'/api/users/photo/' + auth.isAuthenticated().user._id}
+              src={`/api/users/${auth.isAuthenticated().user._id}/photo`}
             />
           }
           title={
@@ -129,7 +128,7 @@ class Comments extends Component {
             avatar={
               <Avatar
                 className={classes.smallAvatar}
-                src={'/api/users/photo/' + item.postedBy._id}
+                src={`/api/users/${item.postedBy._id}/photo`}
               />
             }
             title={commentBody(item)}

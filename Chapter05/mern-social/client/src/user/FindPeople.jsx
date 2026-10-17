@@ -122,7 +122,7 @@ class FindPeople extends Component {
                   }
                 >
                   <ListItemAvatar className={classes.avatar}>
-                    <Avatar src={'/api/users/photo/' + item._id} />
+                    <Avatar src={`/api/users/${item._id}/photo`} />
                   </ListItemAvatar>
                   <ListItemText primary={item.name} />
                 </ListItem>
