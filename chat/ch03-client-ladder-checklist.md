@@ -165,6 +165,21 @@ place and force-pushed (no students on the client stages yet).
 | M7 | `squares.slice()` (lesson 02/03 teach it by name) | 02–05 | keep |
 | M8 | Same changes in the migration code on `main` (`Chapter03 and 04/mern-skeleton/client`) | — | open: only if the ladder is not merged into `main` |
 
+### Server stages
+
+A survey of all 19 server stages found them already modern (async/await, ES modules, `??`,
+`Object.fromEntries`, optional catch binding, no `.then`). Replayed together with the client ladder,
+which sits on server stage 19.
+
+| ID | Change | Stages | Decision |
+|---|---|---|---|
+| S1 | `config.js`: default `mongoUri` as a template literal instead of `'mongodb://' + … + '/mernskeleton'` | 07a–19 | do |
+| S2 | `tests/4-api.test.js`: `await once(server, 'listening')` (`node:events`) instead of `new Promise` around `server.once` | 19 | do |
+| S3 | `Object.assign(doc, changes)` → Mongoose `doc.set(changes)` | 06, 07, 15 | skip |
+| S4 | `.env.example`: `node -p "crypto.randomBytes(32).toString('hex')"` (no `require` needed) | 12–19 | skip |
+| S5 | `config.js`: comments on why `\|\|`, not `??`, for environment variables (an empty `VAR=` must fall back too) | 07a–19 | do |
+| — | `function()` in Mongoose virtual/hooks (need their own `this`); `scryptSync` (async hashing is a design change) | — | keep |
+
 ## Later / ideas
 
 | ID | Idea |
