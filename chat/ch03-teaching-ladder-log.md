@@ -233,3 +233,27 @@ read 404, patch, patch 404, delete, delete 404): the answers must not change whi
   `getToken`, its test, the default database name and one `.env.example` comment differ;
   `package-lock.json` is identical.
 - Test database `mernskeleton_ladder` dropped at the end; ports 3210–3212 free.
+
+---
+
+## Change after the build — current syntax in the server stages (2026-10-16)
+
+- **Asked for by the user:** current practices and syntax wherever possible. A survey of all 19 stages found
+  the server already modern (async/await, ES modules, `??`, `Object.fromEntries`, optional catch binding);
+  the user chose rows S1, S2 and S5 (`chat/ch03-client-ladder-checklist.md` on `main`, "Server stages").
+- **Changed:**
+  - S1, stages 07a–19 `config/config.js`: the default `mongoUri` is a template literal instead of strings
+    glued with `+`;
+  - S5, same file: comments say why `||` (not `??`) is right for environment variables: an empty `VAR=` in
+    `.env` gives `''`, which should fall back too (`mongoUri` from 07a, `NODE_ENV` from 10);
+  - S2, stage 19 `tests/4-api.test.js`: `await once(server, 'listening')` from `node:events` instead of a
+    hand-made `new Promise` around `server.once`.
+- **Not changed:** `function()` in the Mongoose virtual and hooks (they need their own `this`; the comment says
+  so); `scryptSync` (an async hash would change the design; the comment explains the alternative);
+  `Object.assign` on the document and the `node -e` one-liner in `.env.example` (rows S3, S4: skipped).
+- **How:** `tools/ladder-replay/replay.mjs` with `transforms-2026-10-16-server-syntax.mjs` (on `main`), over
+  the server and client ladders together (the client stages sit on stage 19). Stages 01–06 keep their hashes.
+  Old tips: local tags `backup/before-server-syntax/…`.
+- **Verified:** every new `config.js` (07a–19) gives the same URI as before, `mongodb://localhost:27017/mernskeleton`;
+  with `MONGODB_URI=` and `NODE_ENV=` empty it falls back to the parts and to 'development'. `npm test` on stage
+  19: 19/19 pass.
