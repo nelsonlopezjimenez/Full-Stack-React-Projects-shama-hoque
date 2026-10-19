@@ -38,3 +38,4 @@ git branch -r --list "upstream/teach/*"
 | `Chapter03 and 04/mern-skeleton/` | users, sign-in and authorization: the finished version of the Chapter 3 and 4 ladders |
 | `Chapter05/mern-social/` | the social media app, updated to current React, MUI, Express and Mongoose |
 | `Chapter06 and 07/` … `Chapter11/` | the book's later chapters, mostly as published; not part of the lessons yet |
+| `Chapter12/` | not in the book: exercises on JavaScript built-in methods, for quiz and exam study |

@@ -1,0 +1,13 @@
+{
+  "name": "chapter12-js-built-ins",
+  "private": true,
+  "type": "module",
+  "description": "Practice exercises on JavaScript built-in methods (study material for quizzes and exams)",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:solutions": "node --env-file=solutions/solutions.env --test"
+  }
+}
