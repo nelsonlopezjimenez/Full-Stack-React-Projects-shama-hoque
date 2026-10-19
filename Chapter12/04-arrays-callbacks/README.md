@@ -24,5 +24,25 @@ These call your function once per item: `(item, index, array) => ...`.
 
 ## Files
 
-Status: **outline**. `examples.js`, `exercises.js`, `exercises.test.js` and `quiz.md`
-follow the same pattern as `01-strings/`.
+- `examples.js`: `node 04-arrays-callbacks/examples.js`
+- `exercises.js`: your work (12 exercises; two are "fix the bug")
+- `exercises.test.js`: `node --test 04-arrays-callbacks/exercises.test.js`
+- `quiz.md`: self-check questions, including React ones
+- `react-lists.jsx`: worked React examples. `map` → `<li>`, `filter` then `map`,
+  empty lists, search-as-you-type, and updating state with `map` / `filter`
+- `react-exercises.jsx`: React components for you to finish
+
+The `.jsx` files run in a Vite + React app, not in Node. The steps are at the top of each file
+(and in [instructions/new-vite-react-project-from-the-command-line.md](../../instructions/new-vite-react-project-from-the-command-line.md)).
+
+## map and filter in JSX, in one picture
+
+```jsx
+const passing = students.filter((s) => s.grade >= 70); // keep some items → a shorter array
+
+return (
+  <ul>
+    {passing.map((s) => <li key={s.id}>{s.name}</li>)}  {/* one <li> per item */}
+  </ul>
+);
+```

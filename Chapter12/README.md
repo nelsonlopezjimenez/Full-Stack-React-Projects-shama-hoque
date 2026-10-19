@@ -31,8 +31,8 @@ Node 22 or newer is required (some methods, like `Set.prototype.union`, are new)
 | `01-strings/` | `slice`, `split`, `trim`, `padStart`, `replaceAll`, `at`, ... | ready |
 | `02-numbers-and-math/` | `toFixed`, `parseInt`, `Number.isInteger`, `Math.*` | outline |
 | `03-arrays-basics/` | `push`, `pop`, `slice`, `splice`, `includes`, `indexOf`, `join` | outline |
-| `04-arrays-callbacks/` | `forEach`, `map`, `filter`, `find`, `some`, `every`, `reduce`, `sort` | outline |
-| `05-arrays-modern/` | `at`, `toSorted`, `toReversed`, `with`, `flat`, `flatMap`, `Array.from`, `Object.groupBy` | outline |
+| `04-arrays-callbacks/` | `forEach`, `map`, `filter`, `find`, `some`, `every`, `reduce`, `sort` | ready + React |
+| `05-arrays-modern/` | `Array.from`, `at`, `toSorted`, `toReversed`, `with`, `flat`, `flatMap`, `Object.groupBy` | ready + React |
 | `06-objects/` | `Object.keys/values/entries/fromEntries`, spread, destructuring, `freeze` | outline |
 | `07-map-and-set/` | `Map`, `Set`, set operations (`union`, `intersection`, ...) | outline |
 | `08-json-and-cloning/` | `JSON.stringify/parse`, shallow vs deep copy, `structuredClone` | outline |
@@ -50,6 +50,17 @@ Node 22 or newer is required (some methods, like `Set.prototype.union`, are new)
 ├── exercises.test.js  the checks: node --test 01-strings/exercises.test.js
 └── quiz.md            predict-the-output questions for self-study
 ```
+
+Topics marked "+ React" also have two `.jsx` files that use the same methods
+to build lists in React components:
+
+```text
+04-arrays-callbacks/
+├── react-lists.jsx      worked examples: read them, run them in a Vite app
+└── react-exercises.jsx  components for you to finish
+```
+
+They run in a Vite + React app, not in Node: see the steps at the top of each file.
 
 ## Three questions to ask about every method
 
