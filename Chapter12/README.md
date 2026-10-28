@@ -30,7 +30,7 @@ Node 22 or newer is required (some methods, like `Set.prototype.union`, are new)
 |---|---|---|
 | `01-strings/` | `slice`, `split`, `trim`, `padStart`, `replaceAll`, `at`, ... | ready |
 | `02-numbers-and-math/` | `toFixed`, `parseInt`, `Number.isInteger`, `Math.*` | outline |
-| `03-arrays-basics/` | `push`, `pop`, `slice`, `splice`, `includes`, `indexOf`, `join` | outline |
+| `03-arrays-basics/` | `push`, `pop`, `slice`, `splice`, `includes`, `indexOf`, `join` | ready |
 | `04-arrays-callbacks/` | `forEach`, `map`, `filter`, `find`, `some`, `every`, `reduce`, `sort` | ready + React |
 | `05-arrays-modern/` | `Array.from`, `at`, `toSorted`, `toReversed`, `with`, `flat`, `flatMap`, `Object.groupBy` | ready + React |
 | `06-objects/` | `Object.keys/values/entries/fromEntries`, spread, destructuring, `freeze` | outline |

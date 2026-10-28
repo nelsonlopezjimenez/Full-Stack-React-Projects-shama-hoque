@@ -26,5 +26,12 @@ The first question for every array method: **does it change the original array?*
 
 ## Files
 
-Status: **outline**. `examples.js`, `exercises.js`, `exercises.test.js` and `quiz.md`
-follow the same pattern as `01-strings/`.
+- `examples.js`: `node 03-arrays-basics/examples.js`
+- `exercises.js`: your work (15 exercises; two are "fix the bug"). Some must change the
+  array they get and some must not: the comment above each one says which.
+- `exercises.test.js`: `node --test 03-arrays-basics/exercises.test.js`
+- `quiz.md`: self-check questions
+
+Next: [04-arrays-callbacks](../04-arrays-callbacks/) (`map`, `filter`, `reduce`) and
+[05-arrays-modern](../05-arrays-modern/), where `toReversed`, `toSpliced` and `at`
+replace some of the tricks used here.
