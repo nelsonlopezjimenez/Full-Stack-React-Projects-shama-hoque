@@ -2,8 +2,9 @@
 # A folder can still have its own .gitignore for rules that only make sense there
 # (e.g. dist/ in a Vite client); both files apply.
 
-# Dependencies (recreated with npm install)
-node_modules/
+# Dependencies (recreated with npm install). The * also covers renamed copies
+# such as node_modules.bak/ or node_modules-10.26.2026/.
+node_modules*/
 
 # Secrets: never commit them. .env.example is committed on purpose.
 .env
