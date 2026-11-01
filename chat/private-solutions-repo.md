@@ -43,7 +43,7 @@ git submodule update --remote repos/fullstack-react   # bump to the latest exerc
 
 ### The private repo
 
-`git@github.com:nelsonlopezjimenez/tictactoe-game.git` (private), reused and to be **renamed to `course-solutions`** in the GitHub web UI (Settings → Repository name; GitHub redirects the old URL). One top-level folder per public repo; inside it, paths **mirror the public repo**:
+`git@github.com:nelsonlopezjimenez/course-solutions.git` (private). It reuses the old `tictactoe-game` repo, renamed on 2026-11-01; GitHub redirects the old URL. One top-level folder per public repo; inside it, paths **mirror the public repo**:
 
 ```text
 course-solutions/
