@@ -10,12 +10,18 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const chapterDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
+// The instructor's private solutions repo, cloned at <repo root>/.solutions/.
+// Inside it, paths mirror this repo: full-stack-react-projects/Chapter12/<topic>/.
+const solutionsDir = path.join(
+  chapterDir, '..', '.solutions', 'full-stack-react-projects', path.basename(chapterDir),
+);
+
 export async function loadExercises(testFileUrl) {
   const topicDir = path.dirname(fileURLToPath(testFileUrl));
   const topic = path.basename(topicDir);
 
   const file = process.env.CH12_SOLUTIONS
-    ? path.join(chapterDir, 'solutions', topic, 'exercises.js')
+    ? path.join(solutionsDir, topic, 'exercises.js')
     : path.join(topicDir, 'exercises.js');
 
   return import(pathToFileURL(file).href);

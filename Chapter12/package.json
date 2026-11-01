@@ -8,6 +8,6 @@
   },
   "scripts": {
     "test": "node --test",
-    "test:solutions": "node --env-file=solutions/solutions.env --test"
+    "test:solutions": "node --env-file=../.solutions/full-stack-react-projects/Chapter12/solutions.env --test"
   }
 }
