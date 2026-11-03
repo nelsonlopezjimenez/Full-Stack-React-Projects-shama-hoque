@@ -1,6 +1,17 @@
 
 
 
+> **Students of this course:** start with the [Course guide](COURSE-GUIDE.md).
+> **Keep your fork's `main` up to date on the command line only**, never with VS Code's Sync button or
+> Gitea's Sync fork button: see [Keeping your `main` up to date](instructions/updating-main.md).
+>
+> ```bash
+> git switch main
+> git fetch upstream
+> git merge --ff-only upstream/main
+> git push origin main
+> ```
+
 # Full-Stack React Projects
 This is the code repository for [Full-Stack React Projects](https://www.packtpub.com/web-development/full-stack-react-projects?utm_source=github&utm_medium=repository&utm_campaign=9781788835534), published by [Packt](https://www.packtpub.com/?utm_source=github). It contains all the supporting project files necessary to work through the book from start to finish.
 ## About the Book

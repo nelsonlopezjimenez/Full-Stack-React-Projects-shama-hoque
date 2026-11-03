@@ -1,7 +1,7 @@
 # Git: push syntax, upstream tracking, and the settings used on every machine
 
 **Date:** 2026-10-03
-**Related:** [vscode-declutter-and-autocomplete.md](vscode-declutter-and-autocomplete.md) (editor settings), [git-local-exclude.md](git-local-exclude.md) (per-clone ignore rules), [gist-exercise-answers-and-git-auth.md](gist-exercise-answers-and-git-auth.md) (HTTPS vs SSH, credential security)
+**Related:** [git-student-fork-main-diverged.md](git-student-fork-main-diverged.md) (student `main` diverged after VS Code Sync), [vscode-declutter-and-autocomplete.md](vscode-declutter-and-autocomplete.md) (editor settings), [git-local-exclude.md](git-local-exclude.md) (per-clone ignore rules), [gist-exercise-answers-and-git-auth.md](gist-exercise-answers-and-git-auth.md) (HTTPS vs SSH, credential security)
 
 ---
 

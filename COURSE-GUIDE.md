@@ -10,6 +10,7 @@ Read these on the `main` branch. They are not there while a lesson stage is chec
 | Page | Read it when |
 |---|---|
 | [Working with the lesson stages](instructions/working-with-the-lesson-stages.md) | first: fork, clone, `upstream`, switching stages, diffs, your own `my/…` branches |
+| [Keeping your `main` up to date](instructions/updating-main.md) | the instructor announces changes, or Git says `divergent branches` / `Not possible to fast-forward`. **Command line only, no Sync button** |
 | [A new Vite + React project from the command line](instructions/new-vite-react-project-from-the-command-line.md) | you build a client yourself: `npm init`, `npm pkg set`, installing Vite and React |
 | [Reading error messages](instructions/reading-error-messages.md) | something fails and the terminal is full of red text |
 

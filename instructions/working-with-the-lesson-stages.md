@@ -183,6 +183,20 @@ always gets the newest stages straight from the course repository. So in this gu
 Your fork also holds old copies of the `teach/...` branches from the day you forked. Ignore them (or
 delete them, see section 9). Never use `origin/teach/...`.
 
+**Your `main`** is updated from `upstream` too, **on the command line only**: no VS Code **Sync
+Changes**/**Pull** and no Gitea **Sync fork** on `main`. Those buttons merge, and your `main` stops
+matching the course repository. Once per clone, run `git config pull.ff only`. Then, whenever the
+instructor announces changes:
+
+```bash
+git switch main
+git fetch upstream
+git merge --ff-only upstream/main
+git push origin main
+```
+
+Why, and how to repair a `main` that already diverged: [Keeping your `main` up to date](updating-main.md).
+
 ---
 
 ## 3. Look at a stage
@@ -412,6 +426,8 @@ when your instructor asks for it.
 3. **Stages from `upstream`, your work to `origin`.** Never use `origin/teach/...`: those are old copies.
 4. **Work on `my/...` branches only.**
 5. Run `npm install` after switching stages.
+6. **Update `main` on the command line only** (`git merge --ff-only upstream/main`), never with VS Code's
+   Sync button or Gitea's Sync fork. See [Keeping your `main` up to date](updating-main.md).
 
 ---
 
@@ -436,6 +452,7 @@ First, read the error **from the top** and fix only the **first** one: see
 | `Unable to connect to database` | MongoDB isn't running, or the address in `.env` is wrong | Start MongoDB; check `MONGODB_URI` in `.env` |
 | `EADDRINUSE` | Another server already uses port 3000 | Stop the other one, or set `PORT=3001` in `.env` (and in `api.http`) |
 | `Need to specify how to reconcile divergent branches` | You committed on a branch that was also updated by the instructor | Ask your instructor. Next time, work on a `my/...` branch |
+| On `main`: `Not possible to fast-forward`, `divergent branches`, or a `Merge branch 'main' of …` commit you didn't make | `main` was synced with a button (VS Code Sync, Gitea Sync fork) and got a merge commit | Reset `main` to `upstream/main`: section 3 of [Keeping your `main` up to date](updating-main.md) |
 
 ---
 
