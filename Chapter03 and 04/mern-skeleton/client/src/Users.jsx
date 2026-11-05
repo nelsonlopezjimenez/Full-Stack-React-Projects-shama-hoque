@@ -14,13 +14,37 @@ const Users = () => {
     const controller = new AbortController()
     // [BEGINNER] A relative URL: the request goes to the same server that sent the page (Vite, on
     // port 5173), and Vite forwards everything under /api to Express (see vite.config.js).
-    fetch('/api/users', { signal: controller.signal })
-      .then((response) => response.json())
-      .then((data) => setUsers(data))
-      .catch((err) => {
+    // [BEGINNER] The effect function itself cannot be async: an async function returns a
+    // Promise, but React expects the effect to return nothing or a cleanup function. So the
+    // async code lives in an inner function that is defined and then called right away.
+    const loadUsers = async () => {
+      try {
+        // [BEGINNER] await pauses this function (not the page) until the Promise settles.
+        const response = await fetch('/api/users', { signal: controller.signal })
+        const data = await response.json()
+        setUsers(data)
+      } catch (err) {
         // An aborted request (see the cleanup below) is not an error worth showing.
         if (err.name !== 'AbortError') setError('Cannot reach the server')
-      })
+      }
+    }
+    loadUsers()
+
+    // [BEGINNER] Alternative: axios, a popular library instead of the browser's built-in fetch.
+    // It needs `npm install axios` and `import axios from 'axios'` at the top of this file.
+    // Differences from fetch: axios parses the JSON itself (the body is in response.data), and
+    // it throws on HTTP errors such as 404 or 500, which fetch only reports as response.ok false.
+    // const loadUsers = async () => {
+    //   try {
+    //     const response = await axios.get('/api/users', { signal: controller.signal })
+    //     setUsers(response.data)
+    //   } catch (err) {
+    //     // axios names a cancelled request 'CanceledError' (fetch says 'AbortError').
+    //     if (!axios.isCancel(err)) setError('Cannot reach the server')
+    //   }
+    // }
+    // loadUsers()
+
     // [BEGINNER] The function returned by an effect is its cleanup: it runs when the page is
     // left, so a late answer is ignored instead of updating a page that is gone.
     // [ADVANCED] In development, StrictMode runs every effect twice on purpose (mount, cleanup,
