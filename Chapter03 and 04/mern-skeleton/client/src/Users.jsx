@@ -25,6 +25,16 @@ const Users = () => {
     // ordinary code, local variables stay in scope, and errors are caught with the same
     // try/catch as any other exception. Underneath it is still the same Promises: `await p`
     // is `p.then(...)` written differently.
+    //// [BEGINNER] Alternative: axios, a popular library instead of the browser's built-in fetch.
+    // It needs `npm install axios` and `import axios from 'axios'` at the top of this file.
+    // Differences from fetch: axios parses the JSON itself (the body is in response.data), and
+    // it throws on HTTP errors such as 404 or 500, which fetch only reports as response.ok false.
+    //
+    //   const response = await axios.get('/api/users', { signal: controller.signal })
+    //   setUsers(response.data)
+    //   ...
+    //   // axios names a cancelled request 'CanceledError' (fetch says 'AbortError').
+    //   if (!axios.isCancel(err)) setError('Cannot reach the server')
     //
     // [BEGINNER] The effect function itself cannot be async: React expects it to return nothing
     // or a cleanup function, and an async function always returns a Promise. So the async work
