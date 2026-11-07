@@ -7,15 +7,14 @@ export const list = async (signal) => {
      return  await loadUsers
 }
 
-export const create = (user) => {
-    const createUser = request('/api/users',
+export const create = async (user) => {
+    const createOneUser = await request('/api/users',
         {
             method:'POST',
-            body: "",
-            signal: 'signal'
+            body: user,
         }
     )
-    return 'created one user'
+    return createOneUser
 }
 export default {
     list,

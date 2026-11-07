@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import api from './api-user.js'
 
 const Signup = ({ onCreated }) => {
     const cout = (event) => console.log(event)
@@ -15,16 +16,18 @@ const Signup = ({ onCreated }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError('');
-        const resp = await fetch('/api/users', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        })
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) {   //400,500,...
-            setError(data.error ?? `Server error (${resp.status})`)
+        try {
+            const setOneUser = await api.create(formData)
+        } catch (err) {
+            setError(err.message)
             return
         }
+        // in request.js error is thrown not returned!!!!
+        // const data = await resp.json().catch(() => ({}));
+        // if (!resp.ok) {   //400,500,...
+        //     setError(data.error ?? `Server error (${resp.status})`)
+        //     return
+        // }
         setFormData({ name: "", email: "", password: "" })
         onCreated()
     }

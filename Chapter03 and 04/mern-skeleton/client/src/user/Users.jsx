@@ -8,15 +8,20 @@ const Users = () => {
   useEffect(() => {
     const controller = new AbortController()
 
-    const listAllUsers = async () => {
-      const data = await api.list(controller.signal)
-      setUsers(data)
+    const listAllUsers = async () => { 
+      try {
+        const data = await api.list(controller.signal)
+        setUsers(data)
+      } catch (err) {
+        setError(err.message)
+      }
     }
     const getAllUsers =  async () => {
       const data = await list(controller.signal)
       setUsers(data)
     }
     listAllUsers()
+    // getAllUsers() // error unreachable
 
     return () => controller.abort()
   }, [])

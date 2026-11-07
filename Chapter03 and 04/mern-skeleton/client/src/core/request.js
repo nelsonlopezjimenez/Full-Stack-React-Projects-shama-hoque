@@ -6,9 +6,8 @@ const request = async (path, { method, body, signal }) => {
     })
     const data = await resp.json().catch(() => ({}));
     if (!resp.ok) {   //400,500,...
-        return (data.error ?? `Server error (${resp.status})`)
+        throw new Error (data.error ?? `Server error (${resp.status})`)
     }
-    // console.log('line11', data)
     return data
 }
 export default request
