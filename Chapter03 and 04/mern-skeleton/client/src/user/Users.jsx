@@ -9,11 +9,16 @@ const Users = () => {
   useEffect(() => {
     const controller = new AbortController()
 
+    const listAllUsers = async () => {
+      const data = await api.list(controller.signal)
+      setUsers(data)
+    }
     const getAllUsers =  async () => {
       const data = await list(controller.signal)
       setUsers(data)
     }
-    getAllUsers()
+    listAllUsers()
+    
     return () => controller.abort()
   }, [])
   return (
