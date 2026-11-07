@@ -4,14 +4,11 @@ import Signup from './Signup.jsx';
 
 const App = () => {
   const [version, setVersion] = useState(0);
-  
-  const onCreated = (version) => {
-    return version + 1 
-  }
+
   return(
   <main>
     <h1>MERN Skeleton</h1>
-    <Signup onCreated={onCreated} />
+    <Signup onCreated={() => setVersion( (v) => v + 1)} />
     <Users key={version}  />
   </main>
   )
