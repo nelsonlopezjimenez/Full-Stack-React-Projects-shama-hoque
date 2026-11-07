@@ -4,7 +4,6 @@ export const list = async (signal) => {
     const loadUsers =  await request('/api/users',
         {method:'get', signal: signal}
      )
-    // console.log('line8', loadUsers)
      return  await loadUsers
 }
 

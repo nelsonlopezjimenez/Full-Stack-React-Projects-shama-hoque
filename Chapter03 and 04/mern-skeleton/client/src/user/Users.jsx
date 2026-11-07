@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-// import request from '../core/request.js'
 import api from './api-user.js'
 import {list} from './api-user.js'
 
@@ -18,13 +17,12 @@ const Users = () => {
       setUsers(data)
     }
     listAllUsers()
-    
+
     return () => controller.abort()
   }, [])
   return (
     <section>
       <h2>All Users : {users.length}</h2>
-      {/* [BEGINNER] `condition && <p>...</p>`: show the paragraph only when there is an error. */}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <ul>
         {users.map((item) => (
