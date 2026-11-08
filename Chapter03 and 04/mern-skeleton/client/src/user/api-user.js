@@ -1,21 +1,11 @@
 import request from '../core/request.js'
 
-export const list = async (signal) => {
-    const loadUsers =  await request('/api/users',
-        {method:'get', signal: signal}
-     )
-     return  await loadUsers
-}
+export const list = (signal) =>
+    request('/api/users', { signal })
 
-export const create = async (user) => {
-    const createOneUser = await request('/api/users',
-        {
-            method:'POST',
-            body: user,
-        }
-    )
-    return createOneUser
-}
+export const create = (user) =>
+    request('/api/users', { method: 'POST', body: user })
+
 export default {
     list,
     create

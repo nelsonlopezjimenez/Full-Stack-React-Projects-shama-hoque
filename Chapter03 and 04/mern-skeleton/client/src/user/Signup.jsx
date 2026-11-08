@@ -16,18 +16,11 @@ const Signup = ({ onCreated }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError('');
-        try {
-            const setOneUser = await api.create(formData)
-        } catch (err) {
-            setError(err.message)
+        const data = await api.create(formData)
+        if (data.error) {   // request() never throws: errors come back as { error }
+            setError(data.error)
             return
         }
-        // in request.js error is thrown not returned!!!!
-        // const data = await resp.json().catch(() => ({}));
-        // if (!resp.ok) {   //400,500,...
-        //     setError(data.error ?? `Server error (${resp.status})`)
-        //     return
-        // }
         setFormData({ name: "", email: "", password: "" })
         onCreated()
     }
